@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ScholarLib — Production School Library Management System">
+<title>ScholarLib — Library Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Supabase JS v2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- SheetJS for Excel/CSV parsing -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --ink: #1c1917;
+  --ink-2: #292524;
+  --ink-muted: #78716c;
+  --ink-faint: #a8a29e;
+  --surface: #fafaf9;
+  --surface-2: #f5f4f2;
+  --surface-3: #e8e5e0;
+  --surface-4: #d6d2cb;
+  --rust: #c2410c;
+  --rust-2: #ea580c;
+  --rust-light: #fff7ed;
+  --rust-mid: #fed7aa;
+  --teal: #0d6e6e;
+  --teal-2: #0f766e;
+  --teal-light: #f0fdfa;
+  --amber: #b45309;
+  --amber-light: #fffbeb;
+  --emerald: #166534;
+  --emerald-light: #f0fdf4;
+  --crimson: #be123c;
+  --crimson-light: #fff1f2;
+  --violet: #5b21b6;
+  --violet-light: #f5f3ff;
+  --border: #e2ddd8;
+  --border-2: #d0cbc4;
+  --shadow-xs: 0 1px 2px rgba(28,25,23,0.05);
+  --shadow-sm: 0 1px 6px rgba(28,25,23,0.08);
+  --shadow-md: 0 4px 16px rgba(28,25,23,0.10);
+  --shadow-lg: 0 12px 40px rgba(28,25,23,0.14);
+  --shadow-xl: 0 24px 64px rgba(28,25,23,0.18);
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --sidebar-w: 256px;
+  --topbar-h: 60px;
+  --t: 0.18s ease;
+}
+
+[data-theme="dark"] {
+  --ink: #fafaf9;
+  --ink-2: #e7e5e4;
+  --ink-muted: #a8a29e;
+  --ink-faint: #78716c;
+  --surface: #141210;
+  --surface-2: #1c1917;
+  --surface-3: #28231f;
+  --surface-4: #362f2b;
+  --rust: #fb923c;
+  --rust-2: #f97316;
+  --rust-light: #1c1008;
+  --rust-mid: #431407;
+  --teal: #5eead4;
+  --teal-2: #2dd4bf;
+  --teal-light: #042f2e;
+  --amber: #fbbf24;
+  --amber-light: #1c1300;
+  --emerald: #86efac;
+  --emerald-light: #052e16;
+  --crimson: #fb7185;
+  --crimson-light: #1f0010;
+  --border: #2e2926;
+  --border-2: #3d3632;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,0.7);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  transition: background var(--t), color var(--t);
+  overflow-x: hidden;
+}
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+table { border-collapse: collapse; width: 100%; }
+img { max-width: 100%; }
+
+/* ═══════════════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════════════ */
+#authScreen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#authScreen.hidden { display: none; }
+
+.auth-container {
+  width: 100%; max-width: 420px;
+}
+.auth-logo {
+  text-align: center; margin-bottom: 32px;
+}
+.auth-logo-icon {
+  width: 64px; height: 64px; background: var(--rust);
+  border-radius: var(--r-lg); display: inline-flex;
+  align-items: center; justify-content: center;
+  font-size: 28px; margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(194,65,12,0.3);
+}
+.auth-logo h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; color: var(--ink); margin-bottom: 6px;
+}
+.auth-logo p { font-size: 0.87rem; color: var(--ink-muted); }
+
+.auth-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+}
+.auth-tabs {
+  display: flex; gap: 0;
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+  padding: 3px; margin-bottom: 24px;
+}
+.auth-tab {
+  flex: 1; padding: 8px; text-align: center;
+  border-radius: 4px; font-size: 0.87rem; font-weight: 600;
+  color: var(--ink-muted); transition: all var(--t); cursor: pointer;
+}
+.auth-tab.active {
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-xs);
+}
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form-group { display: flex; flex-direction: column; gap: 5px; }
+.auth-form-group label { font-size: 0.82rem; font-weight: 600; color: var(--ink-muted); }
+.auth-input {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink); font-size: 0.9rem;
+  transition: border-color var(--t);
+}
+.auth-input:focus { outline: none; border-color: var(--rust); }
+.auth-select {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink); font-size: 0.9rem; cursor: pointer;
+}
+.auth-btn {
+  padding: 11px;
+  background: var(--rust);
+  color: #fff; border-radius: var(--r-sm);
+  font-size: 0.92rem; font-weight: 600;
+  transition: all var(--t); margin-top: 4px;
+}
+.auth-btn:hover { background: var(--rust-2); box-shadow: 0 4px 12px rgba(194,65,12,0.35); }
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--ink-faint); font-size: 0.8rem; margin: 4px 0;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.auth-oauth-btn {
+  padding: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 0.87rem; font-weight: 600;
+  color: var(--ink); display: flex;
+  align-items: center; justify-content: center; gap: 8px;
+  transition: all var(--t);
+}
+.auth-oauth-btn:hover { background: var(--surface-3); }
+.auth-error {
+  background: var(--crimson-light);
+  color: var(--crimson);
+  border: 1px solid rgba(190,18,60,0.2);
+  border-radius: var(--r-sm);
+  padding: 10px 14px; font-size: 0.83rem;
+  display: none;
+}
+.auth-error.visible { display: block; }
+.auth-demo-hint {
+  text-align: center; margin-top: 16px;
+  font-size: 0.78rem; color: var(--ink-faint);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════
+   APP LAYOUT
+═══════════════════════════════════════════════════ */
+#appShell { display: flex; width: 100%; min-height: 100vh; }
+#appShell.hidden { display: none; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--ink-2);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform var(--t);
+  overflow: hidden;
+}
+[data-theme="dark"] .sidebar {
+  background: var(--surface-3);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-mark {
+  width: 38px; height: 38px;
+  background: var(--rust);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(194,65,12,0.4);
+}
+.logo-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: #fff; line-height: 1.1;
+}
+.logo-name span {
+  display: block; font-family: 'DM Sans', sans-serif;
+  font-size: 0.6rem; color: rgba(255,255,255,0.45);
+  font-weight: 400; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-top: 2px;
+}
+
+.sidebar-user {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  background: var(--rust);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  flex-shrink: 0; font-family: 'Playfair Display', serif;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 0.85rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.06em; }
+.user-logout { color: rgba(255,255,255,0.4); font-size: 0.85rem; cursor: pointer; padding: 4px; transition: color var(--t); }
+.user-logout:hover { color: var(--rust); }
+
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.nav-label {
+  font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); padding: 14px 20px 5px;
+  font-weight: 600;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  transition: all var(--t);
+  position: relative;
+  font-size: 0.88rem; font-weight: 500;
+  user-select: none;
+}
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-item.active { color: #fff; background: rgba(194,65,12,0.2); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 65%; background: var(--rust);
+  border-radius: 0 2px 2px 0;
+}
+.nav-item.hidden-role { display: none; }
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; background: var(--rust);
+  color: #fff; font-size: 0.68rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.theme-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.07);
+  border-radius: var(--r-sm); padding: 8px 14px;
+  color: rgba(255,255,255,0.65); font-size: 0.82rem;
+  width: 100%; transition: all var(--t);
+}
+.theme-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1; min-height: 100vh;
+  display: flex; flex-direction: column;
+  transition: margin var(--t);
+}
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: var(--topbar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  transition: background var(--t);
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  cursor: pointer; padding: 4px;
+}
+.hamburger span { width: 20px; height: 2px; background: var(--ink); border-radius: 2px; transition: all var(--t); }
+.page-breadcrumb { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.topbar-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); font-size: 0.8rem;
+  font-weight: 500; color: var(--ink-muted);
+  cursor: pointer; transition: all var(--t);
+}
+.topbar-chip:hover { background: var(--surface-3); color: var(--ink); }
+
+.page-content { padding: 24px 28px; flex: 1; }
+
+/* ═══════════════════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════════════════ */
+.section { display: none; animation: fadeIn 0.2s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════════════════
+   CARDS / STATS
+═══════════════════════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  position: relative; overflow: hidden;
+  transition: box-shadow var(--t), transform var(--t);
+  cursor: default;
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-card::after {
+  content: ''; position: absolute;
+  top: 0; right: 0; width: 80px; height: 80px;
+  border-radius: 0 0 0 80px;
+  opacity: 0.07;
+}
+.stat-card.s-rust::after { background: var(--rust); }
+.stat-card.s-teal::after { background: var(--teal); }
+.stat-card.s-amber::after { background: var(--amber); }
+.stat-card.s-emerald::after { background: var(--emerald); }
+
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.15rem; margin-bottom: 14px;
+}
+.s-rust .stat-icon { background: var(--rust-light); }
+.s-teal .stat-icon { background: var(--teal-light); }
+.s-amber .stat-icon { background: var(--amber-light); }
+.s-emerald .stat-icon { background: var(--emerald-light); }
+
+.stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; line-height: 1; margin-bottom: 3px;
+}
+.stat-lbl { font-size: 0.8rem; color: var(--ink-muted); font-weight: 500; }
+
+/* Cards */
+.card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.card-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-weight: 600; font-size: 0.92rem; font-family: 'Playfair Display', serif; }
+.card-body { padding: 18px 20px; }
+
+/* Dashboard grid */
+.dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 18px; }
+
+/* Activity */
+.activity-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.a-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.a-issue { background: var(--rust); }
+.a-return { background: var(--teal); }
+.a-add { background: var(--emerald); }
+.a-delete { background: var(--amber); }
+.a-text { font-size: 0.82rem; color: var(--ink-muted); line-height: 1.5; }
+.a-text strong { color: var(--ink); }
+.a-time { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; display: block; }
+
+/* ═══════════════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════════════ */
+.sec-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; gap: 14px; flex-wrap: wrap;
+}
+.sec-header h2 { font-family: 'Playfair Display', serif; font-size: 1.45rem; }
+.sec-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--r-sm);
+  font-size: 0.85rem; font-weight: 600;
+  transition: all var(--t); cursor: pointer; border: none;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--rust); color: #fff; }
+.btn-primary:hover { background: var(--rust-2); box-shadow: 0 4px 12px rgba(194,65,12,0.35); }
+.btn-secondary { background: var(--surface-3); color: var(--ink); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface-4); }
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-teal:hover { opacity: 0.88; }
+.btn-amber { background: var(--amber); color: #fff; }
+.btn-amber:hover { opacity: 0.88; }
+.btn-danger { background: var(--crimson); color: #fff; }
+.btn-danger:hover { opacity: 0.88; }
+.btn-emerald { background: var(--emerald); color: #fff; }
+.btn-emerald:hover { opacity: 0.88; }
+.btn-sm { padding: 6px 11px; font-size: 0.78rem; }
+.btn-xs { padding: 4px 8px; font-size: 0.73rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════
+   SEARCH & FILTER
+═══════════════════════════════════════════════════ */
+.search-wrap {
+  position: relative; flex: 1; min-width: 180px; max-width: 320px;
+}
+.search-wrap input {
+  width: 100%; padding: 8px 12px 8px 34px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); color: var(--ink); font-size: 0.85rem;
+  transition: all var(--t);
+}
+.search-wrap input:focus { outline: none; border-color: var(--rust); box-shadow: 0 0 0 3px rgba(194,65,12,0.1); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%); color: var(--ink-faint);
+  font-size: 0.88rem; pointer-events: none;
+}
+.flt-select {
+  padding: 8px 12px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--ink); font-size: 0.85rem; cursor: pointer;
+  transition: all var(--t);
+}
+.flt-select:focus { outline: none; border-color: var(--rust); }
+
+/* ═══════════════════════════════════════════════════
+   TABLES
+═══════════════════════════════════════════════════ */
+.tbl-wrap {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.tbl-scroll { overflow-x: auto; }
+.tbl {
+  width: 100%; font-size: 0.84rem;
+}
+.tbl thead tr { background: var(--surface-3); }
+.tbl th {
+  padding: 11px 14px; text-align: left;
+  font-weight: 600; color: var(--ink-muted);
+  font-size: 0.75rem; letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer;
+  user-select: none; transition: color var(--t);
+}
+.tbl th:hover { color: var(--ink); }
+.tbl th.sorted { color: var(--rust); }
+.tbl td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink); vertical-align: middle;
+}
+.tbl tbody tr:last-child td { border-bottom: none; }
+.tbl tbody tr:hover { background: var(--surface-3); }
+.tbl tbody tr { transition: background var(--t); }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+}
+.badge-green { background: var(--emerald-light); color: var(--emerald); }
+.badge-red { background: var(--crimson-light); color: var(--crimson); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-teal { background: var(--teal-light); color: var(--teal); }
+.badge-gray { background: var(--surface-3); color: var(--ink-muted); }
+.badge-rust { background: var(--rust-light); color: var(--rust); }
+.badge-violet { background: var(--violet-light); color: var(--violet); }
+
+/* Table actions */
+.t-actions { display: flex; gap: 5px; align-items: center; }
+.btn-te { background: var(--teal-light); color: var(--teal); padding: 4px 9px; border-radius: 5px; font-size: 0.76rem; font-weight: 600; transition: all var(--t); }
+.btn-te:hover { background: var(--teal); color: #fff; }
+.btn-dl { background: var(--crimson-light); color: var(--crimson); padding: 4px 9px; border-radius: 5px; font-size: 0.76rem; font-weight: 600; transition: all var(--t); }
+.btn-dl:hover { background: var(--crimson); color: #fff; }
+.btn-rt { background: var(--emerald-light); color: var(--emerald); padding: 4px 9px; border-radius: 5px; font-size: 0.76rem; font-weight: 600; transition: all var(--t); }
+.btn-rt:hover { background: var(--emerald); color: #fff; }
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; border-top: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--ink-muted); flex-wrap: wrap; gap: 8px;
+}
+.pg-btns { display: flex; gap: 3px; }
+.pg-btn {
+  width: 30px; height: 30px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 5px; font-size: 0.8rem; font-weight: 600;
+  background: var(--surface-3); color: var(--ink);
+  transition: all var(--t); border: 1px solid var(--border);
+  cursor: pointer;
+}
+.pg-btn:hover { background: var(--surface-4); }
+.pg-btn.active { background: var(--rust); color: #fff; border-color: var(--rust); }
+.pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity var(--t);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 540px;
+  max-height: 92vh; overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  transform: translateY(16px) scale(0.98);
+  transition: transform var(--t);
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-lg { max-width: 720px; }
+.modal-xl { max-width: 900px; }
+.modal-head {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+.modal-x {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--surface-3); color: var(--ink-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: all var(--t);
+}
+.modal-x:hover { background: var(--crimson-light); color: var(--crimson); }
+.modal-body { padding: 20px 24px; }
+.modal-foot {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+  position: sticky; bottom: 0; background: var(--surface);
+}
+
+/* ═══════════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════════ */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg.full { grid-column: 1/-1; }
+.fg label { font-size: 0.8rem; font-weight: 600; color: var(--ink-muted); }
+.fg label span { color: var(--rust); }
+.fi {
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink); font-size: 0.88rem;
+  transition: all var(--t);
+}
+.fi:focus { outline: none; border-color: var(--rust); box-shadow: 0 0 0 3px rgba(194,65,12,0.1); }
+.fi::placeholder { color: var(--ink-faint); }
+.fs {
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink); font-size: 0.88rem; cursor: pointer;
+  transition: all var(--t);
+}
+.fs:focus { outline: none; border-color: var(--rust); }
+.ferr { font-size: 0.76rem; color: var(--crimson); display: none; }
+.fg.has-error .fi, .fg.has-error .fs { border-color: var(--crimson); }
+.fg.has-error .ferr { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+#toastRoot {
+  position: fixed; top: 16px; right: 16px; z-index: 500;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 10px;
+  min-width: 260px; max-width: 340px;
+  animation: toastIn 0.25s ease forwards;
+  border-left: 4px solid var(--teal);
+}
+.toast.error { border-left-color: var(--crimson); }
+.toast.warning { border-left-color: var(--amber); }
+.toast.success { border-left-color: var(--emerald); }
+.toast-text { font-size: 0.84rem; font-weight: 500; flex: 1; }
+.toast-close { color: var(--ink-faint); cursor: pointer; font-size: 0.9rem; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(16px); } }
+
+/* ═══════════════════════════════════════════════════
+   CONFIRM
+═══════════════════════════════════════════════════ */
+#confirmOverlay {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,0.65);
+  backdrop-filter: blur(4px); z-index: 400;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity var(--t);
+}
+#confirmOverlay.open { opacity: 1; pointer-events: all; }
+.confirm-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 28px 24px; max-width: 380px; width: 100%;
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+  transform: scale(0.94); transition: transform var(--t);
+}
+#confirmOverlay.open .confirm-box { transform: scale(1); }
+.confirm-emoji { font-size: 2.4rem; margin-bottom: 10px; }
+.confirm-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 6px; }
+.confirm-msg { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 20px; line-height: 1.6; }
+.confirm-btns { display: flex; gap: 8px; justify-content: center; }
+
+/* ═══════════════════════════════════════════════════
+   LOADING STATES
+═══════════════════════════════════════════════════ */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--rust);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-row td {
+  text-align: center; padding: 40px;
+  color: var(--ink-muted); font-size: 0.87rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--ink-muted);
+}
+.empty-icon { font-size: 2.8rem; margin-bottom: 12px; opacity: 0.45; }
+.empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--ink); margin-bottom: 5px; }
+.empty-state p { font-size: 0.84rem; max-width: 280px; margin: 0 auto; }
+
+/* ═══════════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════════ */
+.report-tabs {
+  display: flex; gap: 0;
+  background: var(--surface-3);
+  border-radius: var(--r-sm); padding: 3px;
+  margin-bottom: 18px; width: fit-content; flex-wrap: wrap;
+}
+.rpt-tab {
+  padding: 7px 16px; border-radius: 4px;
+  font-size: 0.83rem; font-weight: 600;
+  color: var(--ink-muted); transition: all var(--t);
+  white-space: nowrap; cursor: pointer;
+}
+.rpt-tab.active { background: var(--rust); color: #fff; }
+.rpt-tab:hover:not(.active) { color: var(--ink); }
+
+/* ═══════════════════════════════════════════════════
+   FINE / SETTINGS
+═══════════════════════════════════════════════════ */
+.settings-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+.settings-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.sc-head {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-weight: 600; font-family: 'Playfair Display', serif;
+  display: flex; align-items: center; gap: 8px;
+}
+.sc-body { padding: 18px; }
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: 0.84rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row label { color: var(--ink-muted); font-weight: 500; }
+.info-row .val { font-weight: 700; }
+.fine-amt { font-weight: 700; }
+.fine-amt.overdue { color: var(--crimson); }
+.fine-amt.ok { color: var(--emerald); }
+
+/* ═══════════════════════════════════════════════════
+   BULK IMPORT BOT
+═══════════════════════════════════════════════════ */
+.bot-container { max-width: 800px; }
+.bot-step { display: none; }
+.bot-step.active { display: block; }
+
+.drop-zone {
+  border: 2px dashed var(--border-2);
+  border-radius: var(--r-lg);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--t);
+  background: var(--surface-2);
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--rust);
+  background: var(--rust-light);
+}
+.drop-zone-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.6; }
+.drop-zone h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 6px; }
+.drop-zone p { font-size: 0.84rem; color: var(--ink-muted); }
+.drop-file-input { display: none; }
+
+.col-mapping {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 12px; margin: 16px 0;
+}
+.col-map-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px;
+}
+.col-map-label {
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--ink-muted); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.col-map-val {
+  font-size: 0.84rem; font-weight: 600; color: var(--ink);
+  margin-bottom: 6px;
+}
+.col-map-status {
+  font-size: 0.72rem; display: flex; align-items: center; gap: 4px;
+}
+.col-map-status.found { color: var(--emerald); }
+.col-map-status.missing { color: var(--crimson); }
+
+.progress-wrap {
+  background: var(--surface-3);
+  border-radius: 20px; height: 8px; overflow: hidden;
+  margin: 14px 0;
+}
+.progress-bar {
+  height: 100%; background: var(--rust);
+  border-radius: 20px;
+  transition: width 0.3s ease;
+}
+.import-preview-wrap { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+.import-stats {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px;
+}
+.import-stat {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 10px 16px;
+  font-size: 0.84rem; font-weight: 600;
+}
+.import-stat.success { border-color: var(--emerald); color: var(--emerald); }
+.import-stat.error { border-color: var(--crimson); color: var(--crimson); }
+
+/* ═══════════════════════════════════════════════════
+   DEMO BADGE
+═══════════════════════════════════════════════════ */
+.demo-banner {
+  background: var(--amber-light);
+  border: 1px solid var(--amber);
+  border-radius: var(--r-sm);
+  padding: 10px 16px;
+  margin-bottom: 18px;
+  font-size: 0.83rem;
+  color: var(--amber);
+  display: flex; align-items: center; gap: 8px;
+}
+.demo-banner strong { font-weight: 700; }
+
+/* Mobile overlay */
+.sidebar-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(28,25,23,0.5); z-index: 99;
+}
+.sidebar-backdrop.open { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: flex; }
+  .settings-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .page-content { padding: 16px 14px; }
+  .topbar { padding: 0 14px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .sec-actions { width: 100%; }
+}
+@media (max-width: 400px) {
+  .stats-row { grid-template-columns: 1fr; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+@media print {
+  .sidebar, .topbar, .sec-actions, .t-actions, .pagination { display: none !important; }
+  .main { margin-left: 0 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOAST ROOT ══ -->
+<div id="toastRoot"></div>
+
+<!-- ══ CONFIRM DIALOG ══ -->
+<div id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-emoji" id="confirmEmoji">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg">This action cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="authScreen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">📚</div>
+      <h1>ScholarLib</h1>
+      <p>School Library Management System</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-auth="login" onclick="Auth.switchTab('login')">Sign In</div>
+        <div class="auth-tab" data-auth="register" onclick="Auth.switchTab('register')">Register</div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm">
+        <div class="auth-form">
+          <div id="authError" class="auth-error"></div>
+          <div class="auth-form-group">
+            <label>Email</label>
+            <input class="auth-input" type="email" id="loginEmail" placeholder="you@school.edu" autocomplete="email">
+          </div>
+          <div class="auth-form-group">
+            <label>Password</label>
+            <input class="auth-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <button class="auth-btn" onclick="Auth.login()" id="loginBtn">Sign In</button>
+          <div class="auth-divider">or</div>
+          <button class="auth-oauth-btn" onclick="Auth.googleLogin()">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" style="display:none">
+        <div class="auth-form">
+          <div id="authErrorReg" class="auth-error"></div>
+          <div class="auth-form-group">
+            <label>Full Name</label>
+            <input class="auth-input" type="text" id="regName" placeholder="Your full name">
+          </div>
+          <div class="auth-form-group">
+            <label>Email</label>
+            <input class="auth-input" type="email" id="regEmail" placeholder="you@school.edu" autocomplete="email">
+          </div>
+          <div class="auth-form-group">
+            <label>Password</label>
+            <input class="auth-input" type="password" id="regPassword" placeholder="Min 6 characters" autocomplete="new-password">
+          </div>
+          <div class="auth-form-group">
+            <label>Role</label>
+            <select class="auth-select" id="regRole">
+              <option value="student">Student</option>
+              <option value="librarian">Librarian</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button class="auth-btn" onclick="Auth.register()" id="regBtn">Create Account</button>
+        </div>
+      </div>
+
+      <div class="auth-demo-hint">
+        <strong>Demo mode:</strong> If Supabase is not configured, the app runs with localStorage.<br>
+        Try: admin@school.edu / password
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP SHELL ══ -->
+<div id="appShell" class="hidden">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">📚</div>
+      <div class="logo-name">ScholarLib<span>Library System</span></div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">User</div>
+        <div class="user-role" id="userRoleLabel">Admin</div>
+      </div>
+      <span class="user-logout" title="Sign Out" onclick="Auth.logout()">⏏</span>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" data-section="dashboard"><span class="nav-icon">🏠</span>Dashboard</div>
+      <div class="nav-item" data-section="books"><span class="nav-icon">📖</span>Books</div>
+      <div class="nav-item hidden-role" data-section="students" data-roles="admin,librarian"><span class="nav-icon">🎓</span>Users</div>
+
+      <div class="nav-label">Operations</div>
+      <div class="nav-item hidden-role" data-section="issues" data-roles="admin,librarian"><span class="nav-icon">🔄</span>Issue &amp; Return<span class="nav-badge" id="overdueNavBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-section="myissues"><span class="nav-icon">📋</span>My Borrowings</div>
+      <div class="nav-item" data-section="fines"><span class="nav-icon">💰</span>Fines</div>
+      <div class="nav-item hidden-role" data-section="reports" data-roles="admin,librarian"><span class="nav-icon">📊</span>Reports</div>
+
+      <div class="nav-label hidden-role" data-roles="admin,librarian">Tools</div>
+      <div class="nav-item hidden-role" data-section="bulkimport" data-roles="admin,librarian"><span class="nav-icon">🤖</span>AI Bulk Import</div>
+      <div class="nav-item hidden-role" data-section="settings" data-roles="admin"><span class="nav-icon">⚙️</span>Settings</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="theme-btn" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">Dark Mode</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        <h1 class="page-breadcrumb" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-chip" onclick="App.backup()">💾 Backup</button>
+        <label class="topbar-chip" style="cursor:pointer">📂 Restore<input type="file" accept=".json" id="restoreInput" style="display:none" onchange="App.restore(this)"></label>
+        <button class="topbar-chip" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+<!-- ══ DASHBOARD ══ -->
+<section class="section active" id="section-dashboard">
+  <div id="demoBanner" class="demo-banner" style="display:none">
+    ⚠️ <span><strong>Demo Mode:</strong> Running with localStorage. Configure Supabase keys to enable cloud sync, real-time updates, and multi-user support.</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card s-rust">
+      <div class="stat-icon">📚</div>
+      <div class="stat-val" id="statBooks">0</div>
+      <div class="stat-lbl">Book Titles</div>
+    </div>
+    <div class="stat-card s-teal">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-val" id="statStudents">0</div>
+      <div class="stat-lbl">Registered Users</div>
+    </div>
+    <div class="stat-card s-amber">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-val" id="statIssued">0</div>
+      <div class="stat-lbl">Active Issues</div>
+    </div>
+    <div class="stat-card s-emerald">
+      <div class="stat-icon">✅</div>
+      <div class="stat-val" id="statAvail">0</div>
+      <div class="stat-lbl">Available Copies</div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">📋 Recent Issues</span>
+      </div>
+      <div style="padding:0">
+        <div class="tbl-scroll">
+          <table class="tbl">
+            <thead><tr><th>Book</th><th>User</th><th>Due</th><th>Status</th></tr></thead>
+            <tbody id="recentIssuesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">🕐 Activity</span></div>
+      <div style="padding:0 18px">
+        <div id="activityFeed"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOOKS ══ -->
+<section class="section" id="section-books">
+  <div class="sec-header">
+    <h2>📖 Books</h2>
+    <div class="sec-actions">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="bookSearch" placeholder="Search books…" oninput="Books.render()">
+      </div>
+      <select class="flt-select" id="bookCatFilter" onchange="Books.render()">
+        <option value="">All Categories</option>
+      </select>
+      <button class="btn btn-primary admin-librarian-only" onclick="Books.openModal()">＋ Add Book</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th onclick="Books.sort('book_code')">ID ↕</th>
+          <th onclick="Books.sort('title')">Title ↕</th>
+          <th onclick="Books.sort('author')">Author ↕</th>
+          <th>Category</th>
+          <th>ISBN</th>
+          <th onclick="Books.sort('quantity')">Qty ↕</th>
+          <th onclick="Books.sort('available_copies')">Avail. ↕</th>
+          <th class="admin-librarian-only">Actions</th>
+        </tr></thead>
+        <tbody id="booksTbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="booksPagination"></div>
+  </div>
+</section>
+
+<!-- ══ USERS ══ -->
+<section class="section" id="section-students">
+  <div class="sec-header">
+    <h2>🎓 User Management</h2>
+    <div class="sec-actions">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="studentSearch" placeholder="Search users…" oninput="Students.render()">
+      </div>
+      <select class="flt-select" id="studentRoleFilter" onchange="Students.render()">
+        <option value="">All Roles</option>
+        <option value="student">Students</option>
+        <option value="librarian">Librarians</option>
+        <option value="admin">Admins</option>
+      </select>
+      <button class="btn btn-primary" onclick="Students.openModal()">＋ Add User</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th>ID</th><th>Name</th><th>Role</th>
+          <th>Class</th><th>Email</th><th>Active Issues</th><th>Fines</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="studentsTbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="studentsPagination"></div>
+  </div>
+</section>
+
+<!-- ══ ISSUE & RETURN ══ -->
+<section class="section" id="section-issues">
+  <div class="sec-header">
+    <h2>🔄 Issue &amp; Return</h2>
+    <div class="sec-actions">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="issueSearch" placeholder="Search…" oninput="Issues.render()">
+      </div>
+      <select class="flt-select" id="issueFilter" onchange="Issues.render()">
+        <option value="active">Active</option>
+        <option value="all">All</option>
+        <option value="overdue">Overdue</option>
+        <option value="returned">Returned</option>
+      </select>
+      <button class="btn btn-primary" onclick="Issues.openModal()">＋ Issue Book</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th>Issue ID</th><th>User</th><th>Book</th>
+          <th>Issued</th><th>Due</th><th>Fine</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="issuesTbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="issuesPagination"></div>
+  </div>
+</section>
+
+<!-- ══ MY BORROWINGS ══ -->
+<section class="section" id="section-myissues">
+  <div class="sec-header"><h2>📋 My Borrowings</h2></div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead><tr><th>Book</th><th>Issued</th><th>Due</th><th>Returned</th><th>Fine</th><th>Status</th></tr></thead>
+        <tbody id="myIssuesTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINES ══ -->
+<section class="section" id="section-fines">
+  <div class="sec-header">
+    <h2>💰 Fine Management</h2>
+    <div class="sec-actions admin-librarian-only">
+      <button class="btn btn-secondary" onclick="Fines.setRateModal()">⚙️ Fine Rate</button>
+    </div>
+  </div>
+  <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+    <div class="stat-card s-rust">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-val" id="fineOverdueCount">0</div>
+      <div class="stat-lbl">Overdue Books</div>
+    </div>
+    <div class="stat-card s-amber">
+      <div class="stat-icon">💰</div>
+      <div class="stat-val" id="fineTotalAmt">$0.00</div>
+      <div class="stat-lbl">Total Fines Due</div>
+    </div>
+    <div class="stat-card s-emerald">
+      <div class="stat-icon">✅</div>
+      <div class="stat-val" id="fineRateDisplay">$0.50</div>
+      <div class="stat-lbl">Per Day Rate</div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th>Issue ID</th><th>User</th><th>Book</th>
+          <th>Due</th><th>Days Overdue</th><th>Fine</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="finesTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ REPORTS ══ -->
+<section class="section" id="section-reports">
+  <div class="sec-header">
+    <h2>📊 Reports</h2>
+    <div class="sec-actions">
+      <button class="btn btn-teal" onclick="Reports.exportCSV()">⬇️ Export CSV</button>
+      <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+  <div class="report-tabs">
+    <button class="rpt-tab active" data-report="issued">Issued Books</button>
+    <button class="rpt-tab" data-report="overdue">Overdue</button>
+    <button class="rpt-tab" data-report="available">Inventory</button>
+    <button class="rpt-tab" data-report="popular">Popular</button>
+    <button class="rpt-tab" data-report="history">History</button>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table class="tbl">
+        <thead id="reportHead"></thead>
+        <tbody id="reportTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BULK IMPORT ══ -->
+<section class="section" id="section-bulkimport">
+  <div class="sec-header"><h2>🤖 AI Bulk Import Bot</h2></div>
+  <div class="bot-container">
+    <!-- Step 1: Upload -->
+    <div class="bot-step active" id="botStep1">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Step 1 — Upload your file</span></div>
+        <div class="card-body">
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" class="drop-file-input" accept=".csv,.xlsx,.xls" onchange="BotImport.handleFile(this)">
+            <div class="drop-zone-icon">📁</div>
+            <h3>Drop CSV or Excel file here</h3>
+            <p>Supports .csv, .xlsx, .xls — up to 5,000 rows<br>Drag & drop or click to browse</p>
+          </div>
+          <div style="margin-top:14px">
+            <p style="font-size:0.83rem;color:var(--ink-muted);margin-bottom:8px">Expected columns (any order, smart detection):</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span class="badge badge-teal">title</span>
+              <span class="badge badge-teal">author</span>
+              <span class="badge badge-amber">isbn</span>
+              <span class="badge badge-amber">category</span>
+              <span class="badge badge-amber">quantity</span>
+              <span class="badge badge-gray">location</span>
+              <span class="badge badge-gray">publisher</span>
+              <span class="badge badge-gray">year</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Column Mapping -->
+    <div class="bot-step" id="botStep2">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Step 2 — Verify Column Mapping</span>
+          <span id="botFileInfo" style="font-size:0.8rem;color:var(--ink-muted)"></span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:14px">
+            The AI detected these column mappings. Review and correct if needed:
+          </p>
+          <div class="col-mapping" id="colMappingGrid"></div>
+
+          <div style="margin-top:18px">
+            <h4 style="font-size:0.88rem;font-weight:600;margin-bottom:10px">Preview (first 5 rows)</h4>
+            <div class="import-preview-wrap">
+              <table class="tbl" id="previewTable">
+                <thead id="previewHead"></thead>
+                <tbody id="previewBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:18px">
+            <button class="btn btn-secondary" onclick="BotImport.reset()">← Back</button>
+            <button class="btn btn-primary" id="startImportBtn" onclick="BotImport.startImport()">🚀 Import Books</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Importing -->
+    <div class="bot-step" id="botStep3">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Step 3 — Importing…</span></div>
+        <div class="card-body">
+          <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:12px" id="importStatusText">Processing rows…</p>
+          <div class="progress-wrap">
+            <div class="progress-bar" id="importProgress" style="width:0%"></div>
+          </div>
+          <p style="font-size:0.8rem;color:var(--ink-faint);margin-top:6px" id="importProgressLabel">0 / 0 rows</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Results -->
+    <div class="bot-step" id="botStep4">
+      <div class="card">
+        <div class="card-head"><span class="card-title">✅ Import Complete</span></div>
+        <div class="card-body">
+          <div class="import-stats" id="importStats"></div>
+          <div id="importErrorsWrap" style="margin-top:16px;display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <h4 style="font-size:0.88rem;font-weight:600">Failed Rows</h4>
+              <button class="btn btn-secondary btn-sm" onclick="BotImport.downloadErrors()">⬇️ Error Report</button>
+            </div>
+            <div class="import-preview-wrap" style="max-height:200px">
+              <table class="tbl" id="errorTable">
+                <thead><tr><th>Row</th><th>Data</th><th>Error</th></tr></thead>
+                <tbody id="errorTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:18px">
+            <button class="btn btn-secondary" onclick="BotImport.reset()">Import Another</button>
+            <button class="btn btn-primary" onclick="BotImport.undoImport()" id="undoImportBtn">↩ Undo Last Import</button>
+            <button class="btn btn-teal" onclick="Nav.go('books')">View Books →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SETTINGS ══ -->
+<section class="section" id="section-settings">
+  <div class="sec-header"><h2>⚙️ Settings</h2></div>
+  <div class="settings-grid">
+    <div class="settings-card">
+      <div class="sc-head">📋 Library Config</div>
+      <div class="sc-body">
+        <div class="fg" style="margin-bottom:12px">
+          <label>Library Name</label>
+          <input class="fi" id="settingName" placeholder="e.g. Springfield High Library">
+        </div>
+        <div class="fg" style="margin-bottom:12px">
+          <label>Fine Rate (per day $)</label>
+          <input class="fi" type="number" step="0.01" id="settingFineRate" placeholder="0.50">
+        </div>
+        <div class="fg" style="margin-bottom:14px">
+          <label>Default Loan Period (days)</label>
+          <input class="fi" type="number" id="settingLoanPeriod" placeholder="14">
+        </div>
+        <button class="btn btn-primary" onclick="Settings.save()">💾 Save</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">📂 Categories</div>
+      <div class="sc-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input class="fi" id="newCatInput" placeholder="New category" style="flex:1">
+          <button class="btn btn-primary btn-sm" onclick="Settings.addCat()">Add</button>
+        </div>
+        <div id="catList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">💾 Data Management</div>
+      <div class="sc-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-teal" onclick="App.backup()">⬇️ Backup to JSON</button>
+          <label class="btn btn-secondary" style="cursor:pointer;justify-content:center">
+            📂 Restore from JSON
+            <input type="file" accept=".json" onchange="App.restore(this)" style="display:none">
+          </label>
+          <button class="btn btn-danger" onclick="App.clearAll()">🗑️ Clear All Data</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">📈 System Stats</div>
+      <div class="sc-body">
+        <div class="info-row"><label>Total Books</label><span class="val" id="sysBooks">0</span></div>
+        <div class="info-row"><label>Total Users</label><span class="val" id="sysStudents">0</span></div>
+        <div class="info-row"><label>Active Issues</label><span class="val" id="sysIssues">0</span></div>
+        <div class="info-row"><label>All Issue Records</label><span class="val" id="sysTotalIssues">0</span></div>
+        <div class="info-row"><label>Activity Logs</label><span class="val" id="sysLogs">0</span></div>
+        <div class="info-row"><label>Supabase Mode</label><span class="val" id="sysMode">Local</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /appShell -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Book Modal -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="modal-title" id="bookModalTitle">Add Book</h3>
+      <button class="modal-x" onclick="Books.closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg">
+          <label>Book ID <span>*</span></label>
+          <input class="fi" id="bkId" placeholder="BK001">
+          <span class="ferr">ID required & must be unique</span>
+        </div>
+        <div class="fg">
+          <label>ISBN</label>
+          <input class="fi" id="bkIsbn" placeholder="978-0-00-000000-0">
+        </div>
+        <div class="fg full">
+          <label>Title <span>*</span></label>
+          <input class="fi" id="bkTitle" placeholder="Book title">
+          <span class="ferr">Title is required</span>
+        </div>
+        <div class="fg">
+          <label>Author <span>*</span></label>
+          <input class="fi" id="bkAuthor" placeholder="Author name">
+          <span class="ferr">Author required</span>
+        </div>
+        <div class="fg">
+          <label>Category <span>*</span></label>
+          <select class="fs" id="bkCategory">
+            <option value="">Select category</option>
+          </select>
+          <span class="ferr">Category required</span>
+        </div>
+        <div class="fg">
+          <label>Quantity <span>*</span></label>
+          <input class="fi" type="number" id="bkQty" min="1" placeholder="1">
+          <span class="ferr">Qty ≥ 1</span>
+        </div>
+        <div class="fg">
+          <label>Publisher</label>
+          <input class="fi" id="bkPublisher" placeholder="Publisher name">
+        </div>
+        <div class="fg">
+          <label>Year</label>
+          <input class="fi" type="number" id="bkYear" placeholder="2024">
+        </div>
+        <div class="fg full">
+          <label>Location / Shelf</label>
+          <input class="fi" id="bkLocation" placeholder="e.g. Shelf A-3">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="Books.closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="Books.save()">💾 Save Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Modal -->
+<div class="modal-overlay" id="studentModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="modal-title" id="studentModalTitle">Add User</h3>
+      <button class="modal-x" onclick="Students.closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg">
+          <label>User Code <span>*</span></label>
+          <input class="fi" id="stId" placeholder="STU001">
+          <span class="ferr">ID required & must be unique</span>
+        </div>
+        <div class="fg">
+          <label>Role <span>*</span></label>
+          <select class="fs" id="stRole">
+            <option value="student">Student</option>
+            <option value="librarian">Librarian</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="fg full">
+          <label>Full Name <span>*</span></label>
+          <input class="fi" id="stName" placeholder="Full name">
+          <span class="ferr">Name required</span>
+        </div>
+        <div class="fg">
+          <label>Class / Grade</label>
+          <input class="fi" id="stClass" placeholder="Grade 10A">
+        </div>
+        <div class="fg">
+          <label>Email</label>
+          <input class="fi" type="email" id="stEmail" placeholder="user@school.edu">
+          <span class="ferr">Invalid email</span>
+        </div>
+        <div class="fg">
+          <label>Phone</label>
+          <input class="fi" id="stPhone" placeholder="+1 000 000 0000">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="Students.closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="Students.save()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Modal -->
+<div class="modal-overlay" id="issueModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="modal-title">Issue a Book</h3>
+      <button class="modal-x" onclick="Issues.closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg full">
+          <label>Select User <span>*</span></label>
+          <select class="fs" id="issueStudent">
+            <option value="">— Choose User —</option>
+          </select>
+          <span class="ferr">User required</span>
+        </div>
+        <div class="fg full">
+          <label>Select Book <span>*</span></label>
+          <select class="fs" id="issueBook">
+            <option value="">— Choose Book —</option>
+          </select>
+          <span class="ferr">Book required</span>
+        </div>
+        <div class="fg">
+          <label>Issue Date <span>*</span></label>
+          <input class="fi" type="date" id="issueDate">
+        </div>
+        <div class="fg">
+          <label>Due Date <span>*</span></label>
+          <input class="fi" type="date" id="issueDue">
+          <span class="ferr">Must be after issue date</span>
+        </div>
+        <div class="fg full">
+          <label>Remarks</label>
+          <input class="fi" id="issueRemarks" placeholder="Optional remarks">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="Issues.closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="Issues.save()">📤 Issue Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fine Rate Modal -->
+<div class="modal-overlay" id="fineRateModal">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-head">
+      <h3 class="modal-title">Set Fine Rate</h3>
+      <button class="modal-x" onclick="Fines.closeRateModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Fine per overdue day ($) <span>*</span></label>
+        <input class="fi" type="number" step="0.01" min="0" id="fineRateInput" placeholder="0.50">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="Fines.closeRateModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="Fines.saveRate()">Save Rate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Column Override Modal (Bot) -->
+<div class="modal-overlay" id="colOverrideModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <h3 class="modal-title">Edit Column Mapping</h3>
+      <button class="modal-x" onclick="closeModal('colOverrideModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Detected Field</label>
+        <input class="fi" id="colOverrideField" disabled>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label>Map to column from file</label>
+        <select class="fs" id="colOverrideSelect"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('colOverrideModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="BotImport.applyOverride()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   CONFIGURATION
+   Replace with your actual Supabase project URL and anon key.
+   If not configured, the app runs in LOCAL (localStorage) mode.
+═══════════════════════════════════════════════════════════════════ */
+const SUPABASE_URL = '';  // e.g. 'https://xxxx.supabase.co'
+const SUPABASE_ANON_KEY = ''; // your anon key
+
+/* ═══════════════════════════════════════════════════════════════════
+   SUPABASE CLIENT
+═══════════════════════════════════════════════════════════════════ */
+let _supabase = null;
+let _supabaseEnabled = false;
+
+function initSupabase() {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+    try {
+      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      _supabaseEnabled = true;
+      console.log('✅ Supabase enabled');
+    } catch(e) {
+      console.warn('Supabase init failed, using local mode:', e);
+    }
+  } else {
+    console.log('ℹ️ Running in localStorage mode');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STORAGE LAYER — abstracts Supabase vs localStorage
+═══════════════════════════════════════════════════════════════════ */
+const DB = {
+  _local(key, def=[]) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? def; }
+    catch { return def; }
+  },
+  _localSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); },
+
+  // ── BOOKS ──
+  async getBooks(filters={}) {
+    if (_supabaseEnabled) {
+      let q = _supabase.from('books').select('*, category:book_categories(name,color_code)');
+      if (filters.search) q = q.or(`title.ilike.%${filters.search}%,author.ilike.%${filters.search}%,book_code.ilike.%${filters.search}%`);
+      if (filters.category) q = q.eq('category_id', filters.category);
+      const { data, error } = await q.order('book_code');
+      if (error) throw error;
+      return data;
+    }
+    let books = this._local('library_books');
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      books = books.filter(b => [b.title,b.author,b.book_code,b.isbn,b.category].some(f=>(f||'').toLowerCase().includes(q)));
+    }
+    if (filters.category) books = books.filter(b => b.category === filters.category);
+    return books;
+  },
+  async addBook(book) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('books').insert([book]).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const books = this._local('library_books');
+    books.push(book); this._localSet('library_books', books);
+    return book;
+  },
+  async updateBook(id, updates) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('books').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const books = this._local('library_books');
+    const idx = books.findIndex(b=>b.id===id);
+    if (idx>-1) { books[idx]={...books[idx],...updates}; this._localSet('library_books',books); return books[idx]; }
+  },
+  async deleteBook(id) {
+    if (_supabaseEnabled) {
+      const { error } = await _supabase.from('books').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    }
+    const books = this._local('library_books').filter(b=>b.id!==id);
+    this._localSet('library_books', books);
+  },
+
+  // ── STUDENTS/USERS ──
+  async getUsers(filters={}) {
+    if (_supabaseEnabled) {
+      let q = _supabase.from('library_users').select('*');
+      if (filters.role) q = q.eq('role', filters.role);
+      if (filters.search) q = q.or(`full_name.ilike.%${filters.search}%,user_code.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
+      const { data, error } = await q.order('full_name');
+      if (error) throw error;
+      return data;
+    }
+    let users = this._local('library_students');
+    if (filters.role) users = users.filter(u=>u.role===filters.role);
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      users = users.filter(u=>[u.name,u.id,u.email,u.class].some(f=>(f||'').toLowerCase().includes(q)));
+    }
+    return users;
+  },
+  async addUser(user) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('library_users').insert([user]).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const users = this._local('library_students');
+    users.push(user); this._localSet('library_students', users);
+    return user;
+  },
+  async updateUser(id, updates) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('library_users').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const users = this._local('library_students');
+    const idx = users.findIndex(u=>u.id===id);
+    if (idx>-1) { users[idx]={...users[idx],...updates}; this._localSet('library_students',users); return users[idx]; }
+  },
+  async deleteUser(id) {
+    if (_supabaseEnabled) {
+      const { error } = await _supabase.from('library_users').delete().eq('id', id);
+      if (error) throw error;
+    }
+    const users = this._local('library_students').filter(u=>u.id!==id);
+    this._localSet('library_students', users);
+  },
+
+  // ── ISSUES ──
+  async getIssues(filters={}) {
+    if (_supabaseEnabled) {
+      let q = _supabase.from('book_issues').select('*, book:books(title,book_code), user:library_users(full_name,user_code)');
+      if (filters.status==='active') q = q.in('status',['active','overdue']);
+      else if (filters.status==='returned') q = q.eq('status','returned');
+      else if (filters.status==='overdue') q = q.eq('status','overdue');
+      if (filters.userId) q = q.eq('user_id', filters.userId);
+      const { data, error } = await q.order('issue_date', { ascending: false });
+      if (error) throw error;
+      return data;
+    }
+    let issues = this._local('library_issues');
+    if (filters.status==='active') issues = issues.filter(i=>!i.returned);
+    else if (filters.status==='returned') issues = issues.filter(i=>i.returned);
+    else if (filters.status==='overdue') issues = issues.filter(i=>!i.returned && U.daysDiff(i.dueDate)>0);
+    if (filters.userId) issues = issues.filter(i=>i.studentId===filters.userId||i.userId===filters.userId);
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      const books = this._local('library_books');
+      const users = this._local('library_students');
+      issues = issues.filter(i => {
+        const b = books.find(x=>x.id===i.bookId);
+        const u = users.find(x=>x.id===i.studentId);
+        return [(b?.title||''),(u?.name||''),i.id].some(f=>f.toLowerCase().includes(q));
+      });
+    }
+    return issues;
+  },
+  async addIssue(issue) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('book_issues').insert([issue]).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const issues = this._local('library_issues');
+    issues.push(issue); this._localSet('library_issues', issues);
+    return issue;
+  },
+  async updateIssue(id, updates) {
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.from('book_issues').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    }
+    const issues = this._local('library_issues');
+    const idx = issues.findIndex(i=>i.id===id);
+    if (idx>-1) { issues[idx]={...issues[idx],...updates}; this._localSet('library_issues',issues); return issues[idx]; }
+  },
+
+  // ── SETTINGS ──
+  getSettings() {
+    return this._local('library_settings', null) || {
+      libName:'ScholarLib', fineRate:0.5, loanPeriod:14,
+      categories:['Fiction','Non-Fiction','Science','Mathematics',
+        'History','Literature','Technology','Arts','Reference','Biography']
+    };
+  },
+  setSettings(v) { this._localSet('library_settings', v); },
+
+  // ── ACTIVITY ──
+  getActivity() { return this._local('library_activity'); },
+  addActivity(type, text) {
+    const logs = this.getActivity();
+    logs.unshift({ type, text, time: new Date().toISOString() });
+    if (logs.length>60) logs.pop();
+    this._localSet('library_activity', logs);
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+const U = {
+  today: ()=>new Date().toISOString().split('T')[0],
+  addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x.toISOString().split('T')[0]; },
+  daysDiff(d){ const now=new Date(); now.setHours(0,0,0,0); return Math.floor((now-new Date(d))/86400000); },
+  fmt(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); },
+  esc(s){ return String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); },
+  genId(prefix, list, field='id') {
+    let max=0;
+    list.forEach(i=>{ const n=parseInt((i[field]||'').replace(/\D/g,'')); if(!isNaN(n)&&n>max) max=n; });
+    return `${prefix}${String(max+1).padStart(3,'0')}`;
+  },
+  paginate(arr,page,per=15){ return { data:arr.slice((page-1)*per,(page-1)*per+per), pages:Math.ceil(arr.length/per), total:arr.length }; },
+  renderPager(cid,cur,tot,fn){
+    const el=document.getElementById(cid);
+    if(!el) return;
+    if(tot<=1){el.innerHTML='';return;}
+    let h=`<span>Page ${cur} of ${tot}</span><div class="pg-btns">`;
+    h+=`<button class="pg-btn" onclick="${fn}(${cur-1})" ${cur===1?'disabled':''}>‹</button>`;
+    for(let i=1;i<=tot;i++){
+      if(i===1||i===tot||(i>=cur-1&&i<=cur+1)) h+=`<button class="pg-btn ${i===cur?'active':''}" onclick="${fn}(${i})">${i}</button>`;
+      else if(i===cur-2||i===cur+2) h+=`<span class="pg-btn" style="cursor:default;border:none">…</span>`;
+    }
+    h+=`<button class="pg-btn" onclick="${fn}(${cur+1})" ${cur===tot?'disabled':''}>›</button></div>`;
+    el.innerHTML=h;
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════ */
+const Toast = {
+  show(msg, type='success') {
+    const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+    const el=document.createElement('div');
+    el.className=`toast ${type}`;
+    el.innerHTML=`<span>${icons[type]}</span><span class="toast-text">${U.esc(msg)}</span><span class="toast-close" onclick="this.parentElement.remove()">✕</span>`;
+    document.getElementById('toastRoot').appendChild(el);
+    setTimeout(()=>{ el.style.animation='toastOut 0.25s ease forwards'; setTimeout(()=>el.remove(),250); },3500);
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONFIRM
+═══════════════════════════════════════════════════════════════════ */
+const Confirm = {
+  _cb: null,
+  show(title, msg, cb, okLabel='Delete', okCls='btn-danger', emoji='⚠️') {
+    document.getElementById('confirmTitle').textContent=title;
+    document.getElementById('confirmMsg').textContent=msg;
+    document.getElementById('confirmEmoji').textContent=emoji;
+    const btn=document.getElementById('confirmOkBtn');
+    btn.textContent=okLabel; btn.className=`btn ${okCls}`;
+    this._cb=cb;
+    document.getElementById('confirmOverlay').classList.add('open');
+  },
+  ok(){ if(this._cb) this._cb(); this.cancel(); },
+  cancel(){ document.getElementById('confirmOverlay').classList.remove('open'); this._cb=null; }
+};
+document.getElementById('confirmOkBtn').onclick=()=>Confirm.ok();
+document.getElementById('confirmCancelBtn').onclick=()=>Confirm.cancel();
+document.getElementById('confirmOverlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) Confirm.cancel(); });
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUTH MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Auth = {
+  currentUser: null,
+  currentRole: 'student',
+
+  switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active',t.dataset.auth===tab));
+    document.getElementById('loginForm').style.display = tab==='login' ? '' : 'none';
+    document.getElementById('registerForm').style.display = tab==='register' ? '' : 'none';
+  },
+
+  async login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    const err = document.getElementById('authError');
+    err.classList.remove('visible');
+
+    if (!email||!pw) { err.textContent='Please fill in all fields.'; err.classList.add('visible'); return; }
+
+    document.getElementById('loginBtn').textContent='Signing in…';
+    document.getElementById('loginBtn').disabled=true;
+
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pw });
+      if (error) { err.textContent=error.message; err.classList.add('visible'); }
+      else {
+        const { data: profile } = await _supabase.from('library_users').select('*').eq('id', data.user.id).single();
+        this.setUser(data.user, profile);
+      }
+    } else {
+      // Demo mode: accept any login, or check local users
+      const users = DB._local('library_students');
+      const found = users.find(u=>(u.email||'').toLowerCase()===email.toLowerCase());
+      // Demo default credentials
+      if (email==='admin@school.edu'&&pw==='password') {
+        this.setUser({ id:'demo-admin', email }, { id:'demo-admin', name:'Admin User', role:'admin', full_name:'Admin User' });
+      } else if (found) {
+        this.setUser({ id:found.id, email }, found);
+      } else {
+        err.textContent='Invalid credentials. Try admin@school.edu / password'; err.classList.add('visible');
+      }
+    }
+    document.getElementById('loginBtn').textContent='Sign In';
+    document.getElementById('loginBtn').disabled=false;
+  },
+
+  async register() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pw = document.getElementById('regPassword').value;
+    const role = document.getElementById('regRole').value;
+    const err = document.getElementById('authErrorReg');
+    err.classList.remove('visible');
+
+    if (!name||!email||!pw) { err.textContent='All fields required.'; err.classList.add('visible'); return; }
+    if (pw.length<6) { err.textContent='Password must be 6+ characters.'; err.classList.add('visible'); return; }
+
+    document.getElementById('regBtn').textContent='Creating…';
+    document.getElementById('regBtn').disabled=true;
+
+    if (_supabaseEnabled) {
+      const { data, error } = await _supabase.auth.signUp({ email, password: pw, options:{data:{full_name:name,role}} });
+      if (error) { err.textContent=error.message; err.classList.add('visible'); }
+      else {
+        // Create library_users record
+        const users = DB._local('library_students');
+        const userCode = U.genId('STU',users,'id');
+        await DB.addUser({ id:data.user.id, user_code:userCode, full_name:name, email, role, name, class:'', phone:'' });
+        Toast.show('Account created! Please sign in.','success');
+        this.switchTab('login');
+      }
+    } else {
+      const users = DB._local('library_students');
+      if (users.find(u=>u.email===email)) { err.textContent='Email already registered.'; err.classList.add('visible'); }
+      else {
+        const userCode = U.genId('STU',users,'id');
+        const newUser = { id:'u-'+Date.now(), user_code:userCode, name, full_name:name, email, role, class:'', phone:'' };
+        await DB.addUser(newUser);
+        Toast.show('Account created! Please sign in.','success');
+        this.switchTab('login');
+      }
+    }
+    document.getElementById('regBtn').textContent='Create Account';
+    document.getElementById('regBtn').disabled=false;
+  },
+
+  async googleLogin() {
+    if (_supabaseEnabled) {
+      const { error } = await _supabase.auth.signInWithOAuth({ provider:'google', options:{redirectTo:window.location.href} });
+      if (error) Toast.show(error.message,'error');
+    } else {
+      Toast.show('Google login requires Supabase configuration.','warning');
+    }
+  },
+
+  setUser(authUser, profile) {
+    this.currentUser = { ...authUser, ...profile };
+    this.currentRole = profile?.role || 'student';
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('hidden');
+    this.updateUIForRole();
+    Nav.go('dashboard');
+    // Setup realtime if Supabase
+    if (_supabaseEnabled) this.setupRealtime();
+  },
+
+  updateUIForRole() {
+    const role = this.currentRole;
+    const isAdminLib = role==='admin'||role==='librarian';
+
+    // Update sidebar display
+    document.querySelectorAll('.nav-item[data-roles]').forEach(el=>{
+      const roles = el.dataset.roles.split(',');
+      el.classList.toggle('hidden-role', !roles.includes(role));
+    });
+    document.querySelectorAll('.nav-label[data-roles]').forEach(el=>{
+      const roles = el.dataset.roles.split(',');
+      el.style.display = roles.includes(role) ? '' : 'none';
+    });
+    document.querySelectorAll('.admin-librarian-only').forEach(el=>{
+      el.style.display = isAdminLib ? '' : 'none';
+    });
+
+    // User info
+    const name = this.currentUser?.full_name || this.currentUser?.name || this.currentUser?.email || 'User';
+    document.getElementById('userName').textContent = name;
+    document.getElementById('userRoleLabel').textContent = role.charAt(0).toUpperCase()+role.slice(1);
+    document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('sysMode').textContent = _supabaseEnabled ? 'Supabase ☁️' : 'Local 💾';
+    if (!_supabaseEnabled) document.getElementById('demoBanner').style.display='flex';
+  },
+
+  setupRealtime() {
+    if (!_supabase) return;
+    _supabase.channel('db-changes')
+      .on('postgres_changes',{event:'*',schema:'public',table:'books'},()=>{ if(Nav.current==='books') Books.render(); Dashboard.render(); })
+      .on('postgres_changes',{event:'*',schema:'public',table:'book_issues'},()=>{ if(Nav.current==='issues') Issues.render(); Dashboard.render(); })
+      .subscribe();
+  },
+
+  async logout() {
+    if (_supabaseEnabled) await _supabase.auth.signOut();
+    this.currentUser=null; this.currentRole='student';
+    document.getElementById('appShell').classList.add('hidden');
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('demoBanner').style.display='none';
+  },
+
+  async checkSession() {
+    if (_supabaseEnabled) {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await _supabase.from('library_users').select('*').eq('id', session.user.id).single();
+        this.setUser(session.user, profile);
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════════ */
+const Nav = {
+  current: 'dashboard',
+  titles: {
+    dashboard:'Dashboard', books:'Books', students:'User Management',
+    issues:'Issue & Return', myissues:'My Borrowings',
+    fines:'Fine Management', reports:'Reports',
+    bulkimport:'AI Bulk Import', settings:'Settings'
+  },
+  go(section) {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const sec = document.getElementById(`section-${section}`);
+    if (!sec) return;
+    sec.classList.add('active');
+    const nav = document.querySelector(`.nav-item[data-section="${section}"]`);
+    if (nav) nav.classList.add('active');
+    document.getElementById('pageTitle').textContent = this.titles[section] || section;
+    this.current = section;
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('open');
+    // Trigger renders
+    const refreshers = {
+      dashboard: ()=>Dashboard.render(),
+      books: ()=>Books.render(),
+      students: ()=>Students.render(),
+      issues: ()=>Issues.render(),
+      myissues: ()=>MyIssues.render(),
+      fines: ()=>Fines.render(),
+      reports: ()=>Reports.render(),
+      settings: ()=>Settings.render(),
+    };
+    if (refreshers[section]) refreshers[section]();
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>{ if(!item.classList.contains('hidden-role')) Nav.go(item.dataset.section); });
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════════ */
+const Dashboard = {
+  async render() {
+    const books = await DB.getBooks();
+    const users = await DB.getUsers();
+    const issues = await DB.getIssues();
+    const settings = DB.getSettings();
+    const active = issues.filter(i=>!i.returned&&i.status!=='returned');
+    const avail = books.reduce((s,b)=>s+(b.available_copies??b.available??0),0);
+    const overdue = active.filter(i=>U.daysDiff(i.dueDate||i.due_date)>0);
+
+    document.getElementById('statBooks').textContent = books.length;
+    document.getElementById('statStudents').textContent = users.length;
+    document.getElementById('statIssued').textContent = active.length;
+    document.getElementById('statAvail').textContent = avail;
+
+    const badge = document.getElementById('overdueNavBadge');
+    if (overdue.length) { badge.style.display=''; badge.textContent=overdue.length; }
+    else badge.style.display='none';
+
+    // Recent issues
+    const recent = [...active].sort((a,b)=>(b.issueDate||b.issue_date||'').localeCompare(a.issueDate||a.issue_date||'')).slice(0,6);
+    const tbody = document.getElementById('recentIssuesTbody');
+    if (!recent.length) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-muted)">No active issues</td></tr>`;
+    } else {
+      tbody.innerHTML = recent.map(issue=>{
+        const b = books.find(x=>x.id===issue.bookId||x.id===issue.book_id);
+        const u = users.find(x=>x.id===issue.studentId||x.id===issue.user_id);
+        const od = U.daysDiff(issue.dueDate||issue.due_date);
+        const st = od>0 ? `<span class="badge badge-red">Overdue ${od}d</span>` : `<span class="badge badge-green">On Time</span>`;
+        return `<tr><td>${U.esc(b?.title||issue.book_id||issue.bookId||'?')}</td><td>${U.esc(u?.name||u?.full_name||'?')}</td><td>${U.fmt(issue.dueDate||issue.due_date)}</td><td>${st}</td></tr>`;
+      }).join('');
+    }
+
+    // Activity
+    const logs = DB.getActivity();
+    const feed = document.getElementById('activityFeed');
+    if (!logs.length) {
+      feed.innerHTML=`<div style="padding:24px 0;color:var(--ink-muted);font-size:.84rem">No activity yet.</div>`;
+    } else {
+      feed.innerHTML = logs.slice(0,12).map(l=>`
+        <div class="activity-item">
+          <div class="a-dot a-${l.type}"></div>
+          <div>
+            <div class="a-text">${l.text}</div>
+            <span class="a-time">${new Date(l.time).toLocaleString()}</span>
+          </div>
+        </div>`).join('');
+    }
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOKS MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Books = {
+  editId: null, page: 1, sortField: 'book_code', sortDir: 1,
+
+  sort(field) {
+    if (this.sortField===field) this.sortDir*=-1;
+    else { this.sortField=field; this.sortDir=1; }
+    this.render();
+  },
+
+  async render() {
+    const settings = DB.getSettings();
+    const q = document.getElementById('bookSearch')?.value?.toLowerCase()||'';
+    const cat = document.getElementById('bookCatFilter')?.value||'';
+
+    // Refresh category filter
+    const catEl = document.getElementById('bookCatFilter');
+    if (catEl) {
+      const prev = catEl.value;
+      catEl.innerHTML = '<option value="">All Categories</option>' +
+        settings.categories.map(c=>`<option value="${c}" ${c===prev?'selected':''}>${c}</option>`).join('');
+    }
+
+    let books = await DB.getBooks({ search: q, category: cat });
+
+    // Sort
+    const sf = this.sortField;
+    books.sort((a,b)=>{
+      const av=a[sf]||a.book_code||''; const bv=b[sf]||'';
+      return typeof av==='number' ? (av-bv)*this.sortDir : av.localeCompare(bv)*this.sortDir;
+    });
+
+    const { data, pages, total } = U.paginate(books, this.page);
+    const tbody = document.getElementById('booksTbody');
+    const isStaff = Auth.currentRole==='admin'||Auth.currentRole==='librarian';
+
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📚</div><h3>No books found</h3><p>${books.length===0?'Add your first book to get started.':'Try a different search term.'}</p></div></td></tr>`;
+    } else {
+      tbody.innerHTML = data.map(b=>{
+        const avail = b.available_copies ?? b.available ?? 0;
+        const qty = b.total_copies ?? b.quantity ?? 0;
+        return `<tr>
+          <td><strong>${U.esc(b.book_code||b.id)}</strong></td>
+          <td><div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${U.esc(b.title)}">${U.esc(b.title)}</div></td>
+          <td>${U.esc(b.author)}</td>
+          <td><span class="badge badge-teal">${U.esc(b.category||b.category_name||'—')}</span></td>
+          <td><small>${U.esc(b.isbn||'—')}</small></td>
+          <td><strong>${qty}</strong></td>
+          <td><span class="badge ${avail>0?'badge-green':'badge-red'}">${avail}</span></td>
+          <td>${isStaff?`<div class="t-actions"><button class="btn-te" onclick="Books.openModal('${b.id}')">✏️ Edit</button><button class="btn-dl" onclick="Books.delete('${b.id}')">🗑️</button></div>`:'—'}</td>
+        </tr>`;
+      }).join('');
+    }
+    U.renderPager('booksPagination', this.page, pages, 'Books.goPage');
+  },
+
+  goPage(p) { Books.page=p; Books.render(); },
+
+  openModal(editId=null) {
+    this.editId=editId;
+    const settings=DB.getSettings();
+    document.getElementById('bkCategory').innerHTML='<option value="">Select category</option>'+settings.categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+    if (editId) {
+      DB.getBooks().then(books=>{
+        const b=books.find(x=>x.id===editId);
+        if (!b) return;
+        document.getElementById('bookModalTitle').textContent='✏️ Edit Book';
+        document.getElementById('bkId').value=b.book_code||b.id;
+        document.getElementById('bkId').disabled=true;
+        document.getElementById('bkIsbn').value=b.isbn||'';
+        document.getElementById('bkTitle').value=b.title;
+        document.getElementById('bkAuthor').value=b.author;
+        document.getElementById('bkCategory').value=b.category||'';
+        document.getElementById('bkQty').value=b.total_copies||b.quantity||1;
+        document.getElementById('bkPublisher').value=b.publisher||'';
+        document.getElementById('bkYear').value=b.publication_year||b.year||'';
+        document.getElementById('bkLocation').value=b.location||'';
+        clearFgErrors('bookModal');
+        openModal('bookModal');
+      });
+    } else {
+      document.getElementById('bookModalTitle').textContent='➕ Add Book';
+      document.getElementById('bkId').disabled=false;
+      DB.getBooks().then(books=>{
+        document.getElementById('bkId').value=U.genId('BK',books,'book_code')||U.genId('BK',books,'id');
+      });
+      ['bkIsbn','bkTitle','bkAuthor','bkPublisher','bkYear','bkLocation'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('bkCategory').value='';
+      document.getElementById('bkQty').value=1;
+      clearFgErrors('bookModal');
+      openModal('bookModal');
+    }
+  },
+
+  closeModal() { closeModal('bookModal'); this.editId=null; },
+
+  async save() {
+    const id = document.getElementById('bkId').value.trim();
+    const title = document.getElementById('bkTitle').value.trim();
+    const author = document.getElementById('bkAuthor').value.trim();
+    const category = document.getElementById('bkCategory').value;
+    const qty = parseInt(document.getElementById('bkQty').value)||0;
+    const isbn = document.getElementById('bkIsbn').value.trim();
+    const publisher = document.getElementById('bkPublisher').value.trim();
+    const year = parseInt(document.getElementById('bkYear').value)||null;
+    const location = document.getElementById('bkLocation').value.trim();
+
+    let valid=true; clearFgErrors('bookModal');
+    const books = await DB.getBooks();
+    if (!id) { fgErr('bkId',true); valid=false; }
+    if (!this.editId && books.find(b=>(b.book_code||b.id)===id)) { fgErr('bkId',true,'ID already exists!'); valid=false; }
+    if (!title) { fgErr('bkTitle',true); valid=false; }
+    if (!author) { fgErr('bkAuthor',true); valid=false; }
+    if (!category) { fgErr('bkCategory',true); valid=false; }
+    if (qty<1) { fgErr('bkQty',true); valid=false; }
+    if (!valid) return;
+
+    try {
+      if (this.editId) {
+        const old = books.find(b=>b.id===this.editId);
+        const oldQty = old?.total_copies||old?.quantity||0;
+        const oldAvail = old?.available_copies||old?.available||0;
+        const diff = qty - oldQty;
+        await DB.updateBook(this.editId, {
+          title, author, category, isbn, publisher, location,
+          publication_year: year,
+          total_copies: qty, quantity: qty,
+          available_copies: Math.max(0, oldAvail+diff),
+          available: Math.max(0, oldAvail+diff)
+        });
+        DB.addActivity('add',`📖 Book <strong>${title}</strong> updated`);
+        Toast.show('Book updated!','success');
+      } else {
+        await DB.addBook({
+          id: 'b-'+Date.now(),
+          book_code: id, isbn, title, author, category, publisher, location,
+          publication_year: year,
+          total_copies: qty, quantity: qty,
+          available_copies: qty, available: qty,
+          status: 'available'
+        });
+        DB.addActivity('add',`📚 Book <strong>${title}</strong> added`);
+        Toast.show('Book added!','success');
+      }
+      this.closeModal(); this.render(); Dashboard.render();
+    } catch(e) { Toast.show('Error: '+e.message,'error'); }
+  },
+
+  async delete(id) {
+    const books = await DB.getBooks();
+    const b = books.find(x=>x.id===id);
+    const issues = await DB.getIssues();
+    if (issues.some(i=>(i.bookId===id||i.book_id===id)&&!i.returned&&i.status!=='returned')) {
+      Toast.show('Cannot delete: book has active issues!','error'); return;
+    }
+    Confirm.show('Delete Book',`Delete "${b?.title}"? This cannot be undone.`,async()=>{
+      await DB.deleteBook(id);
+      DB.addActivity('delete',`🗑️ Book <strong>${b?.title}</strong> deleted`);
+      Toast.show('Book deleted.','success');
+      Books.render(); Dashboard.render();
+    },'Delete','btn-danger','🗑️');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   STUDENTS / USERS MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Students = {
+  editId: null, page: 1,
+
+  async render() {
+    const q = document.getElementById('studentSearch')?.value?.toLowerCase()||'';
+    const roleF = document.getElementById('studentRoleFilter')?.value||'';
+    const users = await DB.getUsers({ search: q, role: roleF });
+    const issues = await DB.getIssues();
+    const { data, pages } = U.paginate(users, this.page);
+    const tbody = document.getElementById('studentsTbody');
+
+    if (!data.length) {
+      tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🎓</div><h3>No users found</h3><p>${users.length===0?'Add users to get started.':'Try a different search.'}</p></div></td></tr>`;
+    } else {
+      tbody.innerHTML = data.map(u=>{
+        const uid = u.id;
+        const activeIssues = issues.filter(i=>(i.studentId===uid||i.user_id===uid)&&!i.returned&&i.status!=='returned').length;
+        const settings = DB.getSettings();
+        let totalFine = 0;
+        issues.filter(i=>(i.studentId===uid||i.user_id===uid)&&!i.returned&&i.status!=='returned').forEach(i=>{
+          const d=U.daysDiff(i.dueDate||i.due_date);
+          if(d>0) totalFine+=d*settings.fineRate;
+        });
+        const roleBadges = {student:'badge-teal',librarian:'badge-amber',admin:'badge-rust'};
+        return `<tr>
+          <td><strong>${U.esc(u.user_code||u.id)}</strong></td>
+          <td>${U.esc(u.full_name||u.name)}</td>
+          <td><span class="badge ${roleBadges[u.role]||'badge-gray'}">${u.role}</span></td>
+          <td><small>${U.esc(u.class_grade||u.class||'—')}</small></td>
+          <td><small>${U.esc(u.email||'—')}</small></td>
+          <td><span class="badge ${activeIssues>0?'badge-amber':'badge-gray'}">${activeIssues}</span></td>
+          <td><span class="fine-amt ${totalFine>0?'overdue':'ok'}">$${totalFine.toFixed(2)}</span></td>
+          <td><div class="t-actions">
+            <button class="btn-te" onclick="Students.openModal('${uid}')">✏️</button>
+            <button class="btn-dl" onclick="Students.delete('${uid}')">🗑️</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    }
+    U.renderPager('studentsPagination', this.page, pages, 'Students.goPage');
+  },
+
+  goPage(p){ Students.page=p; Students.render(); },
+
+  async openModal(editId=null) {
+    this.editId=editId;
+    if (editId) {
+      const users = await DB.getUsers();
+      const u = users.find(x=>x.id===editId);
+      if (!u) return;
+      document.getElementById('studentModalTitle').textContent='✏️ Edit User';
+      document.getElementById('stId').value=u.user_code||u.id;
+      document.getElementById('stId').disabled=true;
+      document.getElementById('stName').value=u.full_name||u.name||'';
+      document.getElementById('stRole').value=u.role||'student';
+      document.getElementById('stClass').value=u.class_grade||u.class||'';
+      document.getElementById('stEmail').value=u.email||'';
+      document.getElementById('stPhone').value=u.phone||'';
+    } else {
+      document.getElementById('studentModalTitle').textContent='➕ Add User';
+      document.getElementById('stId').disabled=false;
+      const users = await DB.getUsers();
+      document.getElementById('stId').value=U.genId('STU',users,'user_code')||U.genId('STU',users,'id');
+      ['stName','stClass','stEmail','stPhone'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('stRole').value='student';
+    }
+    clearFgErrors('studentModal');
+    openModal('studentModal');
+  },
+
+  closeModal() { closeModal('studentModal'); this.editId=null; },
+
+  async save() {
+    const id=document.getElementById('stId').value.trim();
+    const name=document.getElementById('stName').value.trim();
+    const role=document.getElementById('stRole').value;
+    const cls=document.getElementById('stClass').value.trim();
+    const email=document.getElementById('stEmail').value.trim();
+    const phone=document.getElementById('stPhone').value.trim();
+
+    let valid=true; clearFgErrors('studentModal');
+    const users=await DB.getUsers();
+    if(!id){fgErr('stId',true);valid=false;}
+    if(!this.editId&&users.find(u=>(u.user_code||u.id)===id)){fgErr('stId',true,'ID already exists!');valid=false;}
+    if(!name){fgErr('stName',true);valid=false;}
+    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fgErr('stEmail',true,'Invalid email');valid=false;}
+    if(!valid) return;
+
+    try {
+      if (this.editId) {
+        await DB.updateUser(this.editId, {name, full_name:name, role, class_grade:cls, class:cls, email, phone});
+        DB.addActivity('add',`🎓 User <strong>${name}</strong> updated`);
+        Toast.show('User updated!','success');
+      } else {
+        await DB.addUser({id:'u-'+Date.now(),user_code:id,name,full_name:name,role,class_grade:cls,class:cls,email,phone});
+        DB.addActivity('add',`🎓 User <strong>${name}</strong> added`);
+        Toast.show('User added!','success');
+      }
+      this.closeModal(); this.render(); Dashboard.render();
+    } catch(e) { Toast.show('Error: '+e.message,'error'); }
+  },
+
+  async delete(id) {
+    const users=await DB.getUsers();
+    const u=users.find(x=>x.id===id);
+    const issues=await DB.getIssues();
+    if(issues.some(i=>(i.studentId===id||i.user_id===id)&&!i.returned&&i.status!=='returned')){
+      Toast.show('Cannot delete: user has active issues!','error'); return;
+    }
+    Confirm.show('Remove User',`Remove "${u?.full_name||u?.name}"? Issue history is preserved.`,async()=>{
+      await DB.deleteUser(id);
+      DB.addActivity('delete',`🗑️ User <strong>${u?.full_name||u?.name}</strong> removed`);
+      Toast.show('User removed.','success');
+      Students.render(); Dashboard.render();
+    },'Remove','btn-danger','🗑️');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   ISSUES MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Issues = {
+  page: 1,
+
+  async render() {
+    const filter=document.getElementById('issueFilter')?.value||'active';
+    const q=document.getElementById('issueSearch')?.value?.toLowerCase()||'';
+    const issues=await DB.getIssues({status:filter==='all'?undefined:filter,search:q});
+    const sorted=[...issues].sort((a,b)=>(b.issueDate||b.issue_date||'').localeCompare(a.issueDate||a.issue_date||''));
+    const books=await DB.getBooks();
+    const users=await DB.getUsers();
+    const settings=DB.getSettings();
+    const {data,pages}=U.paginate(sorted,this.page);
+    const tbody=document.getElementById('issuesTbody');
+
+    if(!data.length){
+      tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔄</div><h3>No issues found</h3><p>Issue a book to a user to get started.</p></div></td></tr>`;
+    } else {
+      tbody.innerHTML=data.map(issue=>{
+        const b=books.find(x=>x.id===(issue.bookId||issue.book_id));
+        const u=users.find(x=>x.id===(issue.studentId||issue.user_id));
+        const returned=issue.returned||issue.status==='returned';
+        const od=!returned?U.daysDiff(issue.dueDate||issue.due_date):0;
+        const fine=od>0?(od*settings.fineRate).toFixed(2):'0.00';
+        let stBadge='', actionBtn='';
+        if(returned){stBadge=`<span class="badge badge-gray">Returned</span>`;}
+        else if(od>0){stBadge=`<span class="badge badge-red">Overdue</span>`;actionBtn=`<button class="btn-rt" onclick="Issues.returnBook('${issue.id}')">↩ Return</button>`;}
+        else{stBadge=`<span class="badge badge-green">Active</span>`;actionBtn=`<button class="btn-rt" onclick="Issues.returnBook('${issue.id}')">↩ Return</button>`;}
+        return `<tr>
+          <td><strong>${U.esc(issue.issue_code||issue.id)}</strong></td>
+          <td><small>${U.esc(u?.full_name||u?.name||'?')}</small></td>
+          <td>${U.esc(b?.title||'?')}</td>
+          <td>${U.fmt(issue.issueDate||issue.issue_date)}</td>
+          <td>${U.fmt(issue.dueDate||issue.due_date)}</td>
+          <td><span class="fine-amt ${od>0?'overdue':'ok'}">$${fine}</span></td>
+          <td>${stBadge}</td>
+          <td><div class="t-actions">${actionBtn}</div></td>
+        </tr>`;
+      }).join('');
+    }
+    U.renderPager('issuesPagination',this.page,pages,'Issues.goPage');
+  },
+
+  goPage(p){Issues.page=p;Issues.render();},
+
+  async openModal() {
+    const users=await DB.getUsers();
+    const books=await DB.getBooks();
+    const settings=DB.getSettings();
+    document.getElementById('issueStudent').innerHTML='<option value="">— Choose User —</option>'+
+      users.map(u=>`<option value="${u.id}">${u.full_name||u.name} (${u.user_code||u.id})</option>`).join('');
+    document.getElementById('issueBook').innerHTML='<option value="">— Choose Book —</option>'+
+      books.filter(b=>(b.available_copies||b.available||0)>0)
+        .map(b=>`<option value="${b.id}">${b.title} (${b.available_copies||b.available} avail.)</option>`).join('');
+    const today=U.today();
+    document.getElementById('issueDate').value=today;
+    document.getElementById('issueDue').value=U.addDays(today,settings.loanPeriod);
+    document.getElementById('issueRemarks').value='';
+    clearFgErrors('issueModal');
+    openModal('issueModal');
+  },
+
+  closeModal(){closeModal('issueModal');},
+
+  async save() {
+    const studentId=document.getElementById('issueStudent').value;
+    const bookId=document.getElementById('issueBook').value;
+    const issueDate=document.getElementById('issueDate').value;
+    const dueDate=document.getElementById('issueDue').value;
+    const remarks=document.getElementById('issueRemarks').value.trim();
+
+    let valid=true; clearFgErrors('issueModal');
+    if(!studentId){fgErr('issueStudent',true,'Select a user');valid=false;}
+    if(!bookId){fgErr('issueBook',true,'Select a book');valid=false;}
+    if(!dueDate||dueDate<=issueDate){fgErr('issueDue',true);valid=false;}
+    if(!valid) return;
+
+    const books=await DB.getBooks();
+    const bi=books.find(b=>b.id===bookId);
+    if((bi?.available_copies||bi?.available||0)<1){Toast.show('No available copies!','error');return;}
+
+    try {
+      const issues=await DB.getIssues();
+      const issueId=U.genId('ISS',issues,'issue_code')||U.genId('ISS',issues,'id');
+      await DB.addIssue({
+        id:'i-'+Date.now(), issue_code:issueId,
+        studentId, bookId, userId:studentId, book_id:bookId, user_id:studentId,
+        issueDate, dueDate, issue_date:issueDate, due_date:dueDate,
+        remarks, returned:false, status:'active'
+      });
+      // Decrease availability
+      await DB.updateBook(bookId,{
+        available_copies:Math.max(0,(bi.available_copies||bi.available||0)-1),
+        available:Math.max(0,(bi.available_copies||bi.available||0)-1)
+      });
+
+      const u=await DB.getUsers().then(us=>us.find(x=>x.id===studentId));
+      DB.addActivity('issue',`🔄 <strong>${bi.title}</strong> issued to <strong>${u?.full_name||u?.name||studentId}</strong>`);
+      Toast.show('Book issued!','success');
+      this.closeModal(); this.render(); Dashboard.render();
+    } catch(e){Toast.show('Error: '+e.message,'error');}
+  },
+
+  async returnBook(issueId) {
+    const issues=await DB.getIssues();
+    const issue=issues.find(i=>i.id===issueId);
+    if(!issue) return;
+    const books=await DB.getBooks();
+    const b=books.find(x=>x.id===(issue.bookId||issue.book_id));
+    const users=await DB.getUsers();
+    const u=users.find(x=>x.id===(issue.studentId||issue.user_id));
+    const settings=DB.getSettings();
+    const od=U.daysDiff(issue.dueDate||issue.due_date);
+    const fine=od>0?(od*settings.fineRate).toFixed(2):'0.00';
+    const fineMsg=od>0?` Fine: $${fine}.`:'';
+
+    Confirm.show('Return Book',
+      `Return "${b?.title}" from ${u?.full_name||u?.name||'user'}?${fineMsg}`,
+      async()=>{
+        await DB.updateIssue(issueId,{returned:true,status:'returned',returnDate:U.today(),return_date:U.today()});
+        if(b) await DB.updateBook(b.id,{
+          available_copies:Math.min(b.total_copies||b.quantity||1,(b.available_copies||b.available||0)+1),
+          available:Math.min(b.total_copies||b.quantity||1,(b.available_copies||b.available||0)+1)
+        });
+        DB.addActivity('return',`↩ <strong>${b?.title}</strong> returned by <strong>${u?.full_name||u?.name||'user'}</strong>`);
+        Toast.show(`Book returned!${fine>0?' Fine: $'+fine:''}`,od>0?'warning':'success');
+        Issues.render(); Dashboard.render(); Fines.render && Fines.render();
+      },
+      od>0?`Confirm Return (Fine $${fine})`:'Confirm Return',
+      od>0?'btn-amber':'btn-teal', '↩');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   MY ISSUES (student view)
+═══════════════════════════════════════════════════════════════════ */
+const MyIssues = {
+  async render() {
+    const userId=Auth.currentUser?.id;
+    if(!userId) return;
+    const issues=await DB.getIssues({userId});
+    const books=await DB.getBooks();
+    const settings=DB.getSettings();
+    const tbody=document.getElementById('myIssuesTbody');
+    if(!issues.length){
+      tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><h3>No borrowings yet</h3><p>Books you borrow will appear here.</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML=issues.map(issue=>{
+      const b=books.find(x=>x.id===(issue.bookId||issue.book_id));
+      const returned=issue.returned||issue.status==='returned';
+      const od=!returned?U.daysDiff(issue.dueDate||issue.due_date):0;
+      const fine=od>0?(od*settings.fineRate).toFixed(2):'0.00';
+      return `<tr>
+        <td>${U.esc(b?.title||'?')}</td>
+        <td>${U.fmt(issue.issueDate||issue.issue_date)}</td>
+        <td>${U.fmt(issue.dueDate||issue.due_date)}</td>
+        <td>${returned?U.fmt(issue.returnDate||issue.return_date):'—'}</td>
+        <td><span class="fine-amt ${od>0?'overdue':'ok'}">$${fine}</span></td>
+        <td>${returned?`<span class="badge badge-gray">Returned</span>`:od>0?`<span class="badge badge-red">Overdue</span>`:`<span class="badge badge-green">Active</span>`}</td>
+      </tr>`;
+    }).join('');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   FINES MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Fines = {
+  async render() {
+    const issues=await DB.getIssues({status:'active'});
+    const books=await DB.getBooks();
+    const users=await DB.getUsers();
+    const settings=DB.getSettings();
+
+    const overdue=issues.filter(i=>U.daysDiff(i.dueDate||i.due_date)>0);
+    let total=0;
+    overdue.forEach(i=>{ const d=U.daysDiff(i.dueDate||i.due_date); total+=d*settings.fineRate; });
+
+    document.getElementById('fineOverdueCount').textContent=overdue.length;
+    document.getElementById('fineTotalAmt').textContent='$'+total.toFixed(2);
+    document.getElementById('fineRateDisplay').textContent='$'+settings.fineRate.toFixed(2);
+
+    const tbody=document.getElementById('finesTbody');
+    const isStaff=Auth.currentRole==='admin'||Auth.currentRole==='librarian';
+    const role=Auth.currentRole;
+
+    // For students, only show their own
+    let displayed=issues;
+    if(role==='student') displayed=issues.filter(i=>(i.studentId||i.user_id)===Auth.currentUser?.id);
+
+    if(!displayed.length){
+      tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">💰</div><h3>No active issues</h3></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML=displayed.map(issue=>{
+      const b=books.find(x=>x.id===(issue.bookId||issue.book_id));
+      const u=users.find(x=>x.id===(issue.studentId||issue.user_id));
+      const od=U.daysDiff(issue.dueDate||issue.due_date);
+      const fine=od>0?(od*settings.fineRate).toFixed(2):'0.00';
+      return `<tr>
+        <td><strong>${U.esc(issue.issue_code||issue.id)}</strong></td>
+        <td>${U.esc(u?.full_name||u?.name||'?')}</td>
+        <td>${U.esc(b?.title||'?')}</td>
+        <td>${U.fmt(issue.dueDate||issue.due_date)}</td>
+        <td><span class="${od>0?'fine-amt overdue':''}">${od>0?od+' days':'On time'}</span></td>
+        <td><span class="fine-amt ${od>0?'overdue':'ok'}">$${fine}</span></td>
+        <td><span class="badge ${od>0?'badge-red':'badge-green'}">${od>0?'Overdue':'Active'}</span></td>
+        <td>${isStaff&&od>0?`<button class="btn-rt btn-xs" onclick="Fines.markPaid('${issue.id}')">✔ Mark Paid</button>`:'—'}</td>
+      </tr>`;
+    }).join('');
+  },
+
+  async markPaid(issueId) {
+    Confirm.show('Mark Fine Paid','Mark this fine as collected and return the book?',async()=>{
+      await Issues.returnBook(issueId);
+      Toast.show('Fine marked as paid and book returned.','success');
+      Fines.render();
+    },'Mark Paid','btn-emerald','✅');
+  },
+
+  setRateModal() {
+    document.getElementById('fineRateInput').value=DB.getSettings().fineRate;
+    openModal('fineRateModal');
+  },
+  closeRateModal(){closeModal('fineRateModal');},
+  saveRate() {
+    const r=parseFloat(document.getElementById('fineRateInput').value);
+    if(isNaN(r)||r<0){Toast.show('Invalid rate','error');return;}
+    const s=DB.getSettings(); s.fineRate=r; DB.setSettings(s);
+    closeModal('fineRateModal');
+    Toast.show(`Fine rate set to $${r.toFixed(2)}/day`,'success');
+    this.render(); Settings.render && Settings.render();
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════════════════════════ */
+const Reports = {
+  current: 'issued',
+  async render() { this.renderReport(this.current); },
+  async renderReport(type) {
+    this.current=type;
+    document.querySelectorAll('.rpt-tab').forEach(t=>t.classList.toggle('active',t.dataset.report===type));
+    const books=await DB.getBooks();
+    const users=await DB.getUsers();
+    const issues=await DB.getIssues();
+    const settings=DB.getSettings();
+    let headH='', rowsH='';
+
+    const emptyRow=(cols,msg)=>`<tr><td colspan="${cols}"><div class="empty-state"><div class="empty-icon">📋</div><h3>${msg}</h3></div></td></tr>`;
+
+    if(type==='issued'){
+      headH='<tr><th>ID</th><th>User</th><th>Book</th><th>Issued</th><th>Due</th><th>Status</th></tr>';
+      const active=issues.filter(i=>!i.returned&&i.status!=='returned').sort((a,b)=>(a.dueDate||a.due_date||'').localeCompare(b.dueDate||b.due_date||''));
+      rowsH=!active.length?emptyRow(6,'No issued books'):active.map(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        const od=U.daysDiff(i.dueDate||i.due_date);
+        return `<tr><td>${U.esc(i.issue_code||i.id)}</td><td>${U.esc(u?.full_name||u?.name||'?')}</td><td>${U.esc(b?.title||'?')}</td><td>${U.fmt(i.issueDate||i.issue_date)}</td><td>${U.fmt(i.dueDate||i.due_date)}</td><td><span class="badge ${od>0?'badge-red':'badge-green'}">${od>0?'Overdue':'Active'}</span></td></tr>`;
+      }).join('');
+    } else if(type==='overdue'){
+      headH='<tr><th>ID</th><th>User</th><th>Book</th><th>Due</th><th>Days Over</th><th>Fine</th></tr>';
+      const od=issues.filter(i=>!i.returned&&i.status!=='returned'&&U.daysDiff(i.dueDate||i.due_date)>0);
+      rowsH=!od.length?emptyRow(6,'No overdue books! 🎉'):od.map(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        const days=U.daysDiff(i.dueDate||i.due_date);
+        return `<tr><td>${U.esc(i.issue_code||i.id)}</td><td>${U.esc(u?.full_name||u?.name||'?')}</td><td>${U.esc(b?.title||'?')}</td><td>${U.fmt(i.dueDate||i.due_date)}</td><td><span class="fine-amt overdue">${days}d</span></td><td><span class="fine-amt overdue">$${(days*settings.fineRate).toFixed(2)}</span></td></tr>`;
+      }).join('');
+    } else if(type==='available'){
+      headH='<tr><th>ID</th><th>Title</th><th>Author</th><th>Category</th><th>Total</th><th>Available</th><th>Location</th></tr>';
+      rowsH=!books.length?emptyRow(7,'No books'):books.map(b=>{
+        const avail=b.available_copies??b.available??0;
+        return `<tr><td>${U.esc(b.book_code||b.id)}</td><td>${U.esc(b.title)}</td><td>${U.esc(b.author)}</td><td><span class="badge badge-teal">${U.esc(b.category||'—')}</span></td><td>${b.total_copies||b.quantity||0}</td><td><span class="badge ${avail>0?'badge-green':'badge-red'}">${avail}</span></td><td><small>${U.esc(b.location||'—')}</small></td></tr>`;
+      }).join('');
+    } else if(type==='popular'){
+      headH='<tr><th>Title</th><th>Author</th><th>Category</th><th>Times Issued</th><th>Rank</th></tr>';
+      const countMap={};
+      issues.forEach(i=>{ const bid=i.bookId||i.book_id; countMap[bid]=(countMap[bid]||0)+1; });
+      const ranked=[...books].sort((a,b)=>(countMap[b.id]||0)-(countMap[a.id]||0)).slice(0,20);
+      rowsH=!ranked.length?emptyRow(5,'No data'):ranked.map((b,i)=>`<tr><td>${U.esc(b.title)}</td><td>${U.esc(b.author)}</td><td><span class="badge badge-teal">${U.esc(b.category||'—')}</span></td><td><strong>${countMap[b.id]||0}</strong></td><td>#${i+1}</td></tr>`).join('');
+    } else if(type==='history'){
+      headH='<tr><th>User</th><th>Class</th><th>Book</th><th>Issued</th><th>Returned</th><th>Status</th></tr>';
+      const sorted=[...issues].sort((a,b)=>(b.issueDate||b.issue_date||'').localeCompare(a.issueDate||a.issue_date||''));
+      rowsH=!sorted.length?emptyRow(6,'No history'):sorted.map(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        const ret=i.returned||i.status==='returned';
+        return `<tr><td>${U.esc(u?.full_name||u?.name||'?')}</td><td><small>${U.esc(u?.class_grade||u?.class||'—')}</small></td><td>${U.esc(b?.title||'?')}</td><td>${U.fmt(i.issueDate||i.issue_date)}</td><td>${ret?U.fmt(i.returnDate||i.return_date):'—'}</td><td><span class="badge ${ret?'badge-gray':'badge-green'}">${ret?'Returned':'Active'}</span></td></tr>`;
+      }).join('');
+    }
+
+    document.getElementById('reportHead').innerHTML=headH;
+    document.getElementById('reportTbody').innerHTML=rowsH;
+  },
+
+  async exportCSV() {
+    const books=await DB.getBooks();
+    const users=await DB.getUsers();
+    const issues=await DB.getIssues();
+    const settings=DB.getSettings();
+    const type=this.current;
+    let rows=[];
+
+    if(type==='issued'){
+      rows.push(['ID','User','Book','Issued','Due','Status']);
+      issues.filter(i=>!i.returned&&i.status!=='returned').forEach(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        rows.push([i.issue_code||i.id,u?.full_name||u?.name||'?',b?.title||'?',i.issueDate||i.issue_date,i.dueDate||i.due_date,U.daysDiff(i.dueDate||i.due_date)>0?'Overdue':'Active']);
+      });
+    } else if(type==='overdue'){
+      rows.push(['ID','User','Book','Due','Days Over','Fine']);
+      issues.filter(i=>!i.returned&&i.status!=='returned'&&U.daysDiff(i.dueDate||i.due_date)>0).forEach(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        const d=U.daysDiff(i.dueDate||i.due_date);
+        rows.push([i.issue_code||i.id,u?.full_name||u?.name||'?',b?.title||'?',i.dueDate||i.due_date,d,(d*settings.fineRate).toFixed(2)]);
+      });
+    } else if(type==='available'){
+      rows.push(['ID','Title','Author','Category','Total','Available','Location']);
+      books.forEach(b=>rows.push([b.book_code||b.id,b.title,b.author,b.category||'',b.total_copies||b.quantity||0,b.available_copies??b.available??0,b.location||'']));
+    } else {
+      rows.push(['User','Class','Book','Issued','Returned','Status']);
+      issues.forEach(i=>{
+        const b=books.find(x=>x.id===(i.bookId||i.book_id));
+        const u=users.find(x=>x.id===(i.studentId||i.user_id));
+        rows.push([u?.full_name||u?.name||'?',u?.class_grade||u?.class||'',b?.title||'?',i.issueDate||i.issue_date,i.returnDate||i.return_date||'',(i.returned||i.status==='returned')?'Returned':'Active']);
+      });
+    }
+
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`scholarlib_${type}_${U.today()}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+    Toast.show('CSV exported!','success');
+  }
+};
+
+document.querySelectorAll('.rpt-tab').forEach(t=>t.addEventListener('click',()=>Reports.renderReport(t.dataset.report)));
+
+/* ═══════════════════════════════════════════════════════════════════
+   SETTINGS MODULE
+═══════════════════════════════════════════════════════════════════ */
+const Settings = {
+  async render() {
+    const s=DB.getSettings();
+    document.getElementById('settingName').value=s.libName||'';
+    document.getElementById('settingFineRate').value=s.fineRate||0.5;
+    document.getElementById('settingLoanPeriod').value=s.loanPeriod||14;
+
+    const catList=document.getElementById('catList');
+    catList.innerHTML=s.categories.map(c=>`
+      <span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-light);color:var(--teal);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600">
+        ${U.esc(c)}
+        <button onclick="Settings.removeCat('${U.esc(c)}')" style="background:none;color:inherit;cursor:pointer;font-size:.75rem;margin-left:2px">✕</button>
+      </span>`).join('');
+
+    const books=await DB.getBooks();
+    const users=await DB.getUsers();
+    const issues=await DB.getIssues();
+    document.getElementById('sysBooks').textContent=books.length;
+    document.getElementById('sysStudents').textContent=users.length;
+    document.getElementById('sysIssues').textContent=issues.filter(i=>!i.returned&&i.status!=='returned').length;
+    document.getElementById('sysTotalIssues').textContent=issues.length;
+    document.getElementById('sysLogs').textContent=DB.getActivity().length;
+  },
+  save() {
+    const s=DB.getSettings();
+    s.libName=document.getElementById('settingName').value.trim()||'ScholarLib';
+    s.fineRate=parseFloat(document.getElementById('settingFineRate').value)||0.5;
+    s.loanPeriod=parseInt(document.getElementById('settingLoanPeriod').value)||14;
+    DB.setSettings(s);
+    Toast.show('Settings saved!','success');
+    this.render();
+  },
+  addCat() {
+    const input=document.getElementById('newCatInput');
+    const name=input.value.trim();
+    if(!name) return;
+    const s=DB.getSettings();
+    if(s.categories.includes(name)){Toast.show('Category exists!','warning');return;}
+    s.categories.push(name); DB.setSettings(s);
+    input.value=''; this.render();
+    Toast.show(`Category "${name}" added!`,'success');
+  },
+  removeCat(name) {
+    DB.getBooks().then(books=>{
+      if(books.some(b=>b.category===name)){Toast.show('Category in use!','warning');return;}
+      const s=DB.getSettings();
+      s.categories=s.categories.filter(c=>c!==name);
+      DB.setSettings(s); this.render();
+      Toast.show(`"${name}" removed.`,'success');
+    });
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   AI BULK IMPORT BOT
+   Smart column detection with multiple alias variations
+═══════════════════════════════════════════════════════════════════ */
+const BotImport = {
+  rawData: [],         // All parsed rows
+  headers: [],         // Column headers from file
+  columnMap: {},       // field -> detected header index
+  lastImportIds: [],   // For undo support
+  importErrors: [],    // Rows that failed
+  overrideField: null, // For the override modal
+
+  // Column aliases — the bot checks each variation case-insensitively
+  aliases: {
+    title:    ['title','book_title','book title','name','book_name','book name','books'],
+    author:   ['author','author_name','authors','creator','writer','written_by','by'],
+    isbn:     ['isbn','isbn13','isbn10','isbn-13','isbn-10','identifier','id_number','barcode','ean'],
+    category: ['category','genre','type','subject','department','section','class','tag','tags'],
+    quantity: ['quantity','qty','copies','count','total_copies','total copies','num_copies','stock','copy','number'],
+    location: ['location','shelf','rack','position','shelf_location','shelf location','row','aisle','room'],
+    publisher:['publisher','pub','publishing','published_by','press'],
+    year:     ['year','pub_year','publication_year','published_year','date','year_published'],
+  },
+
+  detectColumns(headers) {
+    const map = {};
+    const headersLower = headers.map(h => String(h).toLowerCase().trim());
+
+    Object.entries(this.aliases).forEach(([field, alts]) => {
+      // Exact match first
+      let idx = headersLower.findIndex(h => alts.some(a => h === a));
+      // Partial match fallback
+      if (idx === -1) idx = headersLower.findIndex(h => alts.some(a => h.includes(a) || a.includes(h)));
+      map[field] = idx >= 0 ? idx : null;
+    });
+    return map;
+  },
+
+  handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Setup drag-and-drop appearance
+    const zone = document.getElementById('dropZone');
+    zone.innerHTML = `<div class="spinner"></div><p style="margin-top:10px">Reading file…</p>`;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        let rows = [];
+        if (file.name.endsWith('.csv')) {
+          // Parse CSV manually
+          const text = e.target.result;
+          rows = this.parseCSV(text);
+        } else {
+          // Excel via SheetJS
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        }
+
+        if (!rows || rows.length < 2) {
+          Toast.show('File is empty or has no data rows.', 'error');
+          this.reset(); return;
+        }
+
+        this.headers = rows[0].map(h => String(h).trim());
+        this.rawData = rows.slice(1).filter(r => r.some(c => String(c||'').trim())); // Remove empty rows
+        this.columnMap = this.detectColumns(this.headers);
+
+        document.getElementById('botFileInfo').textContent = `${file.name} — ${this.rawData.length} rows`;
+        this.renderColumnMapping();
+        this.renderPreview();
+        this.showStep(2);
+      } catch(err) {
+        Toast.show('Failed to parse file: ' + err.message, 'error');
+        this.reset();
+      }
+    };
+
+    if (file.name.endsWith('.csv')) reader.readAsText(file);
+    else reader.readAsArrayBuffer(file);
+  },
+
+  parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const row = [];
+      let inQuotes = false, cur = '';
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') {
+          if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (c === ',' && !inQuotes) {
+          row.push(cur.trim()); cur = '';
+        } else cur += c;
+      }
+      row.push(cur.trim());
+      rows.push(row);
+    }
+    return rows;
+  },
+
+  renderColumnMapping() {
+    const required = ['title','author'];
+    const optional = ['isbn','category','quantity','location','publisher','year'];
+    const grid = document.getElementById('colMappingGrid');
+
+    grid.innerHTML = [...required, ...optional].map(field => {
+      const idx = this.columnMap[field];
+      const found = idx !== null;
+      const colName = found ? this.headers[idx] : 'Not detected';
+      const isReq = required.includes(field);
+      return `
+        <div class="col-map-item" onclick="BotImport.openOverride('${field}')">
+          <div class="col-map-label">${field} ${isReq?'<span style="color:var(--crimson)">*</span>':''}</div>
+          <div class="col-map-val">${U.esc(colName)}</div>
+          <div class="col-map-status ${found?'found':'missing'}">
+            ${found ? '✅ Detected' : '❌ Not found'} <span style="font-size:.68rem;color:var(--ink-faint);margin-left:4px">click to change</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Validate required fields
+    const missingRequired = required.filter(f => this.columnMap[f] === null);
+    const importBtn = document.getElementById('startImportBtn');
+    if (missingRequired.length) {
+      importBtn.disabled = true;
+      importBtn.title = `Missing required columns: ${missingRequired.join(', ')}`;
+    } else {
+      importBtn.disabled = false;
+      importBtn.title = '';
+    }
+  },
+
+  renderPreview() {
+    const fields = ['title','author','isbn','category','quantity','location'];
+    const head = document.getElementById('previewHead');
+    const body = document.getElementById('previewBody');
+
+    head.innerHTML = '<tr>' + fields.map(f => `<th>${f}</th>`).join('') + '</tr>';
+    const preview = this.rawData.slice(0, 5);
+    body.innerHTML = preview.map(row => {
+      return '<tr>' + fields.map(f => {
+        const idx = this.columnMap[f];
+        const val = idx !== null ? (row[idx] || '—') : '—';
+        return `<td>${U.esc(String(val))}</td>`;
+      }).join('') + '</tr>';
+    }).join('');
+  },
+
+  openOverride(field) {
+    this.overrideField = field;
+    document.getElementById('colOverrideField').value = field;
+    const sel = document.getElementById('colOverrideSelect');
+    sel.innerHTML = '<option value="-1">— Not mapped —</option>' +
+      this.headers.map((h, i) => `<option value="${i}" ${this.columnMap[field]===i?'selected':''}>${U.esc(h)} (col ${i+1})</option>`).join('');
+    openModal('colOverrideModal');
+  },
+
+  applyOverride() {
+    const val = parseInt(document.getElementById('colOverrideSelect').value);
+    this.columnMap[this.overrideField] = val >= 0 ? val : null;
+    closeModal('colOverrideModal');
+    this.renderColumnMapping();
+    this.renderPreview();
+  },
+
+  async startImport() {
+    this.showStep(3);
+    this.importErrors = [];
+    this.lastImportIds = [];
+    const settings = DB.getSettings();
+    const existingBooks = await DB.getBooks();
+
+    let success = 0, skip = 0;
+    const total = this.rawData.length;
+    const BATCH = 50;
+
+    const getVal = (row, field) => {
+      const idx = this.columnMap[field];
+      return idx !== null ? String(row[idx] || '').trim() : '';
+    };
+
+    for (let i = 0; i < total; i += BATCH) {
+      const batch = this.rawData.slice(i, i + BATCH);
+
+      for (const row of batch) {
+        const title = getVal(row, 'title');
+        const author = getVal(row, 'author');
+
+        if (!title || !author) {
+          this.importErrors.push({ row: i+this.rawData.indexOf(row)+2, data: row.join(', '), error: 'Missing title or author' });
+          skip++;
+          continue;
+        }
+
+        const isbn = getVal(row, 'isbn');
+        const category = getVal(row, 'category') || settings.categories[0] || 'General';
+        const qtyRaw = getVal(row, 'quantity');
+        const qty = parseInt(qtyRaw) || 1;
+        const location = getVal(row, 'location');
+        const publisher = getVal(row, 'publisher');
+        const yearRaw = getVal(row, 'year');
+        const year = parseInt(yearRaw) || null;
+
+        // Check for duplicate ISBN
+        if (isbn && existingBooks.some(b => b.isbn === isbn)) {
+          this.importErrors.push({ row: i+2, data: title, error: 'Duplicate ISBN: '+isbn });
+          skip++; continue;
+        }
+
+        // Ensure category exists
+        if (!settings.categories.includes(category) && category) {
+          settings.categories.push(category);
+          DB.setSettings(settings);
+        }
+
+        try {
+          const newBook = {
+            id: 'b-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+            book_code: U.genId('BK', [...existingBooks, ...this.lastImportIds.map(id=>({id}))], 'book_code'),
+            isbn, title, author, category, publisher, location,
+            publication_year: year, year,
+            total_copies: qty, quantity: qty,
+            available_copies: qty, available: qty,
+            status: 'available'
+          };
+          await DB.addBook(newBook);
+          existingBooks.push(newBook);
+          this.lastImportIds.push(newBook.id);
+          success++;
+        } catch(e) {
+          this.importErrors.push({ row: i+2, data: title, error: e.message });
+          skip++;
+        }
+      }
+
+      // Update progress
+      const pct = Math.round(((i + batch.length) / total) * 100);
+      document.getElementById('importProgress').style.width = pct + '%';
+      document.getElementById('importProgressLabel').textContent = `${Math.min(i+batch.length,total)} / ${total} rows`;
+      document.getElementById('importStatusText').textContent = `Importing… (${success} added, ${skip} skipped)`;
+
+      // Yield to browser
+      await new Promise(r => setTimeout(r, 0));
+    }
+
+    DB.addActivity('add', `🤖 Bulk import: <strong>${success}</strong> books added, ${skip} skipped`);
+    this.showResults(success, skip);
+  },
+
+  showResults(success, skip) {
+    this.showStep(4);
+    document.getElementById('importStats').innerHTML = `
+      <div class="import-stat success">✅ ${success} books imported</div>
+      <div class="import-stat ${skip>0?'error':''}">⚠️ ${skip} rows skipped</div>
+      <div class="import-stat">📊 ${success+skip} total rows</div>`;
+
+    if (this.importErrors.length) {
+      document.getElementById('importErrorsWrap').style.display = '';
+      document.getElementById('errorTbody').innerHTML = this.importErrors.map(e =>
+        `<tr><td>${e.row}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${U.esc(e.data)}</td><td style="color:var(--crimson)">${U.esc(e.error)}</td></tr>`
+      ).join('');
+    } else {
+      document.getElementById('importErrorsWrap').style.display = 'none';
+    }
+    Toast.show(`Imported ${success} books!`, success>0?'success':'warning');
+  },
+
+  downloadErrors() {
+    if (!this.importErrors.length) return;
+    const rows = [['Row','Data','Error'], ...this.importErrors.map(e=>[e.row,e.data,e.error])];
+    const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a = document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`import_errors_${U.today()}.csv`;
+    a.click();
+    Toast.show('Error report downloaded.','info');
+  },
+
+  async undoImport() {
+    if (!this.lastImportIds.length) { Toast.show('Nothing to undo.','warning'); return; }
+    Confirm.show('Undo Import',
+      `Remove the last ${this.lastImportIds.length} imported books?`,
+      async()=>{
+        for (const id of this.lastImportIds) await DB.deleteBook(id);
+        Toast.show(`Removed ${this.lastImportIds.length} books.`,'success');
+        this.lastImportIds=[];
+        document.getElementById('undoImportBtn').disabled=true;
+        Books.render(); Dashboard.render();
+      },'Undo','btn-danger','↩');
+  },
+
+  showStep(n) {
+    document.querySelectorAll('.bot-step').forEach((s,i)=>s.classList.toggle('active',i===n-1));
+  },
+
+  reset() {
+    this.rawData=[]; this.headers=[]; this.columnMap={};
+    document.getElementById('fileInput').value='';
+    const zone = document.getElementById('dropZone');
+    zone.innerHTML = `<input type="file" id="fileInput" class="drop-file-input" accept=".csv,.xlsx,.xls" onchange="BotImport.handleFile(this)"><div class="drop-zone-icon">📁</div><h3>Drop CSV or Excel file here</h3><p>Supports .csv, .xlsx, .xls — up to 5,000 rows<br>Drag & drop or click to browse</p>`;
+    zone.onclick=()=>document.getElementById('fileInput').click();
+    this.setupDropZone();
+    this.showStep(1);
+    document.getElementById('importErrorsWrap').style.display='none';
+  },
+
+  setupDropZone() {
+    const zone = document.getElementById('dropZone');
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault(); zone.classList.remove('drag-over');
+      const file=e.dataTransfer.files[0];
+      if(file) {
+        const fake={files:[file]};
+        BotImport.handleFile(fake);
+      }
+    });
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   APP-LEVEL
+═══════════════════════════════════════════════════════════════════ */
+const App = {
+  async backup() {
+    const data = {
+      version:'2.0', exportDate:new Date().toISOString(),
+      books: await DB.getBooks(),
+      students: await DB.getUsers(),
+      issues: await DB.getIssues(),
+      settings: DB.getSettings(),
+      activity: DB.getActivity()
+    };
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`scholarlib_backup_${U.today()}.json`;
+    a.click();
+    Toast.show('Backup downloaded!','success');
+  },
+
+  restore(input) {
+    const file=input.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try {
+        const data=JSON.parse(e.target.result);
+        Confirm.show('Restore Backup','Overwrite ALL current data with this backup?',()=>{
+          if(data.books) DB._localSet('library_books',data.books);
+          if(data.students) DB._localSet('library_students',data.students);
+          if(data.issues) DB._localSet('library_issues',data.issues);
+          if(data.settings) DB.setSettings(data.settings);
+          if(data.activity) DB._localSet('library_activity',data.activity);
+          Toast.show('Data restored!','success');
+          Nav.go('dashboard');
+        },'Restore','btn-teal','📂');
+      } catch { Toast.show('Invalid backup file!','error'); }
+      input.value='';
+    };
+    reader.readAsText(file);
+  },
+
+  clearAll() {
+    Confirm.show('⚠️ Clear All Data','Delete ALL books, users, issues, and activity logs? CANNOT BE UNDONE!',()=>{
+      ['library_books','library_students','library_issues','library_activity'].forEach(k=>localStorage.removeItem(k));
+      Toast.show('All data cleared.','warning');
+      Nav.go('dashboard');
+    },'Delete Everything','btn-danger','🗑️');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════════════════════════ */
+function openModal(id){ document.getElementById(id)?.classList.add('open'); }
+function closeModal(id){ document.getElementById(id)?.classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+function fgErr(inputId, show, msg) {
+  const el=document.getElementById(inputId);
+  if(!el) return;
+  const fg=el.closest('.fg');
+  if(!fg) return;
+  fg.classList.toggle('has-error',show);
+  if(msg){ const e=fg.querySelector('.ferr'); if(e) e.textContent=msg; }
+}
+function clearFgErrors(modalId) {
+  document.getElementById(modalId)?.querySelectorAll('.fg').forEach(g=>g.classList.remove('has-error'));
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════════════════════ */
+const Theme = {
+  toggle() {
+    const dark=document.documentElement.dataset.theme==='dark';
+    document.documentElement.dataset.theme=dark?'light':'dark';
+    localStorage.setItem('lib_theme',dark?'light':'dark');
+    this.updateBtn();
+  },
+  init() {
+    const saved=localStorage.getItem('lib_theme')||'light';
+    document.documentElement.dataset.theme=saved;
+    this.updateBtn();
+  },
+  updateBtn() {
+    const dark=document.documentElement.dataset.theme==='dark';
+    document.getElementById('themeIcon').textContent=dark?'☀️':'🌙';
+    document.getElementById('themeLabel').textContent=dark?'Light Mode':'Dark Mode';
+  }
+};
+document.getElementById('themeToggle').addEventListener('click',()=>Theme.toggle());
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE SIDEBAR
+═══════════════════════════════════════════════════════════════════ */
+document.getElementById('hamburger').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+});
+document.getElementById('sidebarBackdrop').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+═══════════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+    Confirm.cancel();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   INITIALIZE
+═══════════════════════════════════════════════════════════════════ */
+(async function init() {
+  Theme.init();
+  initSupabase();
+  BotImport.setupDropZone();
+
+  // Try restoring Supabase session
+  const sessionRestored = await Auth.checkSession();
+  if (sessionRestored) return;
+
+  // Seed sample data in localStorage if empty
+  if (!DB._local('library_books').length) {
+    DB._localSet('library_books', [
+      {id:'b1',book_code:'BK001',isbn:'978-0-14-028329-7',title:'To Kill a Mockingbird',author:'Harper Lee',category:'Fiction',publisher:'Lippincott',publication_year:1960,total_copies:5,quantity:5,available_copies:5,available:5,location:'A-1',status:'available'},
+      {id:'b2',book_code:'BK002',isbn:'978-0-7432-7356-5',title:'The Great Gatsby',author:'F. Scott Fitzgerald',category:'Literature',publisher:'Scribner',publication_year:1925,total_copies:3,quantity:3,available_copies:3,available:3,location:'F-2',status:'available'},
+      {id:'b3',book_code:'BK003',isbn:'978-0-06-112008-4',title:'1984',author:'George Orwell',category:'Fiction',publisher:'Secker & Warburg',publication_year:1949,total_copies:4,quantity:4,available_copies:4,available:4,location:'A-3',status:'available'},
+      {id:'b4',book_code:'BK004',isbn:'978-0-14-044913-6',title:'The Elements of Style',author:'Strunk & White',category:'Reference',publisher:'Macmillan',publication_year:1959,total_copies:6,quantity:6,available_copies:6,available:6,location:'I-1',status:'available'},
+      {id:'b5',book_code:'BK005',isbn:'978-0-553-38016-3',title:'A Brief History of Time',author:'Stephen Hawking',category:'Science',publisher:'Bantam',publication_year:1988,total_copies:3,quantity:3,available_copies:3,available:3,location:'C-2',status:'available'},
+    ]);
+  }
+  if (!DB._local('library_students').length) {
+    DB._localSet('library_students', [
+      {id:'demo-admin',user_code:'ADM001',name:'Admin User',full_name:'Admin User',role:'admin',class_grade:'',class:'',email:'admin@school.edu',phone:''},
+      {id:'u1',user_code:'STU001',name:'Alice Johnson',full_name:'Alice Johnson',role:'student',class_grade:'Grade 10A',class:'Grade 10A',email:'alice@school.edu',phone:'555-0101'},
+      {id:'u2',user_code:'STU002',name:'Bob Smith',full_name:'Bob Smith',role:'student',class_grade:'Grade 11B',class:'Grade 11B',email:'bob@school.edu',phone:'555-0102'},
+      {id:'u3',user_code:'LIB001',name:'Carol Williams',full_name:'Carol Williams',role:'librarian',class_grade:'',class:'',email:'carol@school.edu',phone:'555-0103'},
+    ]);
+  }
+})();
+</script>
+</body>
+</html>
