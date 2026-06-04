@@ -5,428 +5,254 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LibraryOS — School Library Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #f7f6f3;
-  --bg2: #ffffff;
-  --bg3: #efefeb;
   --surface: #ffffff;
-  --surface2: #f7f6f3;
   --border: #e4e2dc;
-  --border2: #d0cec6;
   --text: #1a1917;
   --text2: #6b6860;
-  --text3: #9e9b94;
   --accent: #2563eb;
-  --accent-bg: #eff6ff;
-  --accent2: #7c3aed;
   --success: #16a34a;
-  --success-bg: #f0fdf4;
-  --warning: #d97706;
-  --warning-bg: #fffbeb;
   --danger: #dc2626;
-  --danger-bg: #fef2f2;
+  --warning: #d97706;
   --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.05);
-  --font: 'DM Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
-  --font-display: 'Fraunces', serif;
-  --sidebar-w: 240px;
   --transition: 0.18s ease;
 }
 [data-theme="dark"] {
   --bg: #0f0f0e;
-  --bg2: #1a1917;
-  --bg3: #242320;
   --surface: #1a1917;
-  --surface2: #242320;
   --border: #2e2d29;
-  --border2: #3a3935;
   --text: #f0ede8;
   --text2: #9e9b94;
-  --text3: #6b6860;
   --accent: #3b82f6;
-  --accent-bg: #1e3a5f;
-  --accent2: #8b5cf6;
   --success: #22c55e;
-  --success-bg: #052e16;
-  --warning: #f59e0b;
-  --warning-bg: #2d1f00;
   --danger: #ef4444;
-  --danger-bg: #300c0c;
+  --warning: #f59e0b;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-button { font-family: var(--font); cursor: pointer; border: none; background: none; }
-input, select, textarea { font-family: var(--font); }
-a { color: var(--accent); text-decoration: none; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+button { cursor: pointer; border: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+#config-warning {
+  background: var(--warning); color: #fff; padding: 20px; text-align: center;
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+}
 
-/* ── AUTH SCREEN ── */
 #auth-screen {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; background: var(--bg);
-  background-image: radial-gradient(circle at 20% 20%, rgba(37,99,235,.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(124,58,237,.05) 0%, transparent 50%);
 }
 .auth-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 48px; width: 100%; max-width: 420px;
-  box-shadow: var(--shadow-lg);
+  border-radius: 16px; padding: 40px; width: 100%; max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
-.auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-.auth-logo-icon {
-  width: 40px; height: 40px; background: var(--accent); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px;
-}
-.auth-logo-text { font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--text); }
-.auth-logo-sub { font-size: 11px; color: var(--text2); font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
-.auth-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-.auth-sub { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
-.auth-tabs { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: 8px; margin-bottom: 24px; }
-.auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all var(--transition); }
-.auth-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.auth-logo { text-align: center; margin-bottom: 32px; }
+.auth-logo-icon { font-size: 40px; margin-bottom: 12px; }
+.auth-logo-text { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900; }
+.auth-logo-sub { font-size: 12px; color: var(--text2); }
+.auth-title { font-size: 22px; font-weight: 700; margin: 24px 0 8px; }
+.auth-sub { color: var(--text2); font-size: 14px; margin-bottom: 24px; }
+
 .form-group { margin-bottom: 16px; }
-.form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-.form-label span { color: var(--danger); margin-left: 2px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
 .form-input {
-  width: 100%; padding: 10px 14px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  color: var(--text); font-size: 14px; transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%; padding: 12px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-size: 14px;
 }
 .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-.form-input::placeholder { color: var(--text3); }
-.form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6860' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
+
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500;
-  transition: all var(--transition); cursor: pointer; border: 1px solid transparent; white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px; border-radius: var(--radius); font-size: 14px; font-weight: 600;
+  transition: all var(--transition); width: 100%;
 }
 .btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,.3); }
-.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
-.btn-secondary:hover { background: var(--bg3); }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-danger:hover { background: #b91c1c; }
-.btn-success { background: var(--success); color: #fff; }
-.btn-success:hover { background: #15803d; }
-.btn-ghost { color: var(--text2); padding: 8px 12px; }
-.btn-ghost:hover { background: var(--bg3); color: var(--text); }
-.btn-sm { padding: 6px 12px; font-size: 13px; }
-.btn-lg { padding: 12px 24px; font-size: 15px; }
-.btn-icon { width: 34px; height: 34px; padding: 0; border-radius: var(--radius-sm); }
-.btn-full { width: 100%; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── APP LAYOUT ── */
-#app { display: flex; min-height: 100vh; }
-#app.hidden { display: none; }
-#auth-screen.hidden { display: none; }
+.auth-links { text-align: center; margin-top: 16px; font-size: 13px; }
+.auth-links a { color: var(--accent); cursor: pointer; }
+.auth-links a:hover { text-decoration: underline; }
 
-/* ── SIDEBAR ── */
-.sidebar {
-  width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
-  z-index: 100; transition: transform var(--transition);
-}
-.sidebar-logo {
-  display: flex; align-items: center; gap: 10px; padding: 20px 16px;
-  border-bottom: 1px solid var(--border);
-}
-.sidebar-logo-icon {
-  width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
-  display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0;
-}
-.sidebar-logo-text { font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--text); }
-.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 8px; }
-.nav-section { margin-bottom: 4px; }
-.nav-section-label {
-  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--text3); padding: 8px 8px 4px;
-}
-.nav-item {
-  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
-  border-radius: var(--radius-sm); color: var(--text2); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all var(--transition); margin-bottom: 1px;
-}
-.nav-item:hover { background: var(--bg3); color: var(--text); }
-.nav-item.active { background: var(--accent-bg); color: var(--accent); }
-.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
-.nav-badge {
-  margin-left: auto; background: var(--danger); color: #fff;
-  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
-}
-.sidebar-footer { padding: 12px 8px; border-top: 1px solid var(--border); }
-.user-card {
-  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
-  border-radius: var(--radius-sm); cursor: pointer; transition: background var(--transition);
-}
-.user-card:hover { background: var(--bg3); }
-.user-avatar {
-  width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
-  display: flex; align-items: center; justify-content: center; color: #fff;
-  font-size: 13px; font-weight: 700; flex-shrink: 0;
-}
-.user-info { flex: 1; min-width: 0; }
-.user-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-role { font-size: 11px; color: var(--text2); }
-
-/* ── MAIN CONTENT ── */
-.main-content { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-.topbar {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 16px;
-}
-.topbar-title { font-size: 16px; font-weight: 700; flex: 1; }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-.page-content { padding: 24px; flex: 1; }
-
-/* ── TOAST ── */
 .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast {
   display: flex; align-items: center; gap: 12px; padding: 14px 18px;
   background: var(--text); color: var(--bg); border-radius: var(--radius);
-  box-shadow: var(--shadow-lg); font-size: 14px; font-weight: 500;
-  min-width: 280px; max-width: 380px;
-  animation: slideUp .25s ease; position: relative; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 14px; font-weight: 500;
+  animation: slideUp 0.25s ease; max-width: 400px;
 }
 .toast.success { background: var(--success); }
 .toast.error { background: var(--danger); }
-.toast.warning { background: var(--warning); color: #fff; }
-.toast::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,.4); animation: toastBar 3s linear forwards; }
+.toast.warning { background: var(--warning); }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes toastBar { from { width: 100%; } to { width: 0%; } }
 
-/* ── THEME TOGGLE BUTTON ── */
-.theme-btn { width: 34px; height: 34px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: var(--bg3); color: var(--text); cursor: pointer; font-size: 18px; }
-.theme-btn:hover { background: var(--border); }
-
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(4px); opacity: 0; transition: opacity var(--transition);
-}
-.modal-overlay.visible { opacity: 1; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column;
-  box-shadow: var(--shadow-lg); transform: scale(.96) translateY(8px);
-  transition: transform var(--transition); overflow: hidden;
-}
-.modal-overlay.visible .modal { transform: scale(1) translateY(0); }
-.modal-header { padding: 20px 24px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
-.modal-title { font-size: 17px; font-weight: 700; flex: 1; }
-.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .main-content { margin-left: 0; }
-}
+#app { display: none; padding: 40px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#app.visible { display: flex; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════ AUTH SCREEN ═══════════════════════════ -->
+<!-- CONFIG WARNING -->
+<div id="config-warning">
+  ⚠️ Supabase not configured. Check browser console for instructions.
+</div>
+
+<!-- AUTH SCREEN -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
       <div class="auth-logo-icon">📚</div>
-      <div>
-        <div class="auth-logo-text">LibraryOS</div>
-        <div class="auth-logo-sub">School Library System</div>
-      </div>
+      <div class="auth-logo-text">LibraryOS</div>
+      <div class="auth-logo-sub">School Library System</div>
     </div>
-    <div id="auth-login-view">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view">
       <div class="auth-title">Welcome back</div>
-      <div class="auth-sub">Sign in to manage your school library</div>
+      <div class="auth-sub">Sign in to your account</div>
       <div class="form-group">
-        <label class="form-label">Email <span>*</span></label>
-        <input type="email" id="login-email" class="form-input" placeholder="librarian@school.edu">
+        <label class="form-label">Email</label>
+        <input type="email" id="login-email" class="form-input" placeholder="you@example.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Password <span>*</span></label>
+        <label class="form-label">Password</label>
         <input type="password" id="login-password" class="form-input" placeholder="••••••••">
       </div>
-      <button class="btn btn-primary btn-full btn-lg" id="login-btn">Sign In</button>
-      <div style="text-align:center;margin-top:16px;">
-        <a href="#" id="show-forgot" style="font-size:13px;color:var(--text2);">Forgot password?</a>
-        &nbsp;·&nbsp;
-        <a href="#" id="show-register" style="font-size:13px;">Create account</a>
+      <button class="btn btn-primary" id="login-btn">Sign In</button>
+      <div class="auth-links">
+        Don't have an account? <a id="show-register">Create one</a>
       </div>
     </div>
-    <div id="auth-register-view" style="display:none">
+
+    <!-- REGISTER VIEW -->
+    <div id="register-view" style="display: none;">
       <div class="auth-title">Create account</div>
-      <div class="auth-sub">Register as a library user</div>
+      <div class="auth-sub">Join LibraryOS</div>
       <div class="form-group">
-        <label class="form-label">Full Name <span>*</span></label>
-        <input type="text" id="reg-name" class="form-input" placeholder="Your full name">
+        <label class="form-label">Email</label>
+        <input type="email" id="reg-email" class="form-input" placeholder="you@example.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Email <span>*</span></label>
-        <input type="email" id="reg-email" class="form-input" placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password <span>*</span></label>
+        <label class="form-label">Password</label>
         <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters">
       </div>
-      <button class="btn btn-primary btn-full btn-lg" id="register-btn">Create Account</button>
-      <div style="text-align:center;margin-top:16px;">
-        <a href="#" id="show-login" style="font-size:13px;">Already have an account? Sign in</a>
-      </div>
-    </div>
-    <div id="auth-forgot-view" style="display:none">
-      <div class="auth-title">Reset password</div>
-      <div class="auth-sub">We'll send you a reset link</div>
-      <div class="form-group">
-        <label class="form-label">Email <span>*</span></label>
-        <input type="email" id="forgot-email" class="form-input" placeholder="your@email.com">
-      </div>
-      <button class="btn btn-primary btn-full" id="forgot-btn">Send Reset Link</button>
-      <div style="text-align:center;margin-top:16px;">
-        <a href="#" id="show-login2" style="font-size:13px;">Back to sign in</a>
+      <button class="btn btn-primary" id="register-btn">Create Account</button>
+      <div class="auth-links">
+        Already have an account? <a id="show-login">Sign in</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════ MAIN APP ═══════════════════════════ -->
-<div id="app" class="hidden">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">📚</div>
-      <div class="sidebar-logo-text">LibraryOS</div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-section-label">Overview</div>
-        <div class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span> Dashboard</div>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-card" id="user-card">
-        <div class="user-avatar" id="user-avatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="user-name">Loading…</div>
-          <div class="user-role" id="user-role">—</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="main-content">
-    <header class="topbar">
-      <div class="topbar-title" id="page-title">Dashboard</div>
-      <div class="topbar-actions">
-        <div class="theme-btn" id="theme-toggle" title="Toggle theme">🌙</div>
-        <button class="btn btn-ghost btn-sm" id="topbar-logout">Sign out</button>
-      </div>
-    </header>
-    <div class="page-content" id="page-content">
-      <h1>Welcome to LibraryOS</h1>
-      <p>School Library Management System</p>
-    </div>
-  </main>
+<!-- APP SCREEN -->
+<div id="app">
+  <h1>Welcome to LibraryOS! 📚</h1>
+  <p>You are logged in as: <strong id="user-email">—</strong></p>
+  <button class="btn btn-primary" id="logout-btn" style="width: auto; padding: 12px 24px; margin-top: 20px;">Sign Out</button>
 </div>
 
-<!-- TOAST CONTAINER -->
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// SUPABASE CONFIG
-// ═══════════════════════════════════════════════════
-// IMPORTANT: Replace these with your own Supabase credentials
-// Get them from: https://supabase.com/dashboard
-const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5ODAzNDEsImV4cCI6MjA2NDU1NjM0MX0.3HrXTJBphwwvhKV2xHfjHj9lOxKZMlk2VU3xZqKk6rE";
+// ╔════════════════════════════════════════════════════════════════╗
+// ║     SUPABASE CONFIGURATION - READ THE INSTRUCTIONS BELOW       ║
+// ╚════════════════════════════════════════════════════════════════╝
+//
+// HOW TO SET UP YOUR SUPABASE CREDENTIALS (SAFE WAY):
+//
+// 1. Go to https://supabase.com/dashboard
+// 2. Select your project (or create a new one)
+// 3. Click "Settings" → "API" in the left sidebar
+// 4. You will see:
+//    - Project URL (looks like: https://xxxxx.supabase.co)
+//    - Anon Key (starts with: eyJhbGc...)
+// 5. Copy ONLY the Anon Key (NOT the Secret key)
+// 6. Replace the value below
+//
+// ⚠️  IMPORTANT SECURITY NOTES:
+// - NEVER use the Secret Key in frontend code
+// - NEVER commit API keys to GitHub
+// - The Anon Key is safe to expose (it's limited to public access)
+// - If you accidentally exposed a secret key, regenerate it immediately
+//
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";  // Your project URL
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";  // Your public anon key (ONLY)
 
-// ═══════════════════════════════════════════════════
-// GLOBAL STATE
-// ═══════════════════════════════════════════════════
+// Validation
+const isConfigured = SUPABASE_ANON_KEY !== "YOUR_ANON_KEY_HERE" && SUPABASE_URL !== "https://uvispwigefzhjvkqcxkm.supabase.co";
+
+if (!isConfigured) {
+  console.error(`
+╔════════════════════════════════════════════════════════════════╗
+║ ⚠️  SUPABASE NOT CONFIGURED                                    ║
+╠════════════════════════════════════════════════════════════════╣
+║ Your app won't work until you add your Supabase credentials:   ║
+║                                                                ║
+║ 1. Go to: https://supabase.com/dashboard                       ║
+║ 2. Select your project                                         ║
+║ 3. Settings → API                                              ║
+║ 4. Copy your ANON KEY (not the secret key!)                    ║
+║ 5. Replace "YOUR_ANON_KEY_HERE" in index.html (line ~85)      ║
+║                                                                ║
+║ Example:                                                       ║
+║ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIs...";          ║
+╚════════════════════════════════════════════════════════════════╝
+  `);
+  document.getElementById('config-warning').style.display = 'block';
+  document.querySelectorAll('button').forEach(b => b.disabled = true);
+}
+
+let sb = null;
 let currentUser = null;
-let appSettings = { loan_days: 14, fine_per_day: 50, school_name: 'School Library', theme: 'light' };
 
-// ═══════════════════════════════════════════════════
-// INITIALIZATION
-// ═══════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  initializeApp();
-});
+function initApp() {
+  try {
+    // Initialize Supabase
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Check for existing session
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        currentUser = session.user;
+        showApp();
+      } else {
+        showAuthScreen();
+      }
+    }).catch(err => {
+      showToast("Connection error: " + err.message, "error");
+    });
 
-async function initializeApp() {
-  // Check if user is already logged in
-  const { data: { session }, error } = await sb.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    showApp();
-    loadUserProfile();
-  } else {
-    showAuthScreen();
-    setupAuthListeners();
+    setupEventListeners();
+    setupTheme();
+  } catch (err) {
+    showToast("Failed to initialize app: " + err.message, "error");
   }
-
-  // Setup theme toggle
-  setupThemeToggle();
 }
 
-// ═══════════════════════════════════════════════════
-// AUTH LISTENERS
-// ═══════════════════════════════════════════════════
-function setupAuthListeners() {
-  // Login view links
-  document.getElementById('show-register')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showLoginView('register');
+function setupEventListeners() {
+  // Login
+  document.getElementById('login-btn').addEventListener('click', handleLogin);
+  document.getElementById('show-register').addEventListener('click', () => {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('register-view').style.display = 'block';
   });
 
-  document.getElementById('show-forgot')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showLoginView('forgot');
+  // Register
+  document.getElementById('register-btn').addEventListener('click', handleRegister);
+  document.getElementById('show-login').addEventListener('click', () => {
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('register-view').style.display = 'none';
   });
 
-  // Register view links
-  document.getElementById('show-login')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showLoginView('login');
-  });
-
-  // Forgot password links
-  document.getElementById('show-login2')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showLoginView('login');
-  });
-
-  // Buttons
-  document.getElementById('login-btn')?.addEventListener('click', handleLogin);
-  document.getElementById('register-btn')?.addEventListener('click', handleRegister);
-  document.getElementById('forgot-btn')?.addEventListener('click', handleForgot);
-}
-
-function showLoginView(view) {
-  document.getElementById('auth-login-view').style.display = view === 'login' ? 'block' : 'none';
-  document.getElementById('auth-register-view').style.display = view === 'register' ? 'block' : 'none';
-  document.getElementById('auth-forgot-view').style.display = view === 'forgot' ? 'block' : 'none';
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
 }
 
 async function handleLogin() {
@@ -434,130 +260,114 @@ async function handleLogin() {
   const password = document.getElementById('login-password').value;
 
   if (!email || !password) {
-    showToast('Please fill in all fields', 'error');
+    showToast("Please fill in all fields", "error");
     return;
   }
 
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = "Signing in...";
+
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     
     currentUser = data.user;
-    showToast('Logged in successfully!', 'success');
-    showApp();
-    loadUserProfile();
+    showToast("✓ Logged in successfully!", "success");
+    setTimeout(showApp, 500);
   } catch (err) {
-    showToast(err.message || 'Login failed', 'error');
+    showToast("✗ " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Sign In";
   }
 }
 
 async function handleRegister() {
-  const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
 
-  if (!name || !email || !password) {
-    showToast('Please fill in all fields', 'error');
+  if (!email || !password || password.length < 6) {
+    showToast("Email and password required (min 6 characters)", "error");
     return;
   }
 
-  try {
-    const { data, error } = await sb.auth.signUp({ email, password });
-    if (error) throw error;
-    
-    currentUser = data.user;
-    showToast('Account created! Check your email to confirm.', 'success');
-    showLoginView('login');
-  } catch (err) {
-    showToast(err.message || 'Registration failed', 'error');
-  }
-}
-
-async function handleForgot() {
-  const email = document.getElementById('forgot-email').value.trim();
-  
-  if (!email) {
-    showToast('Please enter your email', 'error');
-    return;
-  }
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true;
+  btn.textContent = "Creating account...";
 
   try {
-    const { error } = await sb.auth.resetPasswordForEmail(email);
-    if (error) throw error;
+    const { data, error } = await sb.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    });
     
-    showToast('Password reset link sent to your email', 'success');
-    showLoginView('login');
+    if (error) throw new Error(error.message);
+    
+    showToast("✓ Account created! Check your email to confirm.", "success");
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('register-view').style.display = 'none';
+    document.getElementById('reg-email').value = '';
+    document.getElementById('reg-password').value = '';
   } catch (err) {
-    showToast(err.message || 'Failed to send reset link', 'error');
+    showToast("✗ " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Create Account";
   }
-}
-
-// ═══════════════════════════════════════════════════
-// UI HELPERS
-// ═══════════════════════════════════════════════════
-function showAuthScreen() {
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('app').classList.add('hidden');
-  showLoginView('login');
-}
-
-function showApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  
-  // Setup app event listeners
-  document.getElementById('topbar-logout')?.addEventListener('click', handleLogout);
 }
 
 async function handleLogout() {
   try {
     await sb.auth.signOut();
     currentUser = null;
-    showAuthScreen();
-    showToast('Logged out', 'success');
+    showToast("✓ Signed out", "success");
+    setTimeout(showAuthScreen, 500);
   } catch (err) {
-    showToast(err.message || 'Logout failed', 'error');
+    showToast("✗ " + err.message, "error");
   }
 }
 
-function loadUserProfile() {
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-view').style.display = 'block';
+  document.getElementById('register-view').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
   if (currentUser) {
-    const initials = currentUser.email?.split('@')[0]?.substring(0, 2)?.toUpperCase() || '?';
-    document.getElementById('user-avatar').textContent = initials;
-    document.getElementById('user-name').textContent = currentUser.email || 'User';
-    document.getElementById('user-role').textContent = 'Librarian';
+    document.getElementById('user-email').textContent = currentUser.email;
   }
 }
 
-function setupThemeToggle() {
-  const themeBtn = document.getElementById('theme-toggle');
-  const html = document.documentElement;
-  
-  // Load saved theme
-  const saved = localStorage.getItem('theme') || 'light';
-  html.setAttribute('data-theme', saved);
-  themeBtn.textContent = saved === 'light' ? '🌙' : '☀️';
-  
-  themeBtn?.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    themeBtn.textContent = next === 'light' ? '🌙' : '☀️';
-  });
-}
-
-function showToast(message, type = 'info') {
+function showToast(message, type = "info") {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.textContent = message;
   container.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.animation = 'slideUp 0.25s ease reverse';
-    setTimeout(() => toast.remove(), 250);
-  }, 3000);
+
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function setupTheme() {
+  const saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+}
+
+// Only initialize if configured
+if (isConfigured) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
 }
 </script>
 </body>
