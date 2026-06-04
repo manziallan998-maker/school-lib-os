@@ -37,11 +37,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 button { cursor: pointer; border: none; font-family: inherit; }
 input, textarea { font-family: inherit; }
 
-#config-warning {
-  background: var(--warning); color: #fff; padding: 20px; text-align: center;
-  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
-}
-
 #auth-screen {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; background: var(--bg);
@@ -94,14 +89,14 @@ input, textarea { font-family: inherit; }
 
 #app { display: none; padding: 40px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 #app.visible { display: flex; }
+
+.dashboard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 30px; max-width: 600px; }
+.dashboard h1 { font-size: 28px; margin-bottom: 10px; }
+.user-info { color: var(--text2); margin: 20px 0; font-size: 16px; }
+.user-email { color: var(--accent); font-weight: 600; }
 </style>
 </head>
 <body>
-
-<!-- CONFIG WARNING -->
-<div id="config-warning">
-  ⚠️ Supabase not configured. Check browser console for instructions.
-</div>
 
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
@@ -152,62 +147,25 @@ input, textarea { font-family: inherit; }
 
 <!-- APP SCREEN -->
 <div id="app">
-  <h1>Welcome to LibraryOS! 📚</h1>
-  <p>You are logged in as: <strong id="user-email">—</strong></p>
-  <button class="btn btn-primary" id="logout-btn" style="width: auto; padding: 12px 24px; margin-top: 20px;">Sign Out</button>
+  <div class="dashboard">
+    <h1>Welcome to LibraryOS! 📚</h1>
+    <div class="user-info">
+      You are logged in as:<br>
+      <span class="user-email" id="user-email">—</span>
+    </div>
+    <button class="btn btn-primary" id="logout-btn" style="width: auto; padding: 12px 24px; margin-top: 30px;">Sign Out</button>
+  </div>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
 
 <script>
 // ╔════════════════════════════════════════════════════════════════╗
-// ║     SUPABASE CONFIGURATION - READ THE INSTRUCTIONS BELOW       ║
+// ║            SUPABASE CONFIGURATION FOR LEARNING                ║
 // ╚════════════════════════════════════════════════════════════════╝
-//
-// HOW TO SET UP YOUR SUPABASE CREDENTIALS (SAFE WAY):
-//
-// 1. Go to https://supabase.com/dashboard
-// 2. Select your project (or create a new one)
-// 3. Click "Settings" → "API" in the left sidebar
-// 4. You will see:
-//    - Project URL (looks like: https://xxxxx.supabase.co)
-//    - Anon Key (starts with: eyJhbGc...)
-// 5. Copy ONLY the Anon Key (NOT the Secret key)
-// 6. Replace the value below
-//
-// ⚠️  IMPORTANT SECURITY NOTES:
-// - NEVER use the Secret Key in frontend code
-// - NEVER commit API keys to GitHub
-// - The Anon Key is safe to expose (it's limited to public access)
-// - If you accidentally exposed a secret key, regenerate it immediately
-//
 
-const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";  // Your project URL
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";  // Your public anon key (ONLY)
-
-// Validation
-const isConfigured = SUPABASE_ANON_KEY !== "YOUR_ANON_KEY_HERE" && SUPABASE_URL !== "https://uvispwigefzhjvkqcxkm.supabase.co";
-
-if (!isConfigured) {
-  console.error(`
-╔════════════════════════════════════════════════════════════════╗
-║ ⚠️  SUPABASE NOT CONFIGURED                                    ║
-╠════════════════════════════════════════════════════════════════╣
-║ Your app won't work until you add your Supabase credentials:   ║
-║                                                                ║
-║ 1. Go to: https://supabase.com/dashboard                       ║
-║ 2. Select your project                                         ║
-║ 3. Settings → API                                              ║
-║ 4. Copy your ANON KEY (not the secret key!)                    ║
-║ 5. Replace "YOUR_ANON_KEY_HERE" in index.html (line ~85)      ║
-║                                                                ║
-║ Example:                                                       ║
-║ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIs...";          ║
-╚════════════════════════════════════════════════════════════════╝
-  `);
-  document.getElementById('config-warning').style.display = 'block';
-  document.querySelectorAll('button').forEach(b => b.disabled = true);
-}
+const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5ODAzNDEsImV4cCI6MjA2NDU1NjM0MX0.3HrXTJBphwwvhKV2xHfjHj9lOxKZMlk2VU3xZqKk6rE";
 
 let sb = null;
 let currentUser = null;
@@ -216,6 +174,8 @@ function initApp() {
   try {
     // Initialize Supabase
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    console.log("✅ Supabase initialized successfully!");
     
     // Check for existing session
     sb.auth.getSession().then(({ data: { session } }) => {
@@ -227,12 +187,14 @@ function initApp() {
       }
     }).catch(err => {
       showToast("Connection error: " + err.message, "error");
+      console.error(err);
     });
 
     setupEventListeners();
     setupTheme();
   } catch (err) {
     showToast("Failed to initialize app: " + err.message, "error");
+    console.error(err);
   }
 }
 
@@ -277,6 +239,7 @@ async function handleLogin() {
     setTimeout(showApp, 500);
   } catch (err) {
     showToast("✗ " + err.message, "error");
+    console.error(err);
   } finally {
     btn.disabled = false;
     btn.textContent = "Sign In";
@@ -307,13 +270,14 @@ async function handleRegister() {
     
     if (error) throw new Error(error.message);
     
-    showToast("✓ Account created! Check your email to confirm.", "success");
+    showToast("✓ Account created! You can now sign in.", "success");
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
     document.getElementById('reg-email').value = '';
     document.getElementById('reg-password').value = '';
   } catch (err) {
     showToast("✗ " + err.message, "error");
+    console.error(err);
   } finally {
     btn.disabled = false;
     btn.textContent = "Create Account";
@@ -328,6 +292,7 @@ async function handleLogout() {
     setTimeout(showAuthScreen, 500);
   } catch (err) {
     showToast("✗ " + err.message, "error");
+    console.error(err);
   }
 }
 
@@ -336,6 +301,8 @@ function showAuthScreen() {
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('register-view').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
 }
 
 function showApp() {
@@ -361,13 +328,11 @@ function setupTheme() {
   document.documentElement.setAttribute('data-theme', saved);
 }
 
-// Only initialize if configured
-if (isConfigured) {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-  } else {
-    initApp();
-  }
+// Initialize app
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
 </script>
 </body>
