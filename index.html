@@ -108,7 +108,7 @@ a { color: var(--accent); text-decoration: none; }
 }
 .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
 .form-input::placeholder { color: var(--text3); }
-.form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6860' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+.form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6860' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500;
@@ -194,100 +194,6 @@ a { color: var(--accent); text-decoration: none; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .page-content { padding: 24px; flex: 1; }
 
-/* ── STATS CARDS ── */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px; position: relative; overflow: hidden;
-}
-.stat-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: var(--accent);
-}
-.stat-card.green::before { background: var(--success); }
-.stat-card.orange::before { background: var(--warning); }
-.stat-card.red::before { background: var(--danger); }
-.stat-card.purple::before { background: var(--accent2); }
-.stat-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
-.stat-value { font-size: 28px; font-weight: 700; color: var(--text); font-family: var(--font-display); }
-.stat-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
-
-/* ── CARDS ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-.card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-.card-title { font-size: 15px; font-weight: 600; flex: 1; }
-.card-body { padding: 20px; }
-
-/* ── TABLE ── */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead th {
-  padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600;
-  color: var(--text2); text-transform: uppercase; letter-spacing: .05em;
-  background: var(--bg3); border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); vertical-align: middle; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--bg3); }
-.td-mono { font-family: var(--font-mono); font-size: 12px; color: var(--text2); }
-.td-actions { display: flex; gap: 4px; }
-
-/* ── BADGES ── */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
-  white-space: nowrap;
-}
-.badge-blue { background: var(--accent-bg); color: var(--accent); }
-.badge-green { background: var(--success-bg); color: var(--success); }
-.badge-orange { background: var(--warning-bg); color: var(--warning); }
-.badge-red { background: var(--danger-bg); color: var(--danger); }
-.badge-gray { background: var(--bg3); color: var(--text2); }
-.badge-purple { background: rgba(124,58,237,.1); color: var(--accent2); }
-
-/* ── SEARCH BAR ── */
-.search-bar {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-.search-bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
-.search-bar input { background: none; border: none; outline: none; color: var(--text); font-size: 14px; flex: 1; min-width: 0; }
-.search-bar input::placeholder { color: var(--text3); }
-.search-icon { color: var(--text3); font-size: 15px; }
-
-/* ── TOOLBAR ── */
-.toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-.toolbar .search-bar { flex: 1; min-width: 200px; }
-
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(4px); opacity: 0; transition: opacity var(--transition);
-}
-.modal-overlay.visible { opacity: 1; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column;
-  box-shadow: var(--shadow-lg); transform: scale(.96) translateY(8px);
-  transition: transform var(--transition); overflow: hidden;
-}
-.modal-overlay.visible .modal { transform: scale(1) translateY(0); }
-.modal-lg { max-width: 800px; }
-.modal-xl { max-width: 1100px; }
-.modal-header { padding: 20px 24px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
-.modal-title { font-size: 17px; font-weight: 700; flex: 1; }
-.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
-
-/* ── EMPTY STATE ── */
-.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
-.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
-.empty-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-.empty-sub { font-size: 14px; color: var(--text2); }
-
 /* ── TOAST ── */
 .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast {
@@ -304,198 +210,35 @@ tbody tr:hover td { background: var(--bg3); }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes toastBar { from { width: 100%; } to { width: 0%; } }
 
-/* ── PAGINATION ── */
-.pagination { display: flex; align-items: center; gap: 4px; padding: 16px 20px; border-top: 1px solid var(--border); }
-.page-btn {
-  width: 32px; height: 32px; border-radius: var(--radius-sm); font-size: 13px;
-  font-weight: 500; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all var(--transition); color: var(--text2);
+/* ── THEME TOGGLE BUTTON ── */
+.theme-btn { width: 34px; height: 34px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: var(--bg3); color: var(--text); cursor: pointer; font-size: 18px; }
+.theme-btn:hover { background: var(--border); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(4px); opacity: 0; transition: opacity var(--transition);
 }
-.page-btn:hover { background: var(--bg3); color: var(--text); }
-.page-btn.active { background: var(--accent); color: #fff; }
-.page-info { font-size: 13px; color: var(--text2); margin-left: auto; }
-
-/* ── PROGRESS BAR ── */
-.progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s ease; }
-
-/* ── IMPORT WIZARD ── */
-.import-step { display: none; }
-.import-step.active { display: block; }
-.import-steps-indicator { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
-.step-dot {
-  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text3);
-  transition: all var(--transition); flex-shrink: 0;
+.modal-overlay.visible { opacity: 1; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column;
+  box-shadow: var(--shadow-lg); transform: scale(.96) translateY(8px);
+  transition: transform var(--transition); overflow: hidden;
 }
-.step-dot.done { background: var(--success); border-color: var(--success); color: #fff; }
-.step-dot.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.step-line { flex: 1; height: 2px; background: var(--border); }
-.step-line.done { background: var(--success); }
-
-/* ── FIELD MAPPING TABLE ── */
-.mapping-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.mapping-detected { flex: 1; font-size: 13px; }
-.mapping-arrow { color: var(--text3); }
-.mapping-target { width: 200px; }
-.confidence-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.conf-high { background: var(--success); }
-.conf-med { background: var(--warning); }
-.conf-low { background: var(--danger); }
-
-/* ── CHARTS ── */
-.charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-canvas { max-height: 220px; }
-
-/* ── AVATAR COLORS ── */
-.av-0 { background: #2563eb; }
-.av-1 { background: #7c3aed; }
-.av-2 { background: #059669; }
-.av-3 { background: #d97706; }
-.av-4 { background: #dc2626; }
-.av-5 { background: #0891b2; }
-
-/* ── TOGGLE ── */
-.toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; inset: 0; background: var(--border2); border-radius: 11px; cursor: pointer;
-  transition: background var(--transition);
-}
-.toggle-slider::before {
-  content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
-  background: #fff; border-radius: 50%; transition: transform var(--transition);
-  box-shadow: 0 1px 3px rgba(0,0,0,.2);
-}
-.toggle input:checked + .toggle-slider { background: var(--accent); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
-
-/* ── GRID LAYOUTS ── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-/* ── LOADING ── */
-.loader { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.page-loader { display: flex; align-items: center; justify-content: center; height: 200px; }
-
-/* ── SETTINGS ── */
-.settings-section { margin-bottom: 32px; }
-.settings-section-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.settings-row:last-child { border-bottom: none; }
-.settings-row-info { flex: 1; }
-.settings-row-label { font-size: 14px; font-weight: 500; }
-.settings-row-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-/* ── ACTIVITY FEED ── */
-.activity-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-.activity-item:last-child { border-bottom: none; }
-.activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
-.activity-text { font-size: 13px; color: var(--text); flex: 1; }
-.activity-time { font-size: 12px; color: var(--text3); white-space: nowrap; }
-
-/* ── COVER UPLOAD ── */
-.cover-upload {
-  width: 100%; aspect-ratio: 3/4; background: var(--bg3); border: 2px dashed var(--border);
-  border-radius: var(--radius); display: flex; flex-direction: column; align-items: center;
-  justify-content: center; cursor: pointer; transition: border-color var(--transition);
-  max-width: 140px;
-}
-.cover-upload:hover { border-color: var(--accent); }
-.cover-upload img { width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--radius) - 2px); }
-
-/* ── SQL MODAL ── */
-.sql-block {
-  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 16px; font-family: var(--font-mono); font-size: 12px; color: var(--text);
-  overflow-x: auto; white-space: pre; max-height: 60vh; overflow-y: auto;
-}
+.modal-overlay.visible .modal { transform: scale(1) translateY(0); }
+.modal-header { padding: 20px 24px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 17px; font-weight: 700; flex: 1; }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .main-content { margin-left: 0; }
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
 }
-
-/* ── DROPDOWN ── */
-.dropdown { position: relative; display: inline-block; }
-.dropdown-menu {
-  position: absolute; right: 0; top: calc(100% + 4px); background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md);
-  min-width: 160px; z-index: 200; overflow: hidden; display: none;
-}
-.dropdown-menu.open { display: block; }
-.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 13px; color: var(--text); cursor: pointer; transition: background var(--transition); }
-.dropdown-item:hover { background: var(--bg3); }
-.dropdown-item.danger { color: var(--danger); }
-.dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-/* ── BOOK GRID ── */
-.books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-.book-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: box-shadow var(--transition), transform var(--transition); }
-.book-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.book-cover { aspect-ratio: 3/4; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; overflow: hidden; }
-.book-cover img { width: 100%; height: 100%; object-fit: cover; }
-.book-card-body { padding: 12px; }
-.book-card-title { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.book-card-author { font-size: 12px; color: var(--text2); }
-.book-card-badges { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
-
-/* ── VIEW TOGGLE ── */
-.view-toggle { display: flex; gap: 2px; background: var(--bg3); padding: 3px; border-radius: var(--radius-sm); }
-.view-btn { padding: 5px 10px; border-radius: 5px; font-size: 13px; cursor: pointer; color: var(--text2); transition: all var(--transition); }
-.view-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-
-/* ── THEME TOGGLE BUTTON ── */
-.theme-btn { width: 34px; height: 34px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: var(--bg3); color: var(--text); cursor: pointer; font-size: 16px; transition: background var(--transition); }
-.theme-btn:hover { background: var(--border); }
-
-/* ── OVERDUE BADGE ── */
-.overdue { color: var(--danger); font-weight: 600; }
-
-/* ── MOBILE MENU TOGGLE ── */
-.menu-toggle { display: none; width: 34px; height: 34px; align-items: center; justify-content: center; background: var(--bg3); border-radius: var(--radius-sm); cursor: pointer; font-size: 18px; color: var(--text); }
-@media (max-width: 768px) { .menu-toggle { display: flex; } }
-
-/* ── SQL SETUP NOTICE ── */
-.setup-banner {
-  background: var(--warning-bg); border: 1px solid var(--warning); border-radius: var(--radius);
-  padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 20px;
-}
-.setup-banner-icon { font-size: 20px; flex-shrink: 0; }
-
-/* ── TAB COMPONENT ── */
-.tabs { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 20px; overflow-x: auto; }
-.tab-btn { padding: 7px 16px; border-radius: 5px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all var(--transition); white-space: nowrap; }
-.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* ── LOAN CARD ── */
-.loan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; }
-.loan-book-icon { width: 48px; height: 64px; background: var(--accent-bg); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-.loan-info { flex: 1; }
-.loan-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.loan-meta { font-size: 12px; color: var(--text2); display: flex; gap: 16px; flex-wrap: wrap; }
-.loan-actions { display: flex; gap: 6px; }
-
-/* Drop zone */
-.drop-zone {
-  border: 2px dashed var(--border2); border-radius: var(--radius);
-  padding: 48px 24px; text-align: center; cursor: pointer;
-  transition: all var(--transition); background: var(--bg3);
-}
-.drop-zone:hover, .drop-zone.dragging { border-color: var(--accent); background: var(--accent-bg); }
-.drop-zone-icon { font-size: 40px; margin-bottom: 12px; }
-
-/* ── REPORT PAGE ── */
-.report-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -536,28 +279,8 @@ canvas { max-height: 220px; }
         <input type="text" id="reg-name" class="form-input" placeholder="Your full name">
       </div>
       <div class="form-group">
-        <label class="form-label">User Code <span>*</span></label>
-        <input type="text" id="reg-code" class="form-input" placeholder="e.g. STU-2024-001">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Role <span>*</span></label>
-        <select id="reg-role" class="form-input form-select">
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-          <option value="librarian">Librarian</option>
-        </select>
-      </div>
-      <div class="form-group" id="reg-class-group">
-        <label class="form-label">Class / Grade</label>
-        <input type="text" id="reg-class" class="form-input" placeholder="e.g. Grade 10A">
-      </div>
-      <div class="form-group">
         <label class="form-label">Email <span>*</span></label>
         <input type="email" id="reg-email" class="form-input" placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone (optional)</label>
-        <input type="tel" id="reg-phone" class="form-input" placeholder="+250 7XX XXX XXX">
       </div>
       <div class="form-group">
         <label class="form-label">Password <span>*</span></label>
@@ -596,27 +319,6 @@ canvas { max-height: 220px; }
         <div class="nav-section-label">Overview</div>
         <div class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span> Dashboard</div>
       </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Catalog</div>
-        <div class="nav-item" data-page="books"><span class="nav-icon">📖</span> Books</div>
-        <div class="nav-item" data-page="categories"><span class="nav-icon">🏷️</span> Categories</div>
-        <div class="nav-item" data-page="import"><span class="nav-icon">⬆️</span> Bulk Import</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Circulation</div>
-        <div class="nav-item" data-page="loans"><span class="nav-icon">🔄</span> Book Loans <span class="nav-badge" id="overdue-badge" style="display:none">!</span></div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">People</div>
-        <div class="nav-item" data-page="users"><span class="nav-icon">👥</span> Users</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">System</div>
-        <div class="nav-item" data-page="reports"><span class="nav-icon">📊</span> Reports</div>
-        <div class="nav-item" data-page="activity"><span class="nav-icon">📋</span> Activity Log</div>
-        <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> Settings</div>
-        <div class="nav-item" data-page="setup"><span class="nav-icon">🗄️</span> DB Setup</div>
-      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-card" id="user-card">
@@ -625,7 +327,6 @@ canvas { max-height: 220px; }
           <div class="user-name" id="user-name">Loading…</div>
           <div class="user-role" id="user-role">—</div>
         </div>
-        <span style="font-size:16px;color:var(--text3)">⋮</span>
       </div>
     </div>
   </aside>
@@ -633,7 +334,6 @@ canvas { max-height: 220px; }
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <header class="topbar">
-      <button class="menu-toggle" id="menu-toggle">☰</button>
       <div class="topbar-title" id="page-title">Dashboard</div>
       <div class="topbar-actions">
         <div class="theme-btn" id="theme-toggle" title="Toggle theme">🌙</div>
@@ -641,7 +341,8 @@ canvas { max-height: 220px; }
       </div>
     </header>
     <div class="page-content" id="page-content">
-      <!-- Pages render here -->
+      <h1>Welcome to LibraryOS</h1>
+      <p>School Library Management System</p>
     </div>
   </main>
 </div>
@@ -649,333 +350,14 @@ canvas { max-height: 220px; }
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toast-container"></div>
 
-<!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
-
-<!-- Book Modal -->
-<div class="modal-overlay" id="book-modal">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" id="book-modal-title">Add Book</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('book-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="grid-2">
-        <div>
-          <div class="form-group">
-            <label class="form-label">Title <span>*</span></label>
-            <input type="text" id="bk-title" class="form-input" placeholder="Book title">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Author <span>*</span></label>
-            <input type="text" id="bk-author" class="form-input" placeholder="Author name">
-          </div>
-          <div class="form-group">
-            <label class="form-label">ISBN</label>
-            <input type="text" id="bk-isbn" class="form-input" placeholder="978-0-XXX-XXXXX-X">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Book Code</label>
-            <input type="text" id="bk-code" class="form-input" placeholder="e.g. BK-2024-001">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Category</label>
-            <select id="bk-category" class="form-input form-select">
-              <option value="">— Select Category —</option>
-            </select>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Publisher</label>
-              <input type="text" id="bk-publisher" class="form-input">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Year</label>
-              <input type="number" id="bk-year" class="form-input" placeholder="2024">
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Total Copies</label>
-              <input type="number" id="bk-copies" class="form-input" value="1" min="1">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Shelf Location</label>
-              <input type="text" id="bk-shelf" class="form-input" placeholder="e.g. A-12">
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Language</label>
-              <input type="text" id="bk-lang" class="form-input" placeholder="English">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Edition</label>
-              <input type="text" id="bk-edition" class="form-input" placeholder="3rd">
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="form-group">
-            <label class="form-label">Cover Image</label>
-            <div class="cover-upload" id="cover-upload-zone" onclick="document.getElementById('cover-file').click()">
-              <div id="cover-preview-wrap">
-                <div style="font-size:36px">📷</div>
-                <div style="font-size:12px;color:var(--text2);margin-top:8px">Click to upload</div>
-              </div>
-            </div>
-            <input type="file" id="cover-file" accept="image/*" style="display:none">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="bk-desc" class="form-input" rows="5" placeholder="Brief description…" style="resize:vertical"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Status</label>
-            <select id="bk-status" class="form-input form-select">
-              <option value="available">Available</option>
-              <option value="unavailable">Unavailable</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('book-modal')">Cancel</button>
-      <button class="btn btn-primary" id="save-book-btn">Save Book</button>
-    </div>
-  </div>
-</div>
-
-<!-- Category Modal -->
-<div class="modal-overlay" id="cat-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="cat-modal-title">Add Category</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('cat-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Category Name <span>*</span></label>
-        <input type="text" id="cat-name" class="form-input" placeholder="e.g. Science Fiction">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea id="cat-desc" class="form-input" rows="3" placeholder="Optional description…"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Color</label>
-        <input type="color" id="cat-color" class="form-input" value="#2563eb" style="height:42px;cursor:pointer">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('cat-modal')">Cancel</button>
-      <button class="btn btn-primary" id="save-cat-btn">Save Category</button>
-    </div>
-  </div>
-</div>
-
-<!-- User Modal -->
-<div class="modal-overlay" id="user-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="user-modal-title">Add User</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('user-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Role <span>*</span></label>
-        <select id="usr-role" class="form-input form-select" onchange="toggleClassField()">
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">User Code <span>*</span></label>
-        <input type="text" id="usr-code" class="form-input" placeholder="e.g. STU-2024-001">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Full Name <span>*</span></label>
-        <input type="text" id="usr-name" class="form-input" placeholder="Full name">
-      </div>
-      <div class="form-group" id="usr-class-group">
-        <label class="form-label">Class / Grade <span>*</span></label>
-        <input type="text" id="usr-class" class="form-input" placeholder="e.g. Grade 10A">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="usr-email" class="form-input" placeholder="optional@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input type="tel" id="usr-phone" class="form-input" placeholder="Optional">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('user-modal')">Cancel</button>
-      <button class="btn btn-primary" id="save-user-btn">Save User</button>
-    </div>
-  </div>
-</div>
-
-<!-- Loan Issue Modal -->
-<div class="modal-overlay" id="loan-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Issue Book</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('loan-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Book <span>*</span></label>
-        <select id="loan-book" class="form-input form-select">
-          <option value="">— Select Book —</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Borrower <span>*</span></label>
-        <select id="loan-user" class="form-input form-select">
-          <option value="">— Select User —</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Due Date <span>*</span></label>
-        <input type="date" id="loan-due" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes</label>
-        <textarea id="loan-notes" class="form-input" rows="2" placeholder="Optional notes…"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('loan-modal')">Cancel</button>
-      <button class="btn btn-primary" id="issue-loan-btn">Issue Book</button>
-    </div>
-  </div>
-</div>
-
-<!-- Return Modal -->
-<div class="modal-overlay" id="return-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Return Book</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('return-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="return-loan-info" style="background:var(--bg3);padding:16px;border-radius:var(--radius);margin-bottom:16px;font-size:13px;line-height:1.8;"></div>
-      <div id="fine-info" style="display:none;background:var(--danger-bg);border:1px solid var(--danger);padding:12px;border-radius:var(--radius);margin-bottom:16px;color:var(--danger);font-weight:600;"></div>
-      <div class="form-group">
-        <label class="form-label">Return Notes</label>
-        <textarea id="return-notes" class="form-input" rows="2" placeholder="Condition notes…"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('return-modal')">Cancel</button>
-      <button class="btn btn-success" id="confirm-return-btn">Confirm Return</button>
-    </div>
-  </div>
-</div>
-
-<!-- Import Modal -->
-<div class="modal-overlay" id="import-modal">
-  <div class="modal modal-xl">
-    <div class="modal-header">
-      <div class="modal-title">📦 AI Bulk Import — Books</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('import-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="import-steps-indicator" id="import-steps">
-        <div class="step-dot active" id="step-dot-1">1</div>
-        <div class="step-line" id="step-line-1"></div>
-        <div class="step-dot" id="step-dot-2">2</div>
-        <div class="step-line" id="step-line-2"></div>
-        <div class="step-dot" id="step-dot-3">3</div>
-        <div class="step-line" id="step-line-3"></div>
-        <div class="step-dot" id="step-dot-4">4</div>
-      </div>
-      <!-- Step 1: Upload -->
-      <div class="import-step active" id="import-step-1">
-        <div class="drop-zone" id="import-drop-zone">
-          <div class="drop-zone-icon">📂</div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:8px">Drop your file here</div>
-          <div style="color:var(--text2);font-size:13px;margin-bottom:16px">Supports CSV, TSV, XLS, XLSX, XLSM, ODS, TXT</div>
-          <button class="btn btn-primary" onclick="document.getElementById('import-file').click()">Browse Files</button>
-          <input type="file" id="import-file" style="display:none" accept=".csv,.tsv,.txt,.xls,.xlsx,.xlsm,.ods">
-        </div>
-      </div>
-      <!-- Step 2: Sheet Selection -->
-      <div class="import-step" id="import-step-2">
-        <div style="margin-bottom:16px;font-size:14px;font-weight:600">Select worksheet to import:</div>
-        <div id="sheet-list"></div>
-        <div style="margin-top:16px;display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="importGoStep(1)">← Back</button>
-          <button class="btn btn-primary" id="select-sheet-btn">Continue →</button>
-        </div>
-      </div>
-      <!-- Step 3: Field Mapping -->
-      <div class="import-step" id="import-step-3">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <div style="font-size:14px;font-weight:600">Review field mapping</div>
-          <div style="font-size:12px;color:var(--text2)" id="import-row-count"></div>
-        </div>
-        <div id="import-preview-notice" style="display:none;margin-bottom:12px;"></div>
-        <div style="max-height:400px;overflow-y:auto;">
-          <div id="field-mapping-list"></div>
-        </div>
-        <div style="margin-top:16px;display:flex;gap:8px;justify-content:space-between">
-          <button class="btn btn-secondary" onclick="importGoStep(2)">← Back</button>
-          <button class="btn btn-primary" id="start-import-btn">Import Now →</button>
-        </div>
-      </div>
-      <!-- Step 4: Progress -->
-      <div class="import-step" id="import-step-4">
-        <div style="text-align:center;padding:32px 0">
-          <div id="import-progress-icon" style="font-size:48px;margin-bottom:16px">⏳</div>
-          <div id="import-progress-title" style="font-size:18px;font-weight:700;margin-bottom:8px">Importing…</div>
-          <div id="import-progress-sub" style="font-size:13px;color:var(--text2);margin-bottom:24px"></div>
-          <div class="progress-bar" style="max-width:400px;margin:0 auto 16px">
-            <div class="progress-fill" id="import-progress-bar" style="width:0%"></div>
-          </div>
-          <div id="import-progress-detail" style="font-size:12px;color:var(--text3)"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Book Detail Modal -->
-<div class="modal-overlay" id="book-detail-modal">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" id="bd-title"></div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('book-detail-modal')">✕</button>
-    </div>
-    <div class="modal-body" id="bd-body"></div>
-  </div>
-</div>
-
-<!-- Confirm Modal -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title" id="confirm-title">Confirm Action</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('confirm-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <p id="confirm-message" style="color:var(--text2)"></p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Cancel</button>
-      <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
-    </div>
-  </div>
-</div>
-
 <script>
 // ═══════════════════════════════════════════════════
-// SUPABASE CONFIG — Paste your credentials below
+// SUPABASE CONFIG
 // ═══════════════════════════════════════════════════
+// IMPORTANT: Replace these with your own Supabase credentials
+// Get them from: https://supabase.com/dashboard
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5ODAzNDEsImV4cCI6MjA2NDU1NjM0MX0.3HrXTJBpFJE-u7hGhRCKzXMmVvEaMXlMuGwrSENh_Gc";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5ODAzNDEsImV4cCI6MjA2NDU1NjM0MX0.3HrXTJBphwwvhKV2xHfjHj9lOxKZMlk2VU3xZqKk6rE";
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -983,1874 +365,200 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // GLOBAL STATE
 // ═══════════════════════════════════════════════════
 let currentUser = null;
-let currentProfile = null;
 let appSettings = { loan_days: 14, fine_per_day: 50, school_name: 'School Library', theme: 'light' };
-let currentPage = 'dashboard';
-let bookPage = 1; const booksPerPage = 20;
-let userPage = 1; const usersPerPage = 20;
-let loanPage = 1; const loansPerPage = 20;
-let actPage = 1; const actPerPage = 30;
-let bookFilter = { search: '', category: '', status: '' };
-let userFilter = { search: '', role: '' };
-let loanFilter = { search: '', status: 'active' };
-let editBookId = null; let editCatId = null; let editUserId = null;
-let returnLoanId = null;
-let importData = null; let importWorkbook = null; let importSheetName = null;
-let importStep = 1; let importMappings = [];
-let confirmCallback = null;
-let charts = {};
 
 // ═══════════════════════════════════════════════════
-// INIT
+// INITIALIZATION
 // ═══════════════════════════════════════════════════
-async function init() {
-  // Theme
-  const saved = localStorage.getItem('lms-theme') || 'light';
-  setTheme(saved);
+document.addEventListener('DOMContentLoaded', () => {
+  initializeApp();
+});
 
-  // Auth state
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    await onLogin(session.user);
+async function initializeApp() {
+  // Check if user is already logged in
+  const { data: { session }, error } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    showApp();
+    loadUserProfile();
+  } else {
+    showAuthScreen();
+    setupAuthListeners();
   }
 
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      await onLogin(session.user);
-    } else if (event === 'SIGNED_OUT') {
-      onLogout();
-    }
+  // Setup theme toggle
+  setupThemeToggle();
+}
+
+// ═══════════════════════════════════════════════════
+// AUTH LISTENERS
+// ═══════════════════════════════════════════════════
+function setupAuthListeners() {
+  // Login view links
+  document.getElementById('show-register')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLoginView('register');
   });
 
-  setupAuthUI();
-  setupRealtime();
+  document.getElementById('show-forgot')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLoginView('forgot');
+  });
+
+  // Register view links
+  document.getElementById('show-login')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLoginView('login');
+  });
+
+  // Forgot password links
+  document.getElementById('show-login2')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLoginView('login');
+  });
+
+  // Buttons
+  document.getElementById('login-btn')?.addEventListener('click', handleLogin);
+  document.getElementById('register-btn')?.addEventListener('click', handleRegister);
+  document.getElementById('forgot-btn')?.addEventListener('click', handleForgot);
 }
 
-async function onLogin(user) {
-  currentUser = user;
-  let { data: profile } = await sb.from('library_users').select('*').eq('auth_id', user.id).maybeSingle();
-  if (!profile) {
-    // Auto-create profile for librarians registered via auth
-    const { data: np } = await sb.from('library_users').insert({
-      auth_id: user.id,
-      email: user.email,
-      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-      user_code: user.user_metadata?.user_code || 'LIB-001',
-      role: user.user_metadata?.role || 'librarian',
-      class_grade: user.user_metadata?.class_grade || null,
-      phone: user.user_metadata?.phone || null
-    }).select().single().catch(() => ({ data: null }));
-    profile = np;
+function showLoginView(view) {
+  document.getElementById('auth-login-view').style.display = view === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register-view').style.display = view === 'register' ? 'block' : 'none';
+  document.getElementById('auth-forgot-view').style.display = view === 'forgot' ? 'block' : 'none';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  if (!email || !password) {
+    showToast('Please fill in all fields', 'error');
+    return;
   }
-  currentProfile = profile;
-  await loadSettings();
-  showApp();
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    
+    currentUser = data.user;
+    showToast('Logged in successfully!', 'success');
+    showApp();
+    loadUserProfile();
+  } catch (err) {
+    showToast(err.message || 'Login failed', 'error');
+  }
 }
 
-function onLogout() {
-  currentUser = null; currentProfile = null;
-  document.getElementById('app').classList.add('hidden');
+async function handleRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+
+  if (!name || !email || !password) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) throw error;
+    
+    currentUser = data.user;
+    showToast('Account created! Check your email to confirm.', 'success');
+    showLoginView('login');
+  } catch (err) {
+    showToast(err.message || 'Registration failed', 'error');
+  }
+}
+
+async function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  
+  if (!email) {
+    showToast('Please enter your email', 'error');
+    return;
+  }
+
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+    
+    showToast('Password reset link sent to your email', 'success');
+    showLoginView('login');
+  } catch (err) {
+    showToast(err.message || 'Failed to send reset link', 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════
+function showAuthScreen() {
   document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('auth-login-view').style.display = '';
-  document.getElementById('auth-register-view').style.display = 'none';
-  document.getElementById('auth-forgot-view').style.display = 'none';
+  document.getElementById('app').classList.add('hidden');
+  showLoginView('login');
 }
 
 function showApp() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  const name = currentProfile?.full_name || currentUser?.email || 'User';
-  document.getElementById('user-name').textContent = name;
-  document.getElementById('user-role').textContent = capitalize(currentProfile?.role || 'user');
-  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-  const av = document.getElementById('user-avatar');
-  av.textContent = initials;
-  av.className = 'user-avatar av-' + (Math.abs(hashStr(name)) % 6);
-  navigateTo('dashboard');
-  checkOverdue();
+  
+  // Setup app event listeners
+  document.getElementById('topbar-logout')?.addEventListener('click', handleLogout);
 }
 
-function hashStr(s) { let h = 0; for (let c of s) h = Math.imul(31, h) + c.charCodeAt(0); return h; }
-
-async function loadSettings() {
-  const { data } = await sb.from('library_settings').select('*').limit(1).maybeSingle();
-  if (data) {
-    appSettings = { ...appSettings, ...data };
-    if (data.theme) setTheme(data.theme);
-    if (data.school_name) document.title = data.school_name + ' — LibraryOS';
+async function handleLogout() {
+  try {
+    await sb.auth.signOut();
+    currentUser = null;
+    showAuthScreen();
+    showToast('Logged out', 'success');
+  } catch (err) {
+    showToast(err.message || 'Logout failed', 'error');
   }
 }
 
-// ═══════════════════════════════════════════════════
-// AUTH UI
-// ═══════════════════════════════════════════════════
-function setupAuthUI() {
-  document.getElementById('show-register').onclick = e => { e.preventDefault(); showAuthView('register'); };
-  document.getElementById('show-login').onclick = e => { e.preventDefault(); showAuthView('login'); };
-  document.getElementById('show-login2').onclick = e => { e.preventDefault(); showAuthView('login'); };
-  document.getElementById('show-forgot').onclick = e => { e.preventDefault(); showAuthView('forgot'); };
-
-  document.getElementById('login-btn').onclick = doLogin;
-  document.getElementById('register-btn').onclick = doRegister;
-  document.getElementById('forgot-btn').onclick = doForgot;
-  document.getElementById('topbar-logout').onclick = doLogout;
-  document.getElementById('user-card').onclick = doLogout;
-
-  document.getElementById('reg-role').addEventListener('change', () => {
-    const role = document.getElementById('reg-role').value;
-    document.getElementById('reg-class-group').style.display = role === 'student' ? '' : 'none';
-  });
-
-  ['login-email','login-password'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  });
-
-  document.getElementById('theme-toggle').onclick = () => {
-    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    setTheme(t);
-    sb.from('library_settings').update({ theme: t }).eq('id', appSettings.id).then(() => {});
-  };
-
-  document.getElementById('menu-toggle').onclick = () => {
-    document.getElementById('sidebar').classList.toggle('open');
-  };
-
-  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-    el.addEventListener('click', () => {
-      navigateTo(el.dataset.page);
-      document.getElementById('sidebar').classList.remove('open');
-    });
-  });
-}
-
-function showAuthView(v) {
-  document.getElementById('auth-login-view').style.display = v === 'login' ? '' : 'none';
-  document.getElementById('auth-register-view').style.display = v === 'register' ? '' : 'none';
-  document.getElementById('auth-forgot-view').style.display = v === 'forgot' ? '' : 'none';
-}
-
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
-  if (!email || !pass) return toast('Please fill in all fields', 'error');
-  const btn = document.getElementById('login-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Signing in…';
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  btn.disabled = false; btn.textContent = 'Sign In';
-  if (error) toast(error.message, 'error');
-}
-
-async function doRegister() {
-  const name = document.getElementById('reg-name').value.trim();
-  const code = document.getElementById('reg-code').value.trim();
-  const role = document.getElementById('reg-role').value;
-  const cls = document.getElementById('reg-class').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const phone = document.getElementById('reg-phone').value.trim();
-  const pass = document.getElementById('reg-password').value;
-  if (!name || !code || !email || !pass) return toast('Please fill required fields', 'error');
-  if (role === 'student' && !cls) return toast('Class/Grade is required for students', 'error');
-
-  const btn = document.getElementById('register-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Creating…';
-  const { data, error } = await sb.auth.signUp({
-    email, password: pass,
-    options: { data: { full_name: name, user_code: code, role, class_grade: cls, phone } }
-  });
-  btn.disabled = false; btn.textContent = 'Create Account';
-  if (error) { toast(error.message, 'error'); return; }
-  if (data?.user) {
-    toast('Account created! Check your email to confirm.', 'success');
-    showAuthView('login');
+function loadUserProfile() {
+  if (currentUser) {
+    const initials = currentUser.email?.split('@')[0]?.substring(0, 2)?.toUpperCase() || '?';
+    document.getElementById('user-avatar').textContent = initials;
+    document.getElementById('user-name').textContent = currentUser.email || 'User';
+    document.getElementById('user-role').textContent = 'Librarian';
   }
 }
 
-async function doForgot() {
-  const email = document.getElementById('forgot-email').value.trim();
-  if (!email) return toast('Enter your email', 'error');
-  const { error } = await sb.auth.resetPasswordForEmail(email);
-  if (error) toast(error.message, 'error');
-  else { toast('Reset link sent! Check your email.', 'success'); showAuthView('login'); }
-}
-
-async function doLogout() {
-  await sb.auth.signOut();
-}
-
-// ═══════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════
-const pageTitles = { dashboard:'Dashboard', books:'Books', categories:'Categories', import:'Bulk Import', loans:'Book Loans', users:'Users', reports:'Reports', activity:'Activity Log', settings:'Settings', setup:'Database Setup' };
-function navigateTo(page) {
-  currentPage = page;
-  document.getElementById('page-title').textContent = pageTitles[page] || page;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
-  const c = document.getElementById('page-content');
-  c.innerHTML = '<div class="page-loader"><span class="loader"></span></div>';
-  switch(page) {
-    case 'dashboard': renderDashboard(); break;
-    case 'books': renderBooks(); break;
-    case 'categories': renderCategories(); break;
-    case 'import': renderImportPage(); break;
-    case 'loans': renderLoans(); break;
-    case 'users': renderUsers(); break;
-    case 'reports': renderReports(); break;
-    case 'activity': renderActivity(); break;
-    case 'settings': renderSettings(); break;
-    case 'setup': renderSetup(); break;
-    default: c.innerHTML = '<div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-title">Coming soon</div></div>';
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════
-async function renderDashboard() {
-  const c = document.getElementById('page-content');
-  const [
-    { count: totalBooks },
-    { count: totalCats },
-    { count: totalStudents },
-    { count: totalTeachers },
-    { data: loanStats },
-    { data: recentActivity },
-    { data: topBooks }
-  ] = await Promise.all([
-    sb.from('books').select('*', { count: 'exact', head: true }),
-    sb.from('book_categories').select('*', { count: 'exact', head: true }),
-    sb.from('library_users').select('*', { count: 'exact', head: true }).eq('role','student'),
-    sb.from('library_users').select('*', { count: 'exact', head: true }).eq('role','teacher'),
-    sb.from('book_loans').select('status'),
-    sb.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(8),
-    sb.from('book_loans').select('book_id, books(title)').eq('status','active').limit(100)
-  ]);
-
-  const active = loanStats?.filter(l => l.status === 'active').length || 0;
-  const overdue = loanStats?.filter(l => l.status === 'overdue').length || 0;
-  const returned = loanStats?.filter(l => l.status === 'returned').length || 0;
-
-  // Count top books
-  const bookCounts = {};
-  (topBooks || []).forEach(l => {
-    const t = l.books?.title || 'Unknown';
-    bookCounts[t] = (bookCounts[t] || 0) + 1;
+function setupThemeToggle() {
+  const themeBtn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  
+  // Load saved theme
+  const saved = localStorage.getItem('theme') || 'light';
+  html.setAttribute('data-theme', saved);
+  themeBtn.textContent = saved === 'light' ? '🌙' : '☀️';
+  
+  themeBtn?.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    themeBtn.textContent = next === 'light' ? '🌙' : '☀️';
   });
-  const topBooksArr = Object.entries(bookCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+}
 
-  c.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Total Books</div>
-        <div class="stat-value">${totalBooks||0}</div>
-        <div class="stat-sub">In catalog</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-label">Categories</div>
-        <div class="stat-value">${totalCats||0}</div>
-        <div class="stat-sub">Book genres</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-label">Students</div>
-        <div class="stat-value">${totalStudents||0}</div>
-        <div class="stat-sub">Registered</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Teachers</div>
-        <div class="stat-value">${totalTeachers||0}</div>
-        <div class="stat-sub">Registered</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-label">Books Borrowed</div>
-        <div class="stat-value">${active}</div>
-        <div class="stat-sub">Active loans</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-label">Overdue</div>
-        <div class="stat-value">${overdue}</div>
-        <div class="stat-sub">Need return</div>
-      </div>
-    </div>
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-title">Loan Overview</div>
-        <canvas id="loan-chart"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Most Borrowed Books</div>
-        <canvas id="books-chart"></canvas>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Quick Actions</div></div>
-        <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="openBookModal()">📖 Add Book</button>
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="openLoanModal()">🔄 Issue Book</button>
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="navigateTo('users')">👤 Add User</button>
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="navigateTo('import')">⬆️ Import</button>
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="navigateTo('reports')">📊 Reports</button>
-          <button class="btn btn-secondary" style="justify-content:flex-start;gap:10px" onclick="navigateTo('loans')">📋 View Loans</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Recent Activity</div></div>
-        <div class="card-body" style="padding:0 20px">
-          ${(recentActivity||[]).map(a => `
-            <div class="activity-item">
-              <div class="activity-dot"></div>
-              <div class="activity-text">${escHtml(a.description || a.action)}</div>
-              <div class="activity-time">${timeAgo(a.created_at)}</div>
-            </div>
-          `).join('') || '<div class="empty-state" style="padding:24px"><div class="empty-title">No activity yet</div></div>'}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Render charts
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  
   setTimeout(() => {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor = isDark ? '#9e9b94' : '#6b6860';
-
-    const lc = document.getElementById('loan-chart');
-    if (lc) {
-      if (charts.loan) charts.loan.destroy();
-      charts.loan = new Chart(lc, {
-        type: 'doughnut',
-        data: {
-          labels: ['Active','Overdue','Returned'],
-          datasets: [{ data: [active, overdue, returned], backgroundColor: ['#2563eb','#dc2626','#16a34a'], borderWidth: 0 }]
-        },
-        options: { plugins: { legend: { labels: { color: textColor, font: { family: 'DM Sans' } } } }, cutout: '70%' }
-      });
-    }
-    const bc = document.getElementById('books-chart');
-    if (bc && topBooksArr.length) {
-      if (charts.books) charts.books.destroy();
-      charts.books = new Chart(bc, {
-        type: 'bar',
-        data: {
-          labels: topBooksArr.map(([t]) => t.length > 20 ? t.slice(0,18)+'…' : t),
-          datasets: [{ data: topBooksArr.map(([,v]) => v), backgroundColor: '#2563eb', borderRadius: 4 }]
-        },
-        options: {
-          plugins: { legend: { display: false } },
-          scales: { x: { ticks: { color: textColor } }, y: { ticks: { color: textColor }, beginAtZero: true } }
-        }
-      });
-    }
-  }, 100);
+    toast.style.animation = 'slideUp 0.25s ease reverse';
+    setTimeout(() => toast.remove(), 250);
+  }, 3000);
 }
-
-// ═══════════════════════════════════════════════════
-// BOOKS
-// ═══════════════════════════════════════════════════
-async function renderBooks() {
-  const c = document.getElementById('page-content');
-  const { data: cats } = await sb.from('book_categories').select('id,name').order('name');
-
-  let q = sb.from('books').select('*, book_categories(name)', { count: 'exact' });
-  if (bookFilter.search) q = q.or(`title.ilike.%${bookFilter.search}%,author.ilike.%${bookFilter.search}%,isbn.ilike.%${bookFilter.search}%,book_code.ilike.%${bookFilter.search}%`);
-  if (bookFilter.category) q = q.eq('category_id', bookFilter.category);
-  if (bookFilter.status) q = q.eq('status', bookFilter.status);
-  const { data: books, count } = await q.order('title').range((bookPage-1)*booksPerPage, bookPage*booksPerPage-1);
-
-  const totalPages = Math.ceil((count||0) / booksPerPage);
-
-  c.innerHTML = `
-    <div class="toolbar">
-      <div class="search-bar" style="flex:1;max-width:380px">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search books, authors, ISBN…" value="${escHtml(bookFilter.search)}" id="book-search">
-      </div>
-      <select class="form-input form-select" style="width:160px" id="book-cat-filter">
-        <option value="">All Categories</option>
-        ${(cats||[]).map(c => `<option value="${c.id}" ${bookFilter.category==c.id?'selected':''}>${escHtml(c.name)}</option>`).join('')}
-      </select>
-      <select class="form-input form-select" style="width:140px" id="book-status-filter">
-        <option value="">All Status</option>
-        <option value="available" ${bookFilter.status==='available'?'selected':''}>Available</option>
-        <option value="unavailable" ${bookFilter.status==='unavailable'?'selected':''}>Unavailable</option>
-      </select>
-      <div class="view-toggle">
-        <div class="view-btn active" id="view-table">☰ Table</div>
-        <div class="view-btn" id="view-grid">⊞ Grid</div>
-      </div>
-      <button class="btn btn-primary" onclick="openBookModal()">+ Add Book</button>
-    </div>
-    <div id="books-view">
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th>
-            <th>Copies</th><th>Available</th><th>Status</th><th>Actions</th>
-          </tr></thead>
-          <tbody>
-            ${(books||[]).map(bk => `
-              <tr>
-                <td>
-                  <div style="font-weight:600;cursor:pointer;color:var(--accent)" onclick="openBookDetail('${bk.id}')">${escHtml(bk.title)}</div>
-                  ${bk.shelf_location ? `<div style="font-size:11px;color:var(--text3)">📍 ${escHtml(bk.shelf_location)}</div>` : ''}
-                </td>
-                <td>${escHtml(bk.author||'—')}</td>
-                <td class="td-mono">${escHtml(bk.isbn||'—')}</td>
-                <td>${bk.book_categories?.name ? `<span class="badge badge-blue">${escHtml(bk.book_categories.name)}</span>` : '—'}</td>
-                <td>${bk.total_copies||0}</td>
-                <td><span class="badge ${(bk.available_copies||0) > 0 ? 'badge-green' : 'badge-red'}">${bk.available_copies||0}</span></td>
-                <td><span class="badge ${bk.status==='available'?'badge-green':'badge-gray'}">${capitalize(bk.status||'available')}</span></td>
-                <td class="td-actions">
-                  <button class="btn btn-ghost btn-sm btn-icon" title="Edit" onclick="openBookModal('${bk.id}')">✏️</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" title="Delete" onclick="deleteBook('${bk.id}','${escHtml(bk.title)}')">🗑️</button>
-                </td>
-              </tr>
-            `).join('') || '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📖</div><div class="empty-title">No books found</div><div class="empty-sub">Add your first book or import a catalog</div></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-      ${renderPagination(bookPage, totalPages, 'bookPage', count||0)}
-    </div>
-    </div>
-  `;
-
-  // Search debounce
-  let st; document.getElementById('book-search').addEventListener('input', e => {
-    clearTimeout(st); st = setTimeout(() => { bookFilter.search = e.target.value; bookPage = 1; renderBooks(); }, 350);
-  });
-  document.getElementById('book-cat-filter').onchange = e => { bookFilter.category = e.target.value; bookPage = 1; renderBooks(); };
-  document.getElementById('book-status-filter').onchange = e => { bookFilter.status = e.target.value; bookPage = 1; renderBooks(); };
-
-  // View toggle
-  document.getElementById('view-table').onclick = () => {
-    document.getElementById('view-table').classList.add('active');
-    document.getElementById('view-grid').classList.remove('active');
-    renderBooksTable(books);
-  };
-  document.getElementById('view-grid').onclick = () => {
-    document.getElementById('view-grid').classList.add('active');
-    document.getElementById('view-table').classList.remove('active');
-    renderBooksGrid(books);
-  };
-}
-
-function renderBooksTable(books) {
-  // already rendered by default
-}
-
-function renderBooksGrid(books) {
-  const v = document.getElementById('books-view');
-  v.innerHTML = `
-    <div class="books-grid">
-      ${(books||[]).map(bk => `
-        <div class="book-card" onclick="openBookDetail('${bk.id}')">
-          <div class="book-cover">${bk.cover_url ? `<img src="${bk.cover_url}" alt="">` : '📖'}</div>
-          <div class="book-card-body">
-            <div class="book-card-title">${escHtml(bk.title)}</div>
-            <div class="book-card-author">${escHtml(bk.author||'Unknown')}</div>
-            <div class="book-card-badges">
-              <span class="badge ${(bk.available_copies||0)>0?'badge-green':'badge-red'}">${bk.available_copies||0} avail.</span>
-            </div>
-          </div>
-        </div>
-      `).join('') || '<div class="empty-state"><div class="empty-icon">📖</div><div class="empty-title">No books found</div></div>'}
-    </div>
-  `;
-}
-
-function renderPagination(page, totalPages, varName, total) {
-  if (totalPages <= 1) return `<div class="page-info" style="padding:12px 20px;font-size:13px;color:var(--text2)">${total} records</div>`;
-  let pages = '';
-  for (let i = 1; i <= Math.min(totalPages, 7); i++) {
-    pages += `<div class="page-btn ${i===page?'active':''}" onclick="${varName}=${i};navigateTo('${currentPage}')">${i}</div>`;
-  }
-  if (totalPages > 7) pages += `<span style="padding:0 8px;color:var(--text3)">…</span><div class="page-btn ${totalPages===page?'active':''}" onclick="${varName}=${totalPages};navigateTo('${currentPage}')">${totalPages}</div>`;
-  return `<div class="pagination">${page>1?`<div class="page-btn" onclick="${varName}=${page-1};navigateTo('${currentPage}')">‹</div>`:''}${pages}${page<totalPages?`<div class="page-btn" onclick="${varName}=${page+1};navigateTo('${currentPage}')">›</div>`:''}<div class="page-info">${total} records</div></div>`;
-}
-
-async function openBookModal(bookId = null) {
-  editBookId = bookId;
-  document.getElementById('book-modal-title').textContent = bookId ? 'Edit Book' : 'Add Book';
-  const { data: cats } = await sb.from('book_categories').select('id,name').order('name');
-  const sel = document.getElementById('bk-category');
-  sel.innerHTML = '<option value="">— Select Category —</option>' + (cats||[]).map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
-
-  // Reset
-  ['bk-title','bk-author','bk-isbn','bk-code','bk-publisher','bk-year','bk-shelf','bk-lang','bk-edition','bk-desc'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('bk-copies').value = 1;
-  document.getElementById('bk-status').value = 'available';
-  document.getElementById('cover-preview-wrap').innerHTML = '<div style="font-size:36px">📷</div><div style="font-size:12px;color:var(--text2);margin-top:8px">Click to upload</div>';
-
-  if (bookId) {
-    const { data: bk } = await sb.from('books').select('*').eq('id', bookId).single();
-    if (bk) {
-      document.getElementById('bk-title').value = bk.title || '';
-      document.getElementById('bk-author').value = bk.author || '';
-      document.getElementById('bk-isbn').value = bk.isbn || '';
-      document.getElementById('bk-code').value = bk.book_code || '';
-      document.getElementById('bk-publisher').value = bk.publisher || '';
-      document.getElementById('bk-year').value = bk.publication_year || '';
-      document.getElementById('bk-shelf').value = bk.shelf_location || '';
-      document.getElementById('bk-lang').value = bk.language || '';
-      document.getElementById('bk-edition').value = bk.edition || '';
-      document.getElementById('bk-desc').value = bk.description || '';
-      document.getElementById('bk-copies').value = bk.total_copies || 1;
-      document.getElementById('bk-status').value = bk.status || 'available';
-      if (bk.category_id) document.getElementById('bk-category').value = bk.category_id;
-      if (bk.cover_url) document.getElementById('cover-preview-wrap').innerHTML = `<img src="${bk.cover_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
-    }
-  }
-
-  // Cover upload handler
-  document.getElementById('cover-file').onchange = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      document.getElementById('cover-preview-wrap').innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  document.getElementById('save-book-btn').onclick = saveBook;
-  openModal('book-modal');
-}
-
-async function saveBook() {
-  const title = document.getElementById('bk-title').value.trim();
-  const author = document.getElementById('bk-author').value.trim();
-  if (!title) return toast('Title is required', 'error');
-  if (!author) return toast('Author is required', 'error');
-
-  const btn = document.getElementById('save-book-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
-
-  let cover_url = null;
-  const coverFile = document.getElementById('cover-file').files[0];
-  if (coverFile) {
-    const ext = coverFile.name.split('.').pop();
-    const path = `covers/${Date.now()}.${ext}`;
-    const { data: up } = await sb.storage.from('library-assets').upload(path, coverFile, { upsert: true });
-    if (up) {
-      const { data: url } = sb.storage.from('library-assets').getPublicUrl(path);
-      cover_url = url.publicUrl;
-    }
-  }
-
-  const copies = parseInt(document.getElementById('bk-copies').value) || 1;
-  const obj = {
-    title, author,
-    isbn: document.getElementById('bk-isbn').value.trim() || null,
-    book_code: document.getElementById('bk-code').value.trim() || null,
-    category_id: document.getElementById('bk-category').value || null,
-    publisher: document.getElementById('bk-publisher').value.trim() || null,
-    publication_year: document.getElementById('bk-year').value ? parseInt(document.getElementById('bk-year').value) : null,
-    shelf_location: document.getElementById('bk-shelf').value.trim() || null,
-    language: document.getElementById('bk-lang').value.trim() || 'English',
-    edition: document.getElementById('bk-edition').value.trim() || null,
-    description: document.getElementById('bk-desc').value.trim() || null,
-    total_copies: copies,
-    status: document.getElementById('bk-status').value,
-    updated_at: new Date().toISOString()
-  };
-  if (!editBookId) { obj.available_copies = copies; obj.created_at = new Date().toISOString(); }
-  if (cover_url) obj.cover_url = cover_url;
-
-  let error;
-  if (editBookId) {
-    ({ error } = await sb.from('books').update(obj).eq('id', editBookId));
-  } else {
-    ({ error } = await sb.from('books').insert(obj));
-  }
-  btn.disabled = false; btn.textContent = 'Save Book';
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  toast(editBookId ? 'Book updated!' : 'Book added!', 'success');
-  await logActivity(editBookId ? 'book_updated' : 'book_created', `${editBookId?'Updated':'Added'} book: ${title}`);
-  closeModal('book-modal');
-  renderBooks();
-}
-
-async function deleteBook(id, title) {
-  showConfirm('Delete Book', `Delete "${title}"? This cannot be undone.`, async () => {
-    const { error } = await sb.from('books').delete().eq('id', id);
-    if (error) { toast('Error: ' + error.message, 'error'); return; }
-    toast('Book deleted', 'success');
-    await logActivity('book_deleted', `Deleted book: ${title}`);
-    renderBooks();
-  });
-}
-
-async function openBookDetail(id) {
-  const { data: bk } = await sb.from('books').select('*, book_categories(name)').eq('id', id).single();
-  if (!bk) return;
-  document.getElementById('bd-title').textContent = bk.title;
-  document.getElementById('bd-body').innerHTML = `
-    <div class="grid-2">
-      <div>
-        <div class="book-cover" style="aspect-ratio:3/4;background:var(--bg3);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:64px;overflow:hidden;max-width:200px;margin-bottom:16px">
-          ${bk.cover_url ? `<img src="${bk.cover_url}" style="width:100%;height:100%;object-fit:cover">` : '📖'}
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="closeModal('book-detail-modal');openBookModal('${bk.id}')">✏️ Edit</button>
-      </div>
-      <div>
-        <table style="width:100%;border-collapse:collapse">
-          ${[
-            ['Author', bk.author], ['ISBN', bk.isbn], ['Book Code', bk.book_code],
-            ['Category', bk.book_categories?.name], ['Publisher', bk.publisher],
-            ['Year', bk.publication_year], ['Language', bk.language], ['Edition', bk.edition],
-            ['Shelf', bk.shelf_location], ['Total Copies', bk.total_copies], ['Available', bk.available_copies],
-            ['Status', capitalize(bk.status||'available')]
-          ].map(([k,v]) => v ? `<tr><td style="padding:8px 0;color:var(--text2);font-size:13px;width:120px">${k}</td><td style="padding:8px 0;font-size:13px;font-weight:500">${escHtml(String(v))}</td></tr>` : '').join('')}
-        </table>
-        ${bk.description ? `<div style="margin-top:16px;padding:16px;background:var(--bg3);border-radius:var(--radius);font-size:13px;color:var(--text2);line-height:1.6">${escHtml(bk.description)}</div>` : ''}
-      </div>
-    </div>
-  `;
-  openModal('book-detail-modal');
-}
-
-// ═══════════════════════════════════════════════════
-// CATEGORIES
-// ═══════════════════════════════════════════════════
-async function renderCategories() {
-  const c = document.getElementById('page-content');
-  const { data: cats } = await sb.from('book_categories').select('*, books(count)').order('name');
-
-  c.innerHTML = `
-    <div class="toolbar">
-      <div style="flex:1"></div>
-      <button class="btn btn-primary" onclick="openCatModal()">+ Add Category</button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Name</th><th>Description</th><th>Books</th><th>Color</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${(cats||[]).map(cat => `
-              <tr>
-                <td style="font-weight:600">${escHtml(cat.name)}</td>
-                <td style="color:var(--text2)">${escHtml(cat.description||'—')}</td>
-                <td><span class="badge badge-blue">${cat.books?.[0]?.count||0} books</span></td>
-                <td><div style="width:24px;height:24px;border-radius:6px;background:${cat.color||'#2563eb'}"></div></td>
-                <td class="td-actions">
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openCatModal('${cat.id}')">✏️</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteCat('${cat.id}','${escHtml(cat.name)}')">🗑️</button>
-                </td>
-              </tr>
-            `).join('') || '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🏷️</div><div class="empty-title">No categories yet</div></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-async function openCatModal(catId = null) {
-  editCatId = catId;
-  document.getElementById('cat-modal-title').textContent = catId ? 'Edit Category' : 'Add Category';
-  document.getElementById('cat-name').value = '';
-  document.getElementById('cat-desc').value = '';
-  document.getElementById('cat-color').value = '#2563eb';
-  if (catId) {
-    const { data } = await sb.from('book_categories').select('*').eq('id', catId).single();
-    if (data) { document.getElementById('cat-name').value = data.name; document.getElementById('cat-desc').value = data.description||''; document.getElementById('cat-color').value = data.color||'#2563eb'; }
-  }
-  document.getElementById('save-cat-btn').onclick = saveCat;
-  openModal('cat-modal');
-}
-
-async function saveCat() {
-  const name = document.getElementById('cat-name').value.trim();
-  if (!name) return toast('Name is required', 'error');
-  const obj = { name, description: document.getElementById('cat-desc').value.trim() || null, color: document.getElementById('cat-color').value };
-  let error;
-  if (editCatId) ({ error } = await sb.from('book_categories').update(obj).eq('id', editCatId));
-  else ({ error } = await sb.from('book_categories').insert(obj));
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  toast(editCatId ? 'Category updated!' : 'Category added!', 'success');
-  closeModal('cat-modal');
-  renderCategories();
-}
-
-async function deleteCat(id, name) {
-  showConfirm('Delete Category', `Delete "${name}"?`, async () => {
-    const { error } = await sb.from('book_categories').delete().eq('id', id);
-    if (error) { toast(error.message, 'error'); return; }
-    toast('Deleted', 'success'); renderCategories();
-  });
-}
-
-// ═══════════════════════════════════════════════════
-// USERS
-// ═══════════════════════════════════════════════════
-async function renderUsers() {
-  const c = document.getElementById('page-content');
-  let q = sb.from('library_users').select('*', { count: 'exact' }).in('role', ['student','teacher','librarian']);
-  if (userFilter.search) q = q.or(`full_name.ilike.%${userFilter.search}%,user_code.ilike.%${userFilter.search}%,email.ilike.%${userFilter.search}%`);
-  if (userFilter.role) q = q.eq('role', userFilter.role);
-  const { data: users, count } = await q.order('full_name').range((userPage-1)*usersPerPage, userPage*usersPerPage-1);
-  const totalPages = Math.ceil((count||0)/usersPerPage);
-
-  c.innerHTML = `
-    <div class="toolbar">
-      <div class="search-bar" style="flex:1;max-width:340px">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search users…" value="${escHtml(userFilter.search)}" id="user-search">
-      </div>
-      <select class="form-input form-select" style="width:140px" id="user-role-filter">
-        <option value="">All Roles</option>
-        <option value="student" ${userFilter.role==='student'?'selected':''}>Students</option>
-        <option value="teacher" ${userFilter.role==='teacher'?'selected':''}>Teachers</option>
-        <option value="librarian" ${userFilter.role==='librarian'?'selected':''}>Librarians</option>
-      </select>
-      <button class="btn btn-primary" onclick="openUserModal()">+ Add User</button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Name</th><th>Code</th><th>Role</th><th>Class/Grade</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${(users||[]).map(u => `
-              <tr>
-                <td>
-                  <div style="display:flex;align-items:center;gap:10px">
-                    <div class="user-avatar av-${Math.abs(hashStr(u.full_name||'')) % 6}" style="width:32px;height:32px;font-size:12px">${(u.full_name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
-                    <span style="font-weight:600">${escHtml(u.full_name||'—')}</span>
-                  </div>
-                </td>
-                <td class="td-mono">${escHtml(u.user_code||'—')}</td>
-                <td><span class="badge ${u.role==='student'?'badge-blue':u.role==='teacher'?'badge-green':'badge-purple'}">${capitalize(u.role||'—')}</span></td>
-                <td>${escHtml(u.class_grade||'—')}</td>
-                <td>${escHtml(u.email||'—')}</td>
-                <td>${escHtml(u.phone||'—')}</td>
-                <td class="td-actions">
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openUserModal('${u.id}')">✏️</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteUser('${u.id}','${escHtml(u.full_name||'')}')">🗑️</button>
-                </td>
-              </tr>
-            `).join('') || '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No users found</div></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-      ${renderPagination(userPage, totalPages, 'userPage', count||0)}
-    </div>
-  `;
-
-  let st; document.getElementById('user-search').addEventListener('input', e => {
-    clearTimeout(st); st = setTimeout(() => { userFilter.search = e.target.value; userPage = 1; renderUsers(); }, 350);
-  });
-  document.getElementById('user-role-filter').onchange = e => { userFilter.role = e.target.value; userPage = 1; renderUsers(); };
-}
-
-function toggleClassField() {
-  const role = document.getElementById('usr-role').value;
-  document.getElementById('usr-class-group').style.display = role === 'student' ? '' : 'none';
-}
-
-async function openUserModal(userId = null) {
-  editUserId = userId;
-  document.getElementById('user-modal-title').textContent = userId ? 'Edit User' : 'Add User';
-  ['usr-code','usr-name','usr-class','usr-email','usr-phone'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('usr-role').value = 'student';
-  toggleClassField();
-  if (userId) {
-    const { data: u } = await sb.from('library_users').select('*').eq('id', userId).single();
-    if (u) {
-      document.getElementById('usr-role').value = u.role || 'student';
-      document.getElementById('usr-code').value = u.user_code || '';
-      document.getElementById('usr-name').value = u.full_name || '';
-      document.getElementById('usr-class').value = u.class_grade || '';
-      document.getElementById('usr-email').value = u.email || '';
-      document.getElementById('usr-phone').value = u.phone || '';
-      toggleClassField();
-    }
-  }
-  document.getElementById('save-user-btn').onclick = saveUser;
-  openModal('user-modal');
-}
-
-async function saveUser() {
-  const role = document.getElementById('usr-role').value;
-  const code = document.getElementById('usr-code').value.trim();
-  const name = document.getElementById('usr-name').value.trim();
-  const cls = document.getElementById('usr-class').value.trim();
-  if (!code || !name) return toast('Code and Name are required', 'error');
-  if (role === 'student' && !cls) return toast('Class/Grade is required for students', 'error');
-
-  const obj = {
-    role, user_code: code, full_name: name,
-    class_grade: role === 'student' ? cls : null,
-    email: document.getElementById('usr-email').value.trim() || null,
-    phone: document.getElementById('usr-phone').value.trim() || null,
-    updated_at: new Date().toISOString()
-  };
-
-  let error;
-  if (editUserId) ({ error } = await sb.from('library_users').update(obj).eq('id', editUserId));
-  else { obj.created_at = new Date().toISOString(); ({ error } = await sb.from('library_users').insert(obj)); }
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  toast(editUserId ? 'User updated!' : 'User added!', 'success');
-  await logActivity(editUserId ? 'user_updated' : 'user_created', `${editUserId?'Updated':'Added'} user: ${name}`);
-  closeModal('user-modal');
-  renderUsers();
-}
-
-async function deleteUser(id, name) {
-  showConfirm('Delete User', `Delete "${name}"?`, async () => {
-    const { error } = await sb.from('library_users').delete().eq('id', id);
-    if (error) { toast(error.message, 'error'); return; }
-    toast('User deleted', 'success'); renderUsers();
-  });
-}
-
-// ═══════════════════════════════════════════════════
-// LOANS
-// ═══════════════════════════════════════════════════
-async function renderLoans() {
-  const c = document.getElementById('page-content');
-  let q = sb.from('book_loans').select('*, books(title,author), library_users(full_name,user_code)', { count: 'exact' });
-  if (loanFilter.search) q = q.or(`books.title.ilike.%${loanFilter.search}%,library_users.full_name.ilike.%${loanFilter.search}%`);
-  if (loanFilter.status && loanFilter.status !== 'all') {
-    if (loanFilter.status === 'overdue') {
-      q = q.eq('status','active').lt('due_date', new Date().toISOString().slice(0,10));
-    } else {
-      q = q.eq('status', loanFilter.status);
-    }
-  }
-  const { data: loans, count } = await q.order('created_at', { ascending: false }).range((loanPage-1)*loansPerPage, loanPage*loansPerPage-1);
-  const totalPages = Math.ceil((count||0)/loansPerPage);
-  const today = new Date().toISOString().slice(0,10);
-
-  c.innerHTML = `
-    <div class="toolbar">
-      <div class="search-bar" style="flex:1;max-width:340px">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search loans…" value="${escHtml(loanFilter.search)}" id="loan-search">
-      </div>
-      <div class="tabs" style="margin:0">
-        <div class="tab-btn ${loanFilter.status==='active'?'active':''}" onclick="loanFilter.status='active';loanPage=1;renderLoans()">Active</div>
-        <div class="tab-btn ${loanFilter.status==='overdue'?'active':''}" onclick="loanFilter.status='overdue';loanPage=1;renderLoans()">Overdue</div>
-        <div class="tab-btn ${loanFilter.status==='returned'?'active':''}" onclick="loanFilter.status='returned';loanPage=1;renderLoans()">Returned</div>
-        <div class="tab-btn ${loanFilter.status==='all'?'active':''}" onclick="loanFilter.status='all';loanPage=1;renderLoans()">All</div>
-      </div>
-      <button class="btn btn-primary" onclick="openLoanModal()">+ Issue Book</button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Book</th><th>Borrower</th><th>Issued</th><th>Due Date</th><th>Returned</th><th>Status</th><th>Fine</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${(loans||[]).map(l => {
-              const isOverdue = l.status === 'active' && l.due_date < today;
-              const fine = isOverdue ? calcFine(l.due_date) : (l.fine_amount || 0);
-              return `
-                <tr ${isOverdue ? 'style="background:var(--danger-bg)"' : ''}>
-                  <td>
-                    <div style="font-weight:600">${escHtml(l.books?.title||'Unknown')}</div>
-                    <div style="font-size:11px;color:var(--text2)">${escHtml(l.books?.author||'')}</div>
-                  </td>
-                  <td>
-                    <div>${escHtml(l.library_users?.full_name||'Unknown')}</div>
-                    <div class="td-mono" style="font-size:11px">${escHtml(l.library_users?.user_code||'')}</div>
-                  </td>
-                  <td class="td-mono">${formatDate(l.issue_date||l.created_at)}</td>
-                  <td class="${isOverdue?'overdue':''}">${formatDate(l.due_date)}</td>
-                  <td>${l.return_date ? formatDate(l.return_date) : '—'}</td>
-                  <td>
-                    ${isOverdue ? '<span class="badge badge-red">Overdue</span>' :
-                      l.status === 'returned' ? '<span class="badge badge-green">Returned</span>' :
-                      '<span class="badge badge-blue">Active</span>'}
-                  </td>
-                  <td>${fine > 0 ? `<span class="badge badge-red">${fine} RWF</span>` : '—'}</td>
-                  <td class="td-actions">
-                    ${l.status !== 'returned' ? `<button class="btn btn-success btn-sm" onclick="openReturnModal('${l.id}')">Return</button>` : ''}
-                    ${l.status === 'active' ? `<button class="btn btn-ghost btn-sm" onclick="renewLoan('${l.id}')">Renew</button>` : ''}
-                  </td>
-                </tr>
-              `;
-            }).join('') || '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔄</div><div class="empty-title">No loans found</div></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-      ${renderPagination(loanPage, totalPages, 'loanPage', count||0)}
-    </div>
-  `;
-
-  let st; document.getElementById('loan-search').addEventListener('input', e => {
-    clearTimeout(st); st = setTimeout(() => { loanFilter.search = e.target.value; loanPage = 1; renderLoans(); }, 350);
-  });
-}
-
-function calcFine(dueDate) {
-  const days = Math.floor((new Date() - new Date(dueDate)) / 86400000);
-  return Math.max(0, days) * (appSettings.fine_per_day || 50);
-}
-
-async function openLoanModal() {
-  const [{ data: books }, { data: users }] = await Promise.all([
-    sb.from('books').select('id,title,author').gt('available_copies', 0).order('title'),
-    sb.from('library_users').select('id,full_name,user_code').in('role',['student','teacher']).order('full_name')
-  ]);
-
-  document.getElementById('loan-book').innerHTML = '<option value="">— Select Book —</option>' + (books||[]).map(b => `<option value="${b.id}">${escHtml(b.title)} — ${escHtml(b.author||'')}</option>`).join('');
-  document.getElementById('loan-user').innerHTML = '<option value="">— Select User —</option>' + (users||[]).map(u => `<option value="${u.id}">${escHtml(u.full_name)} (${escHtml(u.user_code||'')})</option>`).join('');
-
-  const due = new Date(); due.setDate(due.getDate() + (appSettings.loan_days || 14));
-  document.getElementById('loan-due').value = due.toISOString().slice(0,10);
-  document.getElementById('loan-notes').value = '';
-  document.getElementById('issue-loan-btn').onclick = issueLoan;
-  openModal('loan-modal');
-}
-
-async function issueLoan() {
-  const bookId = document.getElementById('loan-book').value;
-  const userId = document.getElementById('loan-user').value;
-  const due = document.getElementById('loan-due').value;
-  if (!bookId || !userId || !due) return toast('All fields are required', 'error');
-
-  const btn = document.getElementById('issue-loan-btn'); btn.disabled = true;
-  const { data: loan, error } = await sb.from('book_loans').insert({
-    book_id: bookId, user_id: userId, issue_date: new Date().toISOString().slice(0,10),
-    due_date: due, status: 'active', notes: document.getElementById('loan-notes').value.trim() || null,
-    issued_by: currentProfile?.id
-  }).select().single();
-
-  if (!error) {
-    await sb.from('books').rpc ? null : await sb.from('books').select('available_copies').eq('id',bookId).single().then(async ({data:b}) => {
-      await sb.from('books').update({ available_copies: Math.max(0,(b?.available_copies||1)-1) }).eq('id',bookId);
-    });
-  }
-
-  btn.disabled = false;
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  toast('Book issued successfully!', 'success');
-  await logActivity('book_issued', `Issued book loan #${loan?.id}`);
-  closeModal('loan-modal');
-  renderLoans();
-}
-
-async function openReturnModal(loanId) {
-  returnLoanId = loanId;
-  const { data: l } = await sb.from('book_loans').select('*, books(title,author), library_users(full_name)').eq('id', loanId).single();
-  if (!l) return;
-  const today = new Date().toISOString().slice(0,10);
-  const fine = calcFine(l.due_date);
-  const isOverdue = l.due_date < today && l.status === 'active';
-
-  document.getElementById('return-loan-info').innerHTML = `
-    <strong>📖 ${escHtml(l.books?.title||'')}</strong><br>
-    👤 ${escHtml(l.library_users?.full_name||'')}<br>
-    📅 Due: ${formatDate(l.due_date)} ${isOverdue?'<span class="badge badge-red">OVERDUE</span>':''}
-  `;
-  const fineEl = document.getElementById('fine-info');
-  if (fine > 0) { fineEl.style.display = ''; fineEl.textContent = `⚠️ Fine: ${fine} RWF (${Math.floor((new Date()-new Date(l.due_date))/86400000)} days overdue × ${appSettings.fine_per_day||50} RWF/day)`; }
-  else { fineEl.style.display = 'none'; }
-  document.getElementById('return-notes').value = '';
-  document.getElementById('confirm-return-btn').onclick = confirmReturn;
-  openModal('return-modal');
-}
-
-async function confirmReturn() {
-  if (!returnLoanId) return;
-  const btn = document.getElementById('confirm-return-btn'); btn.disabled = true;
-  const { data: l } = await sb.from('book_loans').select('book_id,due_date').eq('id',returnLoanId).single();
-  const fine = l ? calcFine(l.due_date) : 0;
-
-  const { error } = await sb.from('book_loans').update({
-    status: 'returned', return_date: new Date().toISOString().slice(0,10),
-    fine_amount: fine, return_notes: document.getElementById('return-notes').value.trim() || null,
-    returned_by: currentProfile?.id
-  }).eq('id', returnLoanId);
-
-  if (!error && l?.book_id) {
-    const { data: bk } = await sb.from('books').select('available_copies').eq('id',l.book_id).single();
-    await sb.from('books').update({ available_copies: (bk?.available_copies||0)+1 }).eq('id',l.book_id);
-  }
-
-  btn.disabled = false;
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  toast('Book returned!', 'success');
-  await logActivity('book_returned', `Returned loan #${returnLoanId}`);
-  closeModal('return-modal');
-  renderLoans();
-}
-
-async function renewLoan(loanId) {
-  const { data: l } = await sb.from('book_loans').select('due_date').eq('id',loanId).single();
-  if (!l) return;
-  const newDue = new Date(l.due_date); newDue.setDate(newDue.getDate() + (appSettings.loan_days||14));
-  const { error } = await sb.from('book_loans').update({ due_date: newDue.toISOString().slice(0,10) }).eq('id',loanId);
-  if (error) { toast('Error: '+error.message,'error'); return; }
-  toast('Loan renewed!','success'); renderLoans();
-}
-
-async function checkOverdue() {
-  const today = new Date().toISOString().slice(0,10);
-  const { count } = await sb.from('book_loans').select('*',{count:'exact',head:true}).eq('status','active').lt('due_date',today);
-  const badge = document.getElementById('overdue-badge');
-  if (count > 0) { badge.style.display = ''; badge.textContent = count; }
-  else badge.style.display = 'none';
-}
-
-// ═══════════════════════════════════════════════════
-// REPORTS
-// ═══════════════════════════════════════════════════
-async function renderReports() {
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
-    <div class="tabs">
-      <div class="tab-btn active" onclick="showReportTab('inventory',this)">Inventory</div>
-      <div class="tab-btn" onclick="showReportTab('loans-report',this)">Loans</div>
-      <div class="tab-btn" onclick="showReportTab('overdue-report',this)">Overdue</div>
-      <div class="tab-btn" onclick="showReportTab('users-report',this)">Users</div>
-    </div>
-    <div id="report-inventory" class="tab-panel active">
-      <div class="report-toolbar">
-        <button class="btn btn-secondary" onclick="exportReport('inventory','csv')">⬇️ Export CSV</button>
-        <button class="btn btn-secondary" onclick="exportReport('inventory','xlsx')">⬇️ Export Excel</button>
-      </div>
-      <div id="report-inventory-table"><div class="page-loader"><span class="loader"></span></div></div>
-    </div>
-    <div id="report-loans-report" class="tab-panel">
-      <div class="report-toolbar">
-        <button class="btn btn-secondary" onclick="exportReport('loans','csv')">⬇️ Export CSV</button>
-      </div>
-      <div id="report-loans-report-table"><div class="page-loader"><span class="loader"></span></div></div>
-    </div>
-    <div id="report-overdue-report" class="tab-panel">
-      <div class="report-toolbar">
-        <button class="btn btn-secondary" onclick="exportReport('overdue','csv')">⬇️ Export CSV</button>
-      </div>
-      <div id="report-overdue-report-table"><div class="page-loader"><span class="loader"></span></div></div>
-    </div>
-    <div id="report-users-report" class="tab-panel">
-      <div class="report-toolbar">
-        <button class="btn btn-secondary" onclick="exportReport('users','csv')">⬇️ Export CSV</button>
-      </div>
-      <div id="report-users-report-table"><div class="page-loader"><span class="loader"></span></div></div>
-    </div>
-  `;
-  loadInventoryReport();
-}
-
-async function showReportTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('report-' + tab).classList.add('active');
-  if (tab === 'loans-report') loadLoansReport();
-  if (tab === 'overdue-report') loadOverdueReport();
-  if (tab === 'users-report') loadUsersReport();
-}
-
-async function loadInventoryReport() {
-  const { data: books } = await sb.from('books').select('*, book_categories(name)').order('title');
-  const el = document.getElementById('report-inventory-table');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Total</th><th>Available</th><th>Status</th></tr></thead>
-    <tbody>${(books||[]).map(b=>`<tr><td>${escHtml(b.title)}</td><td>${escHtml(b.author||'')}</td><td class="td-mono">${escHtml(b.isbn||'')}</td><td>${escHtml(b.book_categories?.name||'')}</td><td>${b.total_copies||0}</td><td>${b.available_copies||0}</td><td>${capitalize(b.status||'')}</td></tr>`).join('')}</tbody>
-  </table></div></div>`;
-  window._reportData = window._reportData || {};
-  window._reportData.inventory = books;
-}
-
-async function loadLoansReport() {
-  const { data: loans } = await sb.from('book_loans').select('*, books(title), library_users(full_name,user_code)').order('created_at',{ascending:false}).limit(500);
-  const el = document.getElementById('report-loans-report-table');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Book</th><th>Borrower</th><th>Code</th><th>Issued</th><th>Due</th><th>Returned</th><th>Status</th><th>Fine</th></tr></thead>
-    <tbody>${(loans||[]).map(l=>`<tr><td>${escHtml(l.books?.title||'')}</td><td>${escHtml(l.library_users?.full_name||'')}</td><td class="td-mono">${escHtml(l.library_users?.user_code||'')}</td><td>${formatDate(l.issue_date||l.created_at)}</td><td>${formatDate(l.due_date)}</td><td>${l.return_date?formatDate(l.return_date):'—'}</td><td>${capitalize(l.status||'')}</td><td>${l.fine_amount?l.fine_amount+' RWF':'—'}</td></tr>`).join('')}</tbody>
-  </table></div></div>`;
-  window._reportData.loans = loans;
-}
-
-async function loadOverdueReport() {
-  const today = new Date().toISOString().slice(0,10);
-  const { data: loans } = await sb.from('book_loans').select('*, books(title), library_users(full_name,user_code,email,phone)').eq('status','active').lt('due_date',today).order('due_date');
-  const el = document.getElementById('report-overdue-report-table');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Book</th><th>Borrower</th><th>Contact</th><th>Due Date</th><th>Days Overdue</th><th>Fine</th></tr></thead>
-    <tbody>${(loans||[]).map(l=>{const days=Math.floor((new Date()-new Date(l.due_date))/86400000);return`<tr style="background:var(--danger-bg)"><td>${escHtml(l.books?.title||'')}</td><td>${escHtml(l.library_users?.full_name||'')}</td><td>${escHtml(l.library_users?.email||l.library_users?.phone||'—')}</td><td class="overdue">${formatDate(l.due_date)}</td><td class="badge badge-red">${days} days</td><td>${days*(appSettings.fine_per_day||50)} RWF</td></tr>`;}).join('')||'<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">No overdue books!</div></div></td></tr>'}</tbody>
-  </table></div></div>`;
-  window._reportData.overdue = loans;
-}
-
-async function loadUsersReport() {
-  const { data: users } = await sb.from('library_users').select('*').in('role',['student','teacher']).order('full_name');
-  const el = document.getElementById('report-users-report-table');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Name</th><th>Code</th><th>Role</th><th>Class</th><th>Email</th><th>Phone</th></tr></thead>
-    <tbody>${(users||[]).map(u=>`<tr><td>${escHtml(u.full_name||'')}</td><td class="td-mono">${escHtml(u.user_code||'')}</td><td>${capitalize(u.role||'')}</td><td>${escHtml(u.class_grade||'—')}</td><td>${escHtml(u.email||'—')}</td><td>${escHtml(u.phone||'—')}</td></tr>`).join('')}</tbody>
-  </table></div></div>`;
-  window._reportData.users = users;
-}
-
-function exportReport(type, format) {
-  const data = window._reportData?.[type];
-  if (!data?.length) return toast('No data to export', 'error');
-  if (format === 'csv') {
-    const headers = Object.keys(data[0]);
-    const rows = data.map(r => headers.map(h => JSON.stringify(r[h]||'')).join(','));
-    const csv = [headers.join(','), ...rows].join('\n');
-    downloadFile(csv, `${type}-report-${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
-  } else {
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, type);
-    XLSX.writeFile(wb, `${type}-report-${new Date().toISOString().slice(0,10)}.xlsx`);
-  }
-  toast('Exported!', 'success');
-}
-
-// ═══════════════════════════════════════════════════
-// ACTIVITY LOG
-// ═══════════════════════════════════════════════════
-async function renderActivity() {
-  const c = document.getElementById('page-content');
-  const { data: logs, count } = await sb.from('activity_logs').select('*, library_users(full_name)', { count: 'exact' }).order('created_at', { ascending: false }).range((actPage-1)*actPerPage, actPage*actPerPage-1);
-  const totalPages = Math.ceil((count||0)/actPerPage);
-
-  const actionIcon = { book_created:'📖', book_updated:'✏️', book_deleted:'🗑️', book_issued:'🔄', book_returned:'✅', user_created:'👤', user_updated:'✏️', settings_updated:'⚙️', import_completed:'⬆️' };
-
-  c.innerHTML = `
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Action</th><th>Description</th><th>User</th><th>Time</th></tr></thead>
-          <tbody>
-            ${(logs||[]).map(l => `
-              <tr>
-                <td><span class="badge badge-gray">${actionIcon[l.action]||'•'} ${escHtml(l.action||'')}</span></td>
-                <td>${escHtml(l.description||'')}</td>
-                <td>${escHtml(l.library_users?.full_name||'System')}</td>
-                <td class="td-mono" style="font-size:12px">${new Date(l.created_at).toLocaleString()}</td>
-              </tr>
-            `).join('') || '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No activity yet</div></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-      ${renderPagination(actPage, totalPages, 'actPage', count||0)}
-    </div>
-  `;
-}
-
-// ═══════════════════════════════════════════════════
-// SETTINGS
-// ═══════════════════════════════════════════════════
-async function renderSettings() {
-  const c = document.getElementById('page-content');
-  const { data: s } = await sb.from('library_settings').select('*').limit(1).maybeSingle();
-  const settings = { ...appSettings, ...s };
-
-  c.innerHTML = `
-    <div style="max-width:700px">
-      <div class="settings-section">
-        <div class="settings-section-title">🏫 School Information</div>
-        <div class="form-group"><label class="form-label">School Name</label><input type="text" id="set-school-name" class="form-input" value="${escHtml(settings.school_name||'')}"></div>
-        <div class="form-group"><label class="form-label">School Logo URL</label><input type="url" id="set-logo" class="form-input" placeholder="https://..." value="${escHtml(settings.logo_url||'')}"></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">📅 Loan Configuration</div>
-        <div class="grid-2">
-          <div class="form-group"><label class="form-label">Default Loan Duration (days)</label><input type="number" id="set-loan-days" class="form-input" value="${settings.loan_days||14}" min="1"></div>
-          <div class="form-group"><label class="form-label">Fine Per Day (RWF)</label><input type="number" id="set-fine" class="form-input" value="${settings.fine_per_day||50}" min="0"></div>
-        </div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">🎨 Appearance</div>
-        <div class="settings-row">
-          <div class="settings-row-info"><div class="settings-row-label">Dark Mode</div><div class="settings-row-desc">Switch between light and dark themes</div></div>
-          <label class="toggle"><input type="checkbox" id="set-dark" ${document.documentElement.getAttribute('data-theme')==='dark'?'checked':''}><span class="toggle-slider"></span></label>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('set-dark').onchange = e => {
-    setTheme(e.target.checked ? 'dark' : 'light');
-  };
-}
-
-async function saveSettings() {
-  const obj = {
-    school_name: document.getElementById('set-school-name').value.trim() || 'School Library',
-    logo_url: document.getElementById('set-logo').value.trim() || null,
-    loan_days: parseInt(document.getElementById('set-loan-days').value) || 14,
-    fine_per_day: parseInt(document.getElementById('set-fine').value) || 50,
-    theme: document.documentElement.getAttribute('data-theme'),
-    updated_at: new Date().toISOString()
-  };
-  let error;
-  const { data: existing } = await sb.from('library_settings').select('id').limit(1).maybeSingle();
-  if (existing?.id) ({ error } = await sb.from('library_settings').update(obj).eq('id', existing.id));
-  else ({ error } = await sb.from('library_settings').insert({ ...obj, created_at: new Date().toISOString() }));
-  if (error) { toast('Error: ' + error.message, 'error'); return; }
-  appSettings = { ...appSettings, ...obj };
-  document.title = obj.school_name + ' — LibraryOS';
-  toast('Settings saved!', 'success');
-  await logActivity('settings_updated', 'Updated library settings');
-}
-
-// ═══════════════════════════════════════════════════
-// DB SETUP PAGE
-// ═══════════════════════════════════════════════════
-function renderSetup() {
-  const c = document.getElementById('page-content');
-  const sql = `-- ═══════════════════════════════════════════════
--- LibraryOS — Complete Database Schema
--- Run this in Supabase SQL Editor
--- ═══════════════════════════════════════════════
-
--- 1. LIBRARY USERS
-CREATE TABLE IF NOT EXISTS library_users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  user_code TEXT NOT NULL,
-  full_name TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('student','teacher','librarian','admin')),
-  class_grade TEXT,
-  email TEXT,
-  phone TEXT,
-  avatar_url TEXT,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_library_users_auth_id ON library_users(auth_id);
-CREATE INDEX IF NOT EXISTS idx_library_users_role ON library_users(role);
-CREATE INDEX IF NOT EXISTS idx_library_users_code ON library_users(user_code);
-
--- 2. BOOK CATEGORIES
-CREATE TABLE IF NOT EXISTS book_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL UNIQUE,
-  description TEXT,
-  color TEXT DEFAULT '#2563eb',
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- 3. BOOKS
-CREATE TABLE IF NOT EXISTS books (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  book_code TEXT,
-  isbn TEXT,
-  title TEXT NOT NULL,
-  author TEXT,
-  category_id UUID REFERENCES book_categories(id) ON DELETE SET NULL,
-  publisher TEXT,
-  publication_year INTEGER,
-  language TEXT DEFAULT 'English',
-  edition TEXT,
-  shelf_location TEXT,
-  total_copies INTEGER DEFAULT 1,
-  available_copies INTEGER DEFAULT 1,
-  status TEXT DEFAULT 'available' CHECK (status IN ('available','unavailable','lost')),
-  description TEXT,
-  cover_url TEXT,
-  custom_fields JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_books_title ON books(title);
-CREATE INDEX IF NOT EXISTS idx_books_author ON books(author);
-CREATE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
-CREATE INDEX IF NOT EXISTS idx_books_category ON books(category_id);
-CREATE INDEX IF NOT EXISTS idx_books_status ON books(status);
-
--- 4. BOOK LOANS
-CREATE TABLE IF NOT EXISTS book_loans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES library_users(id) ON DELETE CASCADE,
-  issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  due_date DATE NOT NULL,
-  return_date DATE,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active','returned','overdue','lost')),
-  fine_amount DECIMAL(10,2) DEFAULT 0,
-  notes TEXT,
-  return_notes TEXT,
-  issued_by UUID REFERENCES library_users(id),
-  returned_by UUID REFERENCES library_users(id),
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_loans_book ON book_loans(book_id);
-CREATE INDEX IF NOT EXISTS idx_loans_user ON book_loans(user_id);
-CREATE INDEX IF NOT EXISTS idx_loans_status ON book_loans(status);
-CREATE INDEX IF NOT EXISTS idx_loans_due ON book_loans(due_date);
-
--- 5. ACTIVITY LOGS
-CREATE TABLE IF NOT EXISTS activity_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  action TEXT NOT NULL,
-  description TEXT,
-  user_id UUID REFERENCES library_users(id) ON DELETE SET NULL,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_logs(action);
-CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at DESC);
-
--- 6. LIBRARY SETTINGS
-CREATE TABLE IF NOT EXISTS library_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  school_name TEXT DEFAULT 'School Library',
-  logo_url TEXT,
-  loan_days INTEGER DEFAULT 14,
-  fine_per_day DECIMAL(10,2) DEFAULT 50,
-  theme TEXT DEFAULT 'light',
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- 7. IMPORT JOBS
-CREATE TABLE IF NOT EXISTS book_import_jobs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  filename TEXT,
-  total_rows INTEGER,
-  imported INTEGER DEFAULT 0,
-  skipped INTEGER DEFAULT 0,
-  failed INTEGER DEFAULT 0,
-  status TEXT DEFAULT 'pending',
-  error TEXT,
-  started_by UUID REFERENCES library_users(id),
-  created_at TIMESTAMPTZ DEFAULT now(),
-  completed_at TIMESTAMPTZ
-);
-
--- ═══════════════════════════════════════════════
--- ROW LEVEL SECURITY
--- ═══════════════════════════════════════════════
-
-ALTER TABLE library_users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE books ENABLE ROW LEVEL SECURITY;
-ALTER TABLE book_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE book_loans ENABLE ROW LEVEL SECURITY;
-ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE library_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE book_import_jobs ENABLE ROW LEVEL SECURITY;
-
--- Allow authenticated users to read everything
-CREATE POLICY "auth_read_users" ON library_users FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_insert_users" ON library_users FOR INSERT TO authenticated WITH CHECK (true);
-CREATE POLICY "auth_update_users" ON library_users FOR UPDATE TO authenticated USING (true);
-CREATE POLICY "auth_delete_users" ON library_users FOR DELETE TO authenticated USING (true);
-
-CREATE POLICY "auth_read_books" ON books FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_insert_books" ON books FOR INSERT TO authenticated WITH CHECK (true);
-CREATE POLICY "auth_update_books" ON books FOR UPDATE TO authenticated USING (true);
-CREATE POLICY "auth_delete_books" ON books FOR DELETE TO authenticated USING (true);
-
-CREATE POLICY "auth_read_cats" ON book_categories FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_write_cats" ON book_categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE POLICY "auth_read_loans" ON book_loans FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_write_loans" ON book_loans FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE POLICY "auth_read_logs" ON activity_logs FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_insert_logs" ON activity_logs FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "auth_read_settings" ON library_settings FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_write_settings" ON library_settings FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE POLICY "auth_read_imports" ON book_import_jobs FOR SELECT TO authenticated USING (true);
-CREATE POLICY "auth_write_imports" ON book_import_jobs FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
--- Insert default settings
-INSERT INTO library_settings (school_name, loan_days, fine_per_day, theme) 
-VALUES ('My School Library', 14, 50, 'light')
-ON CONFLICT DO NOTHING;`;
-
-  c.innerHTML = `
-    <div class="setup-banner">
-      <div class="setup-banner-icon">⚠️</div>
-      <div>
-        <strong>First-time setup required</strong><br>
-        <span style="font-size:13px">Copy the SQL below and run it in your <a href="https://supabase.com/dashboard" target="_blank">Supabase SQL Editor</a> to create all required tables and policies.</span>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">🗄️ Database Schema (SQL)</div>
-        <button class="btn btn-primary btn-sm" onclick="copySQL()">📋 Copy SQL</button>
-        <a href="https://supabase.com/dashboard" target="_blank" class="btn btn-secondary btn-sm">Open Supabase ↗</a>
-      </div>
-      <div class="card-body" style="padding:0">
-        <pre class="sql-block" id="sql-block">${escHtml(sql)}</pre>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <div class="card-header"><div class="card-title">📦 Supabase Storage Bucket</div></div>
-      <div class="card-body">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Create a public storage bucket named <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">library-assets</code> in your Supabase Storage settings to enable cover image uploads.</p>
-        <a href="https://supabase.com/dashboard" target="_blank" class="btn btn-secondary btn-sm">Go to Storage ↗</a>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <div class="card-header"><div class="card-title">✅ Verify Connection</div></div>
-      <div class="card-body">
-        <button class="btn btn-primary" onclick="testConnection()">Test Database Connection</button>
-        <div id="test-result" style="margin-top:12px"></div>
-      </div>
-    </div>
-  `;
-}
-
-function copySQL() {
-  const sql = document.getElementById('sql-block').textContent;
-  navigator.clipboard.writeText(sql).then(() => toast('SQL copied!', 'success'));
-}
-
-async function testConnection() {
-  const el = document.getElementById('test-result');
-  el.innerHTML = '<span class="loader"></span> Testing…';
-  const results = [];
-  const tables = ['books','library_users','book_categories','book_loans','activity_logs','library_settings'];
-  for (const t of tables) {
-    const { error } = await sb.from(t).select('*',{count:'exact',head:true});
-    results.push({ table: t, ok: !error, error: error?.message });
-  }
-  el.innerHTML = results.map(r => `
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span>${r.ok ? '✅' : '❌'}</span>
-      <span style="font-family:var(--font-mono)">${r.table}</span>
-      ${r.error ? `<span style="color:var(--danger);font-size:12px">${r.error}</span>` : '<span style="color:var(--success)">OK</span>'}
-    </div>
-  `).join('');
-}
-
-// ═══════════════════════════════════════════════════
-// IMPORT PAGE
-// ═══════════════════════════════════════════════════
-function renderImportPage() {
-  const c = document.getElementById('page-content');
-  c.innerHTML = `
-    <div style="max-width:700px">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🤖 AI Bulk Import</div>
-        </div>
-        <div class="card-body">
-          <p style="color:var(--text2);font-size:14px;margin-bottom:20px">
-            Import books from any spreadsheet format. Our AI engine automatically detects column types — no need to rename headers.
-          </p>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
-            <div style="background:var(--bg3);padding:14px;border-radius:var(--radius);text-align:center">
-              <div style="font-size:24px;margin-bottom:6px">🔍</div>
-              <div style="font-size:12px;font-weight:600;margin-bottom:4px">Smart Detection</div>
-              <div style="font-size:11px;color:var(--text2)">Detects any column naming</div>
-            </div>
-            <div style="background:var(--bg3);padding:14px;border-radius:var(--radius);text-align:center">
-              <div style="font-size:24px;margin-bottom:6px">🗃️</div>
-              <div style="font-size:12px;font-weight:600;margin-bottom:4px">Multi-format</div>
-              <div style="font-size:11px;color:var(--text2)">CSV, XLS, XLSX, ODS…</div>
-            </div>
-            <div style="background:var(--bg3);padding:14px;border-radius:var(--radius);text-align:center">
-              <div style="font-size:24px;margin-bottom:6px">⚡</div>
-              <div style="font-size:12px;font-weight:600;margin-bottom:4px">Unlimited Rows</div>
-              <div style="font-size:11px;color:var(--text2)">100,000+ records</div>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-lg" onclick="openImportModal()">🚀 Start Import</button>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px" id="import-history-card">
-        <div class="card-header"><div class="card-title">Recent Imports</div></div>
-        <div class="card-body" id="import-history"><div class="page-loader"><span class="loader"></span></div></div>
-      </div>
-    </div>
-  `;
-  loadImportHistory();
-}
-
-async function loadImportHistory() {
-  const { data } = await sb.from('book_import_jobs').select('*').order('created_at',{ascending:false}).limit(10);
-  const el = document.getElementById('import-history');
-  if (!data?.length) { el.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-icon">📂</div><div class="empty-title">No imports yet</div></div>'; return; }
-  el.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>File</th><th>Rows</th><th>Imported</th><th>Skipped</th><th>Status</th><th>Date</th></tr></thead>
-    <tbody>${data.map(j=>`<tr><td>${escHtml(j.filename||'—')}</td><td>${j.total_rows||0}</td><td><span class="badge badge-green">${j.imported||0}</span></td><td><span class="badge badge-gray">${j.skipped||0}</span></td><td><span class="badge ${j.status==='completed'?'badge-green':'badge-orange'}">${capitalize(j.status||'')}</span></td><td class="td-mono" style="font-size:12px">${formatDate(j.created_at)}</td></tr>`).join('')}</tbody>
-  </table></div>`;
-}
-
-function openImportModal() {
-  importStep = 1; importData = null; importWorkbook = null; importSheetName = null; importMappings = [];
-  importGoStep(1);
-  // Setup file input
-  const fileInput = document.getElementById('import-file');
-  fileInput.value = '';
-  fileInput.onchange = handleImportFile;
-
-  // Drag and drop
-  const dz = document.getElementById('import-drop-zone');
-  dz.ondragover = e => { e.preventDefault(); dz.classList.add('dragging'); };
-  dz.ondragleave = () => dz.classList.remove('dragging');
-  dz.ondrop = e => { e.preventDefault(); dz.classList.remove('dragging'); const f = e.dataTransfer.files[0]; if (f) processImportFile(f); };
-
-  openModal('import-modal');
-}
-
-function importGoStep(step) {
-  importStep = step;
-  for (let i = 1; i <= 4; i++) {
-    document.getElementById(`import-step-${i}`)?.classList.toggle('active', i === step);
-    const dot = document.getElementById(`step-dot-${i}`);
-    if (dot) { dot.className = 'step-dot' + (i < step ? ' done' : i === step ? ' active' : ''); if (i < step) dot.textContent = '✓'; else dot.textContent = String(i); }
-    const line = document.getElementById(`step-line-${i}`);
-    if (line) line.className = 'step-line' + (i < step ? ' done' : '');
-  }
-}
-
-async function handleImportFile(e) {
-  const file = e.target.files[0]; if (!file) return;
-  processImportFile(file);
-}
-
-async function processImportFile(file) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  if (!['csv','tsv','txt','xls','xlsx','xlsm','ods'].includes(ext)) return toast('Unsupported file type', 'error');
-
-  toast('Reading file…', 'success');
-  const ab = await file.arrayBuffer();
-
-  if (['csv','tsv','txt'].includes(ext)) {
-    const text = new TextDecoder().decode(ab);
-    const delimiter = ext === 'tsv' ? '\t' : detectDelimiter(text);
-    const rows = parseCSV(text, delimiter);
-    importData = { sheets: { 'Sheet1': rows }, sheetNames: ['Sheet1'] };
-    importWorkbook = null;
-    importSheetName = 'Sheet1';
-    analyzeAndShowMapping();
-  } else {
-    importWorkbook = XLSX.read(ab, { type: 'array' });
-    const names = importWorkbook.SheetNames;
-    importData = { sheets: {}, sheetNames: names };
-    names.forEach(n => {
-      const ws = importWorkbook.Sheets[n];
-      importData.sheets[n] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    });
-    if (names.length === 1) {
-      importSheetName = names[0];
-      analyzeAndShowMapping();
-    } else {
-      showSheetSelection(names);
-    }
-  }
-}
-
-function detectDelimiter(text) {
-  const line = text.split('\n')[0];
-  const commas = (line.match(/,/g)||[]).length;
-  const tabs = (line.match(/\t/g)||[]).length;
-  const semis = (line.match(/;/g)||[]).length;
-  return tabs > commas && tabs > semis ? '\t' : semis > commas ? ';' : ',';
-}
-
-function parseCSV(text, delim = ',') {
-  const lines = text.split('\n').filter(l => l.trim());
-  return lines.map(line => {
-    const row = []; let cur = ''; let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQ = !inQ; }
-      else if (ch === delim && !inQ) { row.push(cur.trim()); cur = ''; }
-      else { cur += ch; }
-    }
-    row.push(cur.trim());
-    return row;
-  });
-}
-
-function showSheetSelection(names) {
-  const el = document.getElementById('sheet-list');
-  el.innerHTML = names.map((n,i) => `
-    <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer">
-      <input type="radio" name="sheet-sel" value="${escHtml(n)}" ${i===0?'checked':''}>
-      <span style="font-weight:500">${escHtml(n)}</span>
-      <span style="margin-left:auto;font-size:12px;color:var(--text2)">${importData.sheets[n]?.length||0} rows</span>
-    </label>
-  `).join('');
-  document.getElementById('select-sheet-btn').onclick = () => {
-    const sel = document.querySelector('input[name="sheet-sel"]:checked');
-    importSheetName = sel?.value || names[0];
-    analyzeAndShowMapping();
-  };
-  importGoStep(2);
-}
-
-// ── AI FIELD DETECTION ENGINE ──
-const FIELD_PATTERNS = {
-  title: { patterns: [/^title$/i,/book.?title/i,/name$/i,/book.?name/i,/resource.?name/i,/item.?name/i], valueTest: v => typeof v === 'string' && v.length > 3 && v.length < 300 },
-  author: { patterns: [/^author/i,/writer/i,/creator/i,/by$/i,/authored.?by/i,/written.?by/i], valueTest: v => typeof v === 'string' && /[A-Za-z]/.test(v) && !v.includes('ISBN') },
-  isbn: { patterns: [/^isbn/i,/i\.s\.b\.n/i,/reference.?no/i,/ref.?num/i,/catalog.?num/i], valueTest: v => /\d[\d\-]{8,}/.test(String(v)) },
-  category: { patterns: [/^categor/i,/^genre/i,/^subject/i,/^type$/i,/^class$/i,/section/i,/department/i], valueTest: () => true },
-  publisher: { patterns: [/^publish/i,/^press$/i,/^imprint/i,/publication.?house/i], valueTest: v => typeof v === 'string' },
-  publication_year: { patterns: [/^year/i,/pub.?year/i,/publish.?date/i,/edition.?year/i,/copyright/i,/date/i], valueTest: v => /^(19|20)\d{2}$/.test(String(v).trim()) },
-  total_copies: { patterns: [/^cop/i,/^qty/i,/^quantity/i,/num.?cop/i,/available.?unit/i,/stock/i,/count/i,/number/i], valueTest: v => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
-  book_code: { patterns: [/^book.?code/i,/^acc/i,/barcode/i,/call.?num/i,/catalog.?id/i,/lib.?id/i], valueTest: v => typeof v === 'string' && v.length < 50 },
-  shelf_location: { patterns: [/^shelf/i,/^location/i,/^rack/i,/^section/i,/^row/i,/placement/i], valueTest: () => true },
-  language: { patterns: [/^lang/i,/^tongue/i], valueTest: v => typeof v === 'string' && v.length < 30 },
-  edition: { patterns: [/^edition/i,/^ed\.?$/i,/^version/i,/^rev/i], valueTest: () => true },
-  description: { patterns: [/^desc/i,/^synopsis/i,/^summary/i,/^abstract/i,/^about/i,/^notes/i], valueTest: v => typeof v === 'string' && v.length > 10 }
-};
-
-function detectFieldType(header, sampleValues) {
-  const clean = String(header).trim();
-  for (const [field, def] of Object.entries(FIELD_PATTERNS)) {
-    for (const p of def.patterns) {
-      if (p.test(clean)) {
-        const matchCount = sampleValues.filter(v => v !== null && v !== '' && def.valueTest(v)).length;
-        const conf = matchCount / Math.max(sampleValues.length, 1);
-        return { field, confidence: Math.round((0.7 + conf * 0.3) * 100) };
-      }
-    }
-  }
-  // Value-based inference
-  const nonEmpty = sampleValues.filter(v => v !== null && v !== '');
-  for (const [field, def] of Object.entries(FIELD_PATTERNS)) {
-    if (['isbn','publication_year','total_copies'].includes(field)) {
-      const matchCount = nonEmpty.filter(v => def.valueTest(v)).length;
-      if (matchCount / Math.max(nonEmpty.length, 1) > 0.7) {
-        return { field, confidence: Math.round(matchCount / Math.max(nonEmpty.length,1) * 60) };
-      }
-    }
-  }
-  return { field: 'custom', confidence: 0 };
-}
-
-function findHeaderRow(rows) {
-  for (let i = 0; i < Math.min(rows.length, 10); i++) {
-    const row = rows[i];
-    const nonEmpty = row.filter(c => c !== null && c !== '');
-    if (nonEmpty.length >= 2) {
-      const textCount = nonEmpty.filter(c => typeof c === 'string' && isNaN(c) && c.length < 60).length;
-      if (textCount / nonEmpty.length > 0.6) return i;
-    }
-  }
-  return 0;
-}
-
-function analyzeAndShowMapping() {
-  const rawRows = importData.sheets[importSheetName];
-  if (!rawRows?.length) { toast('No data found in sheet', 'error'); return; }
-
-  const headerRow = findHeaderRow(rawRows);
-  const headers = rawRows[headerRow];
-  const dataRows = rawRows.slice(headerRow + 1).filter(r => r.some(c => c !== null && c !== ''));
-
-  const mappings = headers.map((h, colIdx) => {
-    const samples = dataRows.slice(0, 10).map(r => r[colIdx]).filter(v => v !== null && v !== '');
-    const { field, confidence } = detectFieldType(h, samples);
-    return { original: String(h || `Column_${colIdx+1}`), colIdx, field, confidence, samples: samples.slice(0,3) };
-  });
-
-  importMappings = { mappings, headerRow, dataRows, headers };
-
-  const el = document.getElementById('field-mapping-list');
-  const assignedFields = new Set();
-
-  el.innerHTML = mappings.map((m, i) => {
-    const isDup = assignedFields.has(m.field) && m.field !== 'custom';
-    if (m.field !== 'custom') assignedFields.add(m.field);
-
-    const confColor = m.confidence >= 80 ? 'conf-high' : m.confidence >= 50 ? 'conf-med' : 'conf-low';
-    return `
-      <div class="mapping-row">
-        <div class="confidence-dot ${confColor}" title="${m.confidence}% confidence"></div>
-        <div class="mapping-detected">
-          <div style="font-weight:600;font-size:13px">${escHtml(m.original)}</div>
-          <div style="font-size:11px;color:var(--text3)">${m.samples.map(s=>escHtml(String(s))).join(' · ')}</div>
-        </div>
-        <span class="mapping-arrow">→</span>
-        <select class="form-input form-select mapping-target" id="map-${i}" style="width:200px">
-          <option value="skip">— Skip —</option>
-          ${Object.keys(FIELD_PATTERNS).map(f => `<option value="${f}" ${m.field===f&&!isDup?'selected':''}>${f.replace(/_/g,' ')}</option>`).join('')}
-          <option value="custom" ${m.field==='custom'?'selected':''}>Custom Field</option>
-        </select>
-        <span class="badge ${m.confidence >= 80 ? 'badge-green' : m.confidence >= 50 ? 'badge-orange' : 'badge-gray'}" style="width:50px;justify-content:center">${m.confidence}%</span>
-      </div>
-    `;
-  }).join('');
-
-  document.getElementById('import-row-count').textContent = `${dataRows.length.toLocaleString()} rows detected`;
-  document.getElementById('start-import-btn').onclick = startImport;
-  importGoStep(3);
-}
-
-async function startImport() {
-  const { mappings, dataRows, headers } = importMappings;
-  const fieldMap = mappings.map((m, i) => ({ ...m, target: document.getElementById(`map-${i}`)?.value || 'skip' }));
-
-  importGoStep(4);
-  document.getElementById('import-progress-title').textContent = 'Importing books…';
-  document.getElementById('import-progress-sub').textContent = `0 / ${dataRows.length} rows`;
-
-  // Create import job
-  const { data: job } = await sb.from('book_import_jobs').insert({
-    filename: 'import-' + new Date().toISOString().slice(0,10),
-    total_rows: dataRows.length, status: 'running',
-    started_by: currentProfile?.id, created_at: new Date().toISOString()
-  }).select().single().catch(() => ({ data: null }));
-
-  const CHUNK = 50;
-  let imported = 0, skipped = 0, errors = 0;
-
-  for (let i = 0; i < dataRows.length; i += CHUNK) {
-    const chunk = dataRows.slice(i, i + CHUNK);
-    const booksToInsert = [];
-
-    for (const row of chunk) {
-      const book = { custom_fields: {}, available_copies: 1, total_copies: 1, language: 'English', status: 'available', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-      let hasTitle = false;
-
-      for (const fm of fieldMap) {
-        if (fm.target === 'skip') continue;
-        const val = row[fm.colIdx];
-        if (val === null || val === '' || val === undefined) continue;
-        const v = String(val).trim();
-        if (!v) continue;
-
-        if (fm.target === 'custom') {
-          book.custom_fields[fm.original] = v;
-        } else if (fm.target === 'total_copies' || fm.target === 'available_copies') {
-          const n = parseInt(v); if (!isNaN(n)) { book[fm.target] = n; if (fm.target === 'total_copies') book.available_copies = n; }
-        } else if (fm.target === 'publication_year') {
-          const n = parseInt(v); if (!isNaN(n)) book[fm.target] = n;
-        } else {
-          book[fm.target] = v;
-          if (fm.target === 'title') hasTitle = true;
-        }
-      }
-
-      if (!hasTitle) { skipped++; continue; }
-
-      // Duplicate check by title + author
-      const { data: existing } = await sb.from('books').select('id').or(`title.eq.${book.title}${book.isbn ? `,isbn.eq.${book.isbn}` : ''}`).limit(1).maybeSingle();
-      if (existing) { skipped++; continue; }
-
-      booksToInsert.push(book);
-    }
-
-    if (booksToInsert.length > 0) {
-      const { error, data: ins } = await sb.from('books').insert(booksToInsert).select();
-      if (error) { errors += booksToInsert.length; }
-      else { imported += ins?.length || 0; }
-    }
-
-    const done = Math.min(i + CHUNK, dataRows.length);
-    const pct = Math.round(done / dataRows.length * 100);
-    document.getElementById('import-progress-bar').style.width = pct + '%';
-    document.getElementById('import-progress-sub').textContent = `${done.toLocaleString()} / ${dataRows.length.toLocaleString()} rows`;
-    document.getElementById('import-progress-detail').textContent = `✅ ${imported} imported · ⏭️ ${skipped} skipped · ❌ ${errors} failed`;
-
-    await new Promise(r => setTimeout(r, 10)); // allow UI update
-  }
-
-  // Update job
-  if (job) await sb.from('book_import_jobs').update({ status:'completed', imported, skipped, failed: errors, completed_at: new Date().toISOString() }).eq('id', job.id);
-  await logActivity('import_completed', `Imported ${imported} books (${skipped} skipped, ${errors} failed)`);
-
-  document.getElementById('import-progress-icon').textContent = errors > imported ? '⚠️' : '🎉';
-  document.getElementById('import-progress-title').textContent = 'Import Complete!';
-  document.getElementById('import-progress-sub').textContent = `${imported} books imported successfully`;
-  document.getElementById('import-progress-detail').textContent = `✅ ${imported} imported · ⏭️ ${skipped} skipped · ❌ ${errors} failed`;
-
-  toast(`Import complete! ${imported} books added.`, 'success');
-}
-
-// ═══════════════════════════════════════════════════
-// REALTIME
-// ═══════════════════════════════════════════════════
-function setupRealtime() {
-  sb.channel('library-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'books' }, () => {
-      if (currentPage === 'books' || currentPage === 'dashboard') navigateTo(currentPage);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'book_loans' }, () => {
-      checkOverdue();
-      if (currentPage === 'loans' || currentPage === 'dashboard') navigateTo(currentPage);
-    })
-    .subscribe();
-}
-
-// ═══════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════
-function openModal(id) {
-  const el = document.getElementById(id);
-  el.style.display = 'flex';
-  requestAnimationFrame(() => el.classList.add('visible'));
-  document.addEventListener('keydown', handleEsc);
-}
-
-function closeModal(id) {
-  const el = document.getElementById(id);
-  el.classList.remove('visible');
-  setTimeout(() => { el.style.display = 'none'; }, 200);
-  document.removeEventListener('keydown', handleEsc);
-}
-
-function handleEsc(e) { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.visible').forEach(m => { m.classList.remove('visible'); setTimeout(() => m.style.display='none',200); }); }
-
-// Click outside modal to close
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('visible')) {
-    e.target.classList.remove('visible');
-    setTimeout(() => { e.target.style.display = 'none'; }, 200);
-  }
-});
-
-function toast(msg, type = 'default') {
-  const c = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span><span>${msg}</span>`;
-  c.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; el.style.transition = 'all .3s'; setTimeout(() => el.remove(), 300); }, 3000);
-}
-
-function showConfirm(title, msg, cb) {
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-message').textContent = msg;
-  confirmCallback = cb;
-  document.getElementById('confirm-ok-btn').onclick = () => { closeModal('confirm-modal'); cb(); };
-  openModal('confirm-modal');
-}
-
-function setTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('lms-theme', t);
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
-}
-
-async function logActivity(action, description) {
-  await sb.from('activity_logs').insert({ action, description, user_id: currentProfile?.id, created_at: new Date().toISOString() }).catch(() => {});
-}
-
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function capitalize(s) { return String(s||'').charAt(0).toUpperCase() + String(s||'').slice(1); }
-function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; } }
-function timeAgo(d) {
-  const diff = Date.now() - new Date(d).getTime();
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  return Math.floor(diff/86400000) + 'd ago';
-}
-function downloadFile(content, filename, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ═══════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
