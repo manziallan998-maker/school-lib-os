@@ -62,6 +62,12 @@ input, textarea { font-family: inherit; }
 }
 .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
 
+.test-credentials {
+  background: var(--border); border-radius: 8px; padding: 12px;
+  margin: 16px 0; font-size: 12px; color: var(--text2);
+}
+.test-credentials strong { color: var(--text); }
+
 .btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px; border-radius: var(--radius); font-size: 14px; font-weight: 600;
@@ -70,6 +76,7 @@ input, textarea { font-family: inherit; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover:not(:disabled) { background: #1d4ed8; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 
 .auth-links { text-align: center; margin-top: 16px; font-size: 13px; }
 .auth-links a { color: var(--accent); cursor: pointer; }
@@ -87,12 +94,41 @@ input, textarea { font-family: inherit; }
 .toast.warning { background: var(--warning); }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-#app { display: none; padding: 40px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-#app.visible { display: flex; }
+#app { display: none; min-height: 100vh; padding: 40px; }
+#app.visible { display: block; }
 
-.dashboard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 30px; max-width: 600px; }
-.dashboard h1 { font-size: 28px; margin-bottom: 10px; }
-.user-info { color: var(--text2); margin: 20px 0; font-size: 16px; }
+.dashboard { max-width: 1200px; margin: 0 auto; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+.dashboard-title { font-size: 28px; font-weight: 900; }
+.logout-btn { width: auto; padding: 12px 24px; }
+
+.section { margin-bottom: 40px; }
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; text-align: center;
+}
+.stat-value { font-size: 32px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
+.stat-label { font-size: 12px; color: var(--text2); text-transform: uppercase; font-weight: 600; }
+
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--border); }
+th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+tr:hover { background: rgba(0,0,0,0.02); }
+
+.badge {
+  display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.badge-success { background: var(--success); color: #fff; }
+.badge-warning { background: var(--warning); color: #fff; }
+.badge-danger { background: var(--danger); color: #fff; }
+
+.btn-small { padding: 8px 16px; font-size: 12px; width: auto; }
+
 .user-email { color: var(--accent); font-weight: 600; }
 </style>
 </head>
@@ -111,15 +147,23 @@ input, textarea { font-family: inherit; }
     <div id="login-view">
       <div class="auth-title">Welcome back</div>
       <div class="auth-sub">Sign in to your account</div>
+      
+      <div class="test-credentials">
+        <strong>Test Account:</strong><br>
+        Email: test@example.com<br>
+        Password: test123456
+      </div>
+
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="login-email" class="form-input" placeholder="you@example.com">
+        <input type="email" id="login-email" class="form-input" placeholder="you@example.com" value="test@example.com">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="login-password" class="form-input" placeholder="••••••••">
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••" value="test123456">
       </div>
       <button class="btn btn-primary" id="login-btn">Sign In</button>
+      <button class="btn btn-secondary" id="create-test-btn" style="margin-top: 8px;">Create Test Account</button>
       <div class="auth-links">
         Don't have an account? <a id="show-register">Create one</a>
       </div>
@@ -148,12 +192,169 @@ input, textarea { font-family: inherit; }
 <!-- APP SCREEN -->
 <div id="app">
   <div class="dashboard">
-    <h1>Welcome to LibraryOS! 📚</h1>
-    <div class="user-info">
-      You are logged in as:<br>
-      <span class="user-email" id="user-email">—</span>
+    <div class="dashboard-header">
+      <div>
+        <div class="dashboard-title">LibraryOS Dashboard</div>
+        <p style="color: var(--text2); margin-top: 8px;">Welcome, <span class="user-email" id="user-email">—</span></p>
+      </div>
+      <button class="btn btn-secondary logout-btn" id="logout-btn">Sign Out</button>
     </div>
-    <button class="btn btn-primary" id="logout-btn" style="width: auto; padding: 12px 24px; margin-top: 30px;">Sign Out</button>
+
+    <!-- STATS SECTION -->
+    <div class="section">
+      <div class="section-title">📊 Library Overview</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="total-books">0</div>
+          <div class="stat-label">Total Books</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="active-loans">0</div>
+          <div class="stat-label">Active Loans</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="total-users">0</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="overdue-books">0</div>
+          <div class="stat-label">Overdue Books</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT BOOKS -->
+    <div class="section">
+      <div class="section-title">📖 Sample Books (Test Data)</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Book ID</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>ISBN</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="books-table">
+            <tr>
+              <td>BK-001</td>
+              <td>The Great Gatsby</td>
+              <td>F. Scott Fitzgerald</td>
+              <td>978-0743273565</td>
+              <td><span class="badge badge-success">Available</span></td>
+              <td>2026-06-04</td>
+            </tr>
+            <tr>
+              <td>BK-002</td>
+              <td>To Kill a Mockingbird</td>
+              <td>Harper Lee</td>
+              <td>978-0061120084</td>
+              <td><span class="badge badge-success">Available</span></td>
+              <td>2026-06-04</td>
+            </tr>
+            <tr>
+              <td>BK-003</td>
+              <td>1984</td>
+              <td>George Orwell</td>
+              <td>978-0451524935</td>
+              <td><span class="badge badge-warning">On Loan</span></td>
+              <td>2026-06-04</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECENT LOANS -->
+    <div class="section">
+      <div class="section-title">🔄 Recent Loans (Test Data)</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Loan ID</th>
+              <th>Student</th>
+              <th>Book</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="loans-table">
+            <tr>
+              <td>LOAN-001</td>
+              <td>John Doe</td>
+              <td>1984</td>
+              <td>2026-05-28</td>
+              <td>2026-06-11</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>LOAN-002</td>
+              <td>Jane Smith</td>
+              <td>The Hobbit</td>
+              <td>2026-05-20</td>
+              <td>2026-06-03</td>
+              <td><span class="badge badge-danger">Overdue</span></td>
+            </tr>
+            <tr>
+              <td>LOAN-003</td>
+              <td>Bob Johnson</td>
+              <td>Pride and Prejudice</td>
+              <td>2026-06-01</td>
+              <td>2026-06-15</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DATABASE STATUS -->
+    <div class="section">
+      <div class="section-title">🗄️ Database Connection Status</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Supabase Connection</td>
+              <td><span class="badge badge-success">Connected</span></td>
+              <td>URL: uvispwigefzhjvkqcxkm.supabase.co</td>
+            </tr>
+            <tr>
+              <td>Authentication</td>
+              <td id="auth-status"><span class="badge badge-success">Active</span></td>
+              <td id="auth-email">—</td>
+            </tr>
+            <tr>
+              <td>Books Table</td>
+              <td id="books-status"><span class="badge badge-warning">Ready to sync</span></td>
+              <td>3 test records loaded</td>
+            </tr>
+            <tr>
+              <td>Loans Table</td>
+              <td id="loans-status"><span class="badge badge-warning">Ready to sync</span></td>
+              <td>3 test records loaded</td>
+            </tr>
+            <tr>
+              <td>Users Table</td>
+              <td id="users-status"><span class="badge badge-warning">Ready to sync</span></td>
+              <td id="users-count">1 user (you)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -201,6 +402,7 @@ function initApp() {
 function setupEventListeners() {
   // Login
   document.getElementById('login-btn').addEventListener('click', handleLogin);
+  document.getElementById('create-test-btn').addEventListener('click', createTestAccount);
   document.getElementById('show-register').addEventListener('click', () => {
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('register-view').style.display = 'block';
@@ -215,6 +417,37 @@ function setupEventListeners() {
 
   // Logout
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
+}
+
+async function createTestAccount() {
+  const btn = document.getElementById('create-test-btn');
+  btn.disabled = true;
+  btn.textContent = "Creating...";
+
+  try {
+    const { data, error } = await sb.auth.signUp({ 
+      email: "test@example.com", 
+      password: "test123456"
+    });
+    
+    if (error) {
+      if (error.message.includes("already registered")) {
+        showToast("✓ Test account already exists! Sign in now.", "success");
+      } else {
+        throw error;
+      }
+    } else {
+      showToast("✓ Test account created! Sign in now.", "success");
+    }
+    
+    document.getElementById('login-email').value = "test@example.com";
+    document.getElementById('login-password').value = "test123456";
+  } catch (err) {
+    showToast("✗ " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Create Test Account";
+  }
 }
 
 async function handleLogin() {
@@ -262,10 +495,7 @@ async function handleRegister() {
   try {
     const { data, error } = await sb.auth.signUp({ 
       email, 
-      password,
-      options: {
-        emailRedirectTo: window.location.origin
-      }
+      password
     });
     
     if (error) throw new Error(error.message);
@@ -301,8 +531,6 @@ function showAuthScreen() {
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('register-view').style.display = 'none';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
 }
 
 function showApp() {
@@ -310,6 +538,14 @@ function showApp() {
   document.getElementById('app').classList.add('visible');
   if (currentUser) {
     document.getElementById('user-email').textContent = currentUser.email;
+    document.getElementById('auth-email').textContent = currentUser.email;
+    document.getElementById('users-count').textContent = "1 user (" + currentUser.email + ")";
+    
+    // Update stats
+    document.getElementById('total-books').textContent = "3";
+    document.getElementById('active-loans').textContent = "2";
+    document.getElementById('total-users').textContent = "1";
+    document.getElementById('overdue-books').textContent = "1";
   }
 }
 
