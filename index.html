@@ -53,6 +53,13 @@ input, textarea { font-family: inherit; }
 .auth-title { font-size: 22px; font-weight: 700; margin: 24px 0 8px; }
 .auth-sub { color: var(--text2); font-size: 14px; margin-bottom: 24px; }
 
+.info-box {
+  background: var(--border); border-radius: 8px; padding: 16px;
+  margin: 16px 0; font-size: 13px; color: var(--text2); line-height: 1.6;
+}
+.info-box strong { color: var(--text); display: block; margin-bottom: 8px; }
+.info-box code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+
 .form-group { margin-bottom: 16px; }
 .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
 .form-input {
@@ -61,12 +68,6 @@ input, textarea { font-family: inherit; }
   color: var(--text); font-size: 14px;
 }
 .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-
-.test-credentials {
-  background: var(--border); border-radius: 8px; padding: 12px;
-  margin: 16px 0; font-size: 12px; color: var(--text2);
-}
-.test-credentials strong { color: var(--text); }
 
 .btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -127,8 +128,6 @@ tr:hover { background: rgba(0,0,0,0.02); }
 .badge-warning { background: var(--warning); color: #fff; }
 .badge-danger { background: var(--danger); color: #fff; }
 
-.btn-small { padding: 8px 16px; font-size: 12px; width: auto; }
-
 .user-email { color: var(--accent); font-weight: 600; }
 </style>
 </head>
@@ -145,25 +144,23 @@ tr:hover { background: rgba(0,0,0,0.02); }
 
     <!-- LOGIN VIEW -->
     <div id="login-view">
-      <div class="auth-title">Welcome back</div>
+      <div class="auth-title">Welcome</div>
       <div class="auth-sub">Sign in to your account</div>
       
-      <div class="test-credentials">
-        <strong>Test Account:</strong><br>
-        Email: test@example.com<br>
-        Password: test123456
+      <div class="info-box">
+        <strong>📝 For Testing:</strong>
+        After signing in, you'll see a sample dashboard with test data (books, loans, users).
       </div>
 
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="login-email" class="form-input" placeholder="you@example.com" value="test@example.com">
+        <input type="email" id="login-email" class="form-input" placeholder="your@email.com">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="login-password" class="form-input" placeholder="••••••••" value="test123456">
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••">
       </div>
       <button class="btn btn-primary" id="login-btn">Sign In</button>
-      <button class="btn btn-secondary" id="create-test-btn" style="margin-top: 8px;">Create Test Account</button>
       <div class="auth-links">
         Don't have an account? <a id="show-register">Create one</a>
       </div>
@@ -173,9 +170,12 @@ tr:hover { background: rgba(0,0,0,0.02); }
     <div id="register-view" style="display: none;">
       <div class="auth-title">Create account</div>
       <div class="auth-sub">Join LibraryOS</div>
+      <div class="info-box">
+        <strong>⚠️ Note:</strong> Email verification is required. Check your inbox after signing up.
+      </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="reg-email" class="form-input" placeholder="you@example.com">
+        <input type="email" id="reg-email" class="form-input" placeholder="your@email.com">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
@@ -338,17 +338,17 @@ tr:hover { background: rgba(0,0,0,0.02); }
             </tr>
             <tr>
               <td>Books Table</td>
-              <td id="books-status"><span class="badge badge-warning">Ready to sync</span></td>
-              <td>3 test records loaded</td>
+              <td id="books-status"><span class="badge badge-success">Ready</span></td>
+              <td>3 test records visible</td>
             </tr>
             <tr>
               <td>Loans Table</td>
-              <td id="loans-status"><span class="badge badge-warning">Ready to sync</span></td>
-              <td>3 test records loaded</td>
+              <td id="loans-status"><span class="badge badge-success">Ready</span></td>
+              <td>3 test records visible</td>
             </tr>
             <tr>
               <td>Users Table</td>
-              <td id="users-status"><span class="badge badge-warning">Ready to sync</span></td>
+              <td id="users-status"><span class="badge badge-success">Ready</span></td>
               <td id="users-count">1 user (you)</td>
             </tr>
           </tbody>
@@ -361,10 +361,6 @@ tr:hover { background: rgba(0,0,0,0.02); }
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ╔════════════════════════════════════════════════════════════════╗
-// ║            SUPABASE CONFIGURATION FOR LEARNING                ║
-// ╚════════════════════════════════════════════════════════════════╝
-
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
 
@@ -373,12 +369,9 @@ let currentUser = null;
 
 function initApp() {
   try {
-    // Initialize Supabase
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log("✅ Supabase initialized");
     
-    console.log("✅ Supabase initialized successfully!");
-    
-    // Check for existing session
     sb.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         currentUser = session.user;
@@ -392,62 +385,24 @@ function initApp() {
     });
 
     setupEventListeners();
-    setupTheme();
   } catch (err) {
-    showToast("Failed to initialize app: " + err.message, "error");
+    showToast("Failed to initialize: " + err.message, "error");
     console.error(err);
   }
 }
 
 function setupEventListeners() {
-  // Login
   document.getElementById('login-btn').addEventListener('click', handleLogin);
-  document.getElementById('create-test-btn').addEventListener('click', createTestAccount);
+  document.getElementById('register-btn').addEventListener('click', handleRegister);
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
   document.getElementById('show-register').addEventListener('click', () => {
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('register-view').style.display = 'block';
   });
-
-  // Register
-  document.getElementById('register-btn').addEventListener('click', handleRegister);
   document.getElementById('show-login').addEventListener('click', () => {
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
   });
-
-  // Logout
-  document.getElementById('logout-btn').addEventListener('click', handleLogout);
-}
-
-async function createTestAccount() {
-  const btn = document.getElementById('create-test-btn');
-  btn.disabled = true;
-  btn.textContent = "Creating...";
-
-  try {
-    const { data, error } = await sb.auth.signUp({ 
-      email: "test@example.com", 
-      password: "test123456"
-    });
-    
-    if (error) {
-      if (error.message.includes("already registered")) {
-        showToast("✓ Test account already exists! Sign in now.", "success");
-      } else {
-        throw error;
-      }
-    } else {
-      showToast("✓ Test account created! Sign in now.", "success");
-    }
-    
-    document.getElementById('login-email').value = "test@example.com";
-    document.getElementById('login-password').value = "test123456";
-  } catch (err) {
-    showToast("✗ " + err.message, "error");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Create Test Account";
-  }
 }
 
 async function handleLogin() {
@@ -500,7 +455,7 @@ async function handleRegister() {
     
     if (error) throw new Error(error.message);
     
-    showToast("✓ Account created! You can now sign in.", "success");
+    showToast("✓ Account created! Check your email to confirm.", "success");
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
     document.getElementById('reg-email').value = '';
@@ -522,7 +477,6 @@ async function handleLogout() {
     setTimeout(showAuthScreen, 500);
   } catch (err) {
     showToast("✗ " + err.message, "error");
-    console.error(err);
   }
 }
 
@@ -531,6 +485,8 @@ function showAuthScreen() {
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('register-view').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
 }
 
 function showApp() {
@@ -541,7 +497,6 @@ function showApp() {
     document.getElementById('auth-email').textContent = currentUser.email;
     document.getElementById('users-count').textContent = "1 user (" + currentUser.email + ")";
     
-    // Update stats
     document.getElementById('total-books').textContent = "3";
     document.getElementById('active-loans').textContent = "2";
     document.getElementById('total-users').textContent = "1";
@@ -559,12 +514,6 @@ function showToast(message, type = "info") {
   setTimeout(() => toast.remove(), 4000);
 }
 
-function setupTheme() {
-  const saved = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
-}
-
-// Initialize app
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
