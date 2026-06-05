@@ -212,32 +212,32 @@ tr:hover { background: rgba(0,0,0,0.02); }
           <div class="stat-label">Total Books</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="active-loans">—</div>
-          <div class="stat-label">Active Loans</div>
+          <div class="stat-value" id="active-issues">—</div>
+          <div class="stat-label">Active Issues</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="total-users">—</div>
-          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="total-students">—</div>
+          <div class="stat-label">Total Students</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="overdue-books">—</div>
-          <div class="stat-label">Overdue Books</div>
+          <div class="stat-value" id="unreturned-books">—</div>
+          <div class="stat-label">Unreturned Books</div>
         </div>
       </div>
     </div>
 
-    <!-- RECENT BOOKS -->
+    <!-- BOOKS -->
     <div class="section">
       <div class="section-title">📖 Books in Library</div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>ISBN</th>
-              <th>Status</th>
-              <th>Created</th>
+              <th>Subject</th>
+              <th>Category</th>
+              <th>Grade</th>
+              <th>Publisher</th>
+              <th>Copies</th>
             </tr>
           </thead>
           <tbody id="books-table">
@@ -249,23 +249,23 @@ tr:hover { background: rgba(0,0,0,0.02); }
       </div>
     </div>
 
-    <!-- RECENT LOANS -->
+    <!-- BOOK ISSUES -->
     <div class="section">
-      <div class="section-title">🔄 Active Loans</div>
+      <div class="section-title">🔄 Book Issues</div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Student Email</th>
-              <th>Book Title</th>
+              <th>Student</th>
+              <th>Subject</th>
               <th>Issue Date</th>
-              <th>Due Date</th>
+              <th>Return Date</th>
               <th>Status</th>
             </tr>
           </thead>
-          <tbody id="loans-table">
+          <tbody id="issues-table">
             <tr>
-              <td colspan="5" class="empty-state">Loading loans...</td>
+              <td colspan="5" class="empty-state">Loading issues...</td>
             </tr>
           </tbody>
         </table>
@@ -301,14 +301,14 @@ tr:hover { background: rgba(0,0,0,0.02); }
               <td id="books-count">—</td>
             </tr>
             <tr>
-              <td>Loans Table</td>
-              <td id="loans-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
-              <td id="loans-count">—</td>
+              <td>Students Table</td>
+              <td id="students-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
+              <td id="students-count">—</td>
             </tr>
             <tr>
-              <td>Users Table</td>
-              <td id="users-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
-              <td id="users-count">—</td>
+              <td>Book Issues Table</td>
+              <td id="issues-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
+              <td id="issues-count">—</td>
             </tr>
           </tbody>
         </table>
@@ -321,7 +321,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
 
 <script>
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN[...]
 
 let sb = null;
 let currentUser = null;
@@ -414,18 +414,6 @@ async function handleRegister() {
     
     if (error) throw new Error(error.message);
     
-    // Create user profile in users table
-    const { error: profileError } = await sb.from('users').insert({
-      id: data.user.id,
-      email: email,
-      full_name: email.split('@')[0],
-      role: 'user'
-    });
-
-    if (profileError) {
-      console.warn("Profile creation note:", profileError.message);
-    }
-    
     showToast("✓ Account created! You can now sign in.", "success");
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
@@ -476,7 +464,7 @@ async function loadDashboardData() {
   try {
     await Promise.all([
       loadBooks(),
-      loadLoans(),
+      loadIssues(),
       loadStatistics(),
       checkDatabaseStatus()
     ]);
@@ -487,9 +475,9 @@ async function loadDashboardData() {
 
 async function loadBooks() {
   try {
-    const { data, error } = await sb.from('books').select('*').order('created_at', { ascending: false });
+    const { data, error } = await sb.from('books').select('*').limit(10);
     
-    if (error) throw error;
+    if (error) throw new Error(error.message || JSON.stringify(error));
 
     const tbody = document.getElementById('books-table');
     tbody.innerHTML = '';
@@ -501,15 +489,13 @@ async function loadBooks() {
 
     data.forEach(book => {
       const row = document.createElement('tr');
-      const statusBadge = getStatusBadge(book.status);
-      const dateStr = new Date(book.created_at).toLocaleDateString();
       
       row.innerHTML = `
-        <td>${book.title}</td>
-        <td>${book.author}</td>
-        <td>${book.isbn || '—'}</td>
-        <td>${statusBadge}</td>
-        <td>${dateStr}</td>
+        <td>${book.subject || '—'}</td>
+        <td>${book.book_category || '—'}</td>
+        <td>${book.grade || '—'}</td>
+        <td>${book.book_publisher || '—'}</td>
+        <td>${book.tot || 0}</td>
       `;
       tbody.appendChild(row);
     });
@@ -519,46 +505,45 @@ async function loadBooks() {
   }
 }
 
-async function loadLoans() {
+async function loadIssues() {
   try {
     const { data, error } = await sb
-      .from('loans')
+      .from('book_issues')
       .select(`
         *,
-        users(email),
-        books(title)
+        books(subject, book_category),
+        students(student_name)
       `)
-      .eq('status', 'active')
-      .order('issue_date', { ascending: false });
+      .limit(10);
     
-    if (error) throw error;
+    if (error) throw new Error(error.message || JSON.stringify(error));
 
-    const tbody = document.getElementById('loans-table');
+    const tbody = document.getElementById('issues-table');
     tbody.innerHTML = '';
 
     if (!data || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No active loans</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No issues found</td></tr>';
       return;
     }
 
-    data.forEach(loan => {
+    data.forEach(issue => {
       const row = document.createElement('tr');
-      const issueDateStr = new Date(loan.issue_date).toLocaleDateString();
-      const dueDateStr = new Date(loan.due_date).toLocaleDateString();
-      const statusBadge = getStatusBadge(loan.status);
+      const issueDateStr = new Date(issue.issue_date).toLocaleDateString();
+      const returnDateStr = issue.return_date ? new Date(issue.return_date).toLocaleDateString() : '—';
+      const statusBadge = issue.returned ? '<span class="badge badge-success">Returned</span>' : '<span class="badge badge-warning">Pending</span>';
       
       row.innerHTML = `
-        <td>${loan.users?.email || '—'}</td>
-        <td>${loan.books?.title || '—'}</td>
+        <td>${issue.students?.student_name || '—'}</td>
+        <td>${issue.books?.subject || '—'}</td>
         <td>${issueDateStr}</td>
-        <td>${dueDateStr}</td>
+        <td>${returnDateStr}</td>
         <td>${statusBadge}</td>
       `;
       tbody.appendChild(row);
     });
   } catch (err) {
-    console.error("Error loading loans:", err);
-    document.getElementById('loans-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading loans</td></tr>';
+    console.error("Error loading issues:", err);
+    document.getElementById('issues-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading issues</td></tr>';
   }
 }
 
@@ -569,27 +554,27 @@ async function loadStatistics() {
       .from('books')
       .select('*', { count: 'exact', head: true });
 
-    // Count active loans
-    const { count: activeLoanCount } = await sb
-      .from('loans')
+    // Count active issues (not returned)
+    const { count: activeIssueCount } = await sb
+      .from('book_issues')
       .select('*', { count: 'exact', head: true })
-      .eq('status', 'active');
+      .eq('returned', false);
 
-    // Count overdue loans
-    const { count: overdueCount } = await sb
-      .from('loans')
+    // Count unreturned books
+    const { count: unreturnedCount } = await sb
+      .from('book_issues')
       .select('*', { count: 'exact', head: true })
-      .eq('status', 'overdue');
+      .eq('returned', false);
 
-    // Count users
-    const { count: userCount } = await sb
-      .from('users')
+    // Count students
+    const { count: studentCount } = await sb
+      .from('students')
       .select('*', { count: 'exact', head: true });
 
     document.getElementById('total-books').textContent = bookCount || 0;
-    document.getElementById('active-loans').textContent = activeLoanCount || 0;
-    document.getElementById('total-users').textContent = userCount || 0;
-    document.getElementById('overdue-books').textContent = overdueCount || 0;
+    document.getElementById('active-issues').textContent = activeIssueCount || 0;
+    document.getElementById('total-students').textContent = studentCount || 0;
+    document.getElementById('unreturned-books').textContent = unreturnedCount || 0;
   } catch (err) {
     console.error("Error loading statistics:", err);
   }
@@ -600,20 +585,17 @@ async function checkDatabaseStatus() {
     // Check Books table
     const booksCheck = await sb
       .from('books')
-      .select('*', { count: 'exact', head: true })
-      .catch(e => ({ count: null, error: e }));
+      .select('*', { count: 'exact', head: true });
 
-    // Check Loans table
-    const loansCheck = await sb
-      .from('loans')
-      .select('*', { count: 'exact', head: true })
-      .catch(e => ({ count: null, error: e }));
+    // Check Students table
+    const studentsCheck = await sb
+      .from('students')
+      .select('*', { count: 'exact', head: true });
 
-    // Check Users table
-    const usersCheck = await sb
-      .from('users')
-      .select('*', { count: 'exact', head: true })
-      .catch(e => ({ count: null, error: e }));
+    // Check Book Issues table
+    const issuesCheck = await sb
+      .from('book_issues')
+      .select('*', { count: 'exact', head: true });
 
     // Update books status
     if (!booksCheck.error && booksCheck.count !== null) {
@@ -621,41 +603,29 @@ async function checkDatabaseStatus() {
       document.getElementById('books-count').textContent = `${booksCheck.count} records`;
     } else {
       document.getElementById('books-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('books-count').textContent = 'Check table exists';
+      document.getElementById('books-count').textContent = booksCheck.error?.message || 'Check table exists';
     }
 
-    // Update loans status
-    if (!loansCheck.error && loansCheck.count !== null) {
-      document.getElementById('loans-status').innerHTML = '<span class="badge badge-success">Ready</span>';
-      document.getElementById('loans-count').textContent = `${loansCheck.count} records`;
+    // Update students status
+    if (!studentsCheck.error && studentsCheck.count !== null) {
+      document.getElementById('students-status').innerHTML = '<span class="badge badge-success">Ready</span>';
+      document.getElementById('students-count').textContent = `${studentsCheck.count} records`;
     } else {
-      document.getElementById('loans-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('loans-count').textContent = 'Check table exists';
+      document.getElementById('students-status').innerHTML = '<span class="badge badge-danger">Error</span>';
+      document.getElementById('students-count').textContent = studentsCheck.error?.message || 'Check table exists';
     }
 
-    // Update users status
-    if (!usersCheck.error && usersCheck.count !== null) {
-      document.getElementById('users-status').innerHTML = '<span class="badge badge-success">Ready</span>';
-      document.getElementById('users-count').textContent = `${usersCheck.count} users`;
+    // Update issues status
+    if (!issuesCheck.error && issuesCheck.count !== null) {
+      document.getElementById('issues-status').innerHTML = '<span class="badge badge-success">Ready</span>';
+      document.getElementById('issues-count').textContent = `${issuesCheck.count} records`;
     } else {
-      document.getElementById('users-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('users-count').textContent = 'Check table exists';
+      document.getElementById('issues-status').innerHTML = '<span class="badge badge-danger">Error</span>';
+      document.getElementById('issues-count').textContent = issuesCheck.error?.message || 'Check table exists';
     }
   } catch (err) {
     console.error("Error checking database status:", err);
   }
-}
-
-function getStatusBadge(status) {
-  const statusMap = {
-    'available': '<span class="badge badge-success">Available</span>',
-    'on_loan': '<span class="badge badge-warning">On Loan</span>',
-    'archived': '<span class="badge" style="background:var(--text2);color:#fff;">Archived</span>',
-    'active': '<span class="badge badge-success">Active</span>',
-    'returned': '<span class="badge" style="background:var(--text2);color:#fff;">Returned</span>',
-    'overdue': '<span class="badge badge-danger">Overdue</span>'
-  };
-  return statusMap[status] || `<span class="badge">${status}</span>`;
 }
 
 function showToast(message, type = "info") {
