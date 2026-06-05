@@ -123,7 +123,7 @@ button:disabled {
 
 <script>
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEp[...]
 
 let sb = null;
 let testResults = {
@@ -148,7 +148,7 @@ async function runAllTests() {
 
     await addTest('Check Supabase Connection', async () => {
       const { data, error } = await sb.from('books').select('count()', { count: 'exact', head: true });
-      if (error) throw error;
+      if (error) throw new Error(error.message || JSON.stringify(error));
       return true;
     });
 
@@ -158,14 +158,15 @@ async function runAllTests() {
         .select('*', { count: 'exact' })
         .limit(5);
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || JSON.stringify(error));
       
       let result = `Found ${count} books in database.\n`;
       if (data && data.length > 0) {
         result += `\n📚 Sample Books:\n`;
         data.forEach((book, i) => {
-          result += `${i + 1}. "${book.title}" by ${book.author}\n`;
-          result += `   Status: ${book.status} | ISBN: ${book.isbn || 'N/A'}\n`;
+          result += `${i + 1}. Category: ${book.book_category} | Subject: ${book.subject}\n`;
+          result += `   Grade: ${book.grade} | Publisher: ${book.book_publisher}\n`;
+          result += `   Total Copies: ${book.tot}\n`;
         });
       }
       
@@ -173,71 +174,72 @@ async function runAllTests() {
       return true;
     });
 
-    await addTest('Check Loans Table', async () => {
+    await addTest('Check Students Table', async () => {
       const { data, count, error } = await sb
-        .from('loans')
+        .from('students')
         .select('*', { count: 'exact' })
         .limit(5);
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || JSON.stringify(error));
       
-      let result = `Found ${count} loans in database.\n`;
+      let result = `Found ${count} students in database.\n`;
       if (data && data.length > 0) {
-        result += `\n🔄 Sample Loans:\n`;
-        data.forEach((loan, i) => {
-          result += `${i + 1}. Loan ID: ${loan.id}\n`;
-          result += `   Status: ${loan.status}\n`;
-          result += `   Issue: ${new Date(loan.issue_date).toLocaleDateString()}\n`;
+        result += `\n👥 Sample Students:\n`;
+        data.forEach((student, i) => {
+          result += `${i + 1}. ${student.student_name}\n`;
+          result += `   Class: ${student.class}\n`;
         });
       }
       
-      addTestResult('Loans Table', true, result);
+      addTestResult('Students Table', true, result);
       return true;
     });
 
-    await addTest('Check Users Table', async () => {
+    await addTest('Check Book Issues Table', async () => {
       const { data, count, error } = await sb
-        .from('users')
+        .from('book_issues')
         .select('*', { count: 'exact' })
         .limit(5);
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || JSON.stringify(error));
       
-      let result = `Found ${count} users in database.\n`;
+      let result = `Found ${count} book issues in database.\n`;
       if (data && data.length > 0) {
-        result += `\n👥 Sample Users:\n`;
-        data.forEach((user, i) => {
-          result += `${i + 1}. ${user.full_name || user.email}\n`;
-          result += `   Email: ${user.email} | Role: ${user.role}\n`;
+        result += `\n📖 Sample Issues:\n`;
+        data.forEach((issue, i) => {
+          result += `${i + 1}. Issue ID: ${issue.issue_id}\n`;
+          result += `   Book ID: ${issue.book_id} | Student ID: ${issue.student_id}\n`;
+          result += `   Issued: ${new Date(issue.issue_date).toLocaleDateString()}\n`;
+          result += `   Returned: ${issue.returned ? 'Yes' : 'No'}\n`;
         });
       }
       
-      addTestResult('Users Table', true, result);
+      addTestResult('Book Issues Table', true, result);
       return true;
     });
 
-    await addTest('Test Join Query (Loans with Books)', async () => {
+    await addTest('Test Join Query (Issues with Books & Students)', async () => {
       const { data, error } = await sb
-        .from('loans')
+        .from('book_issues')
         .select(`
           *,
-          books(title, author),
-          users(email)
+          books(book_category, subject, grade),
+          students(student_name, class)
         `)
         .limit(3);
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || JSON.stringify(error));
       
       let result = `Join query successful!\n`;
       if (data && data.length > 0) {
-        result += `\n📖 Loans with Book & User Info:\n`;
-        data.forEach((loan, i) => {
-          result += `${i + 1}. ${loan.books?.title || 'Unknown Book'}\n`;
-          result += `   Borrowed by: ${loan.users?.email || 'Unknown User'}\n`;
-          result += `   Status: ${loan.status}\n`;
+        result += `\n📚 Issues with Book & Student Info:\n`;
+        data.forEach((issue, i) => {
+          result += `${i + 1}. ${issue.books?.subject || 'Unknown Subject'} (Grade ${issue.books?.grade || 'N/A'})\n`;
+          result += `   Issued to: ${issue.students?.student_name || 'Unknown Student'} (${issue.students?.class || 'N/A'})\n`;
+          result += `   Returned: ${issue.returned ? 'Yes' : 'No'}\n`;
         });
       } else {
-        result += `No loans found to display.`;
+        result += `No issues found to display.`;
       }
       
       addTestResult('Join Query', true, result);
@@ -246,13 +248,13 @@ async function runAllTests() {
 
     await addTest('Count Total Records', async () => {
       const { count: bookCount } = await sb.from('books').select('*', { count: 'exact', head: true });
-      const { count: loanCount } = await sb.from('loans').select('*', { count: 'exact', head: true });
-      const { count: userCount } = await sb.from('users').select('*', { count: 'exact', head: true });
+      const { count: studentCount } = await sb.from('students').select('*', { count: 'exact', head: true });
+      const { count: issueCount } = await sb.from('book_issues').select('*', { count: 'exact', head: true });
       
       let result = `📊 Total Records:\n`;
       result += `📚 Books: ${bookCount || 0}\n`;
-      result += `🔄 Loans: ${loanCount || 0}\n`;
-      result += `👥 Users: ${userCount || 0}`;
+      result += `👥 Students: ${studentCount || 0}\n`;
+      result += `📖 Book Issues: ${issueCount || 0}`;
       
       addTestResult('Record Count', true, result);
       return true;
@@ -260,7 +262,8 @@ async function runAllTests() {
 
   } catch (err) {
     console.error("Error during tests:", err);
-    addTestResult('Fatal Error', false, err.message);
+    const errorMsg = err.message || String(err);
+    addTestResult('Fatal Error', false, errorMsg);
     testResults.failed++;
   }
 
@@ -279,7 +282,7 @@ async function addTest(name, testFn) {
     testResults.passed++;
     testResults.results.push({ name, status: 'passed' });
   } catch (err) {
-    const errorMsg = err.message || err;
+    const errorMsg = err.message || String(err);
     updateTestElement(testEl, 'error', `❌ Failed: ${errorMsg}`);
     testResults.failed++;
     testResults.results.push({ name, status: 'failed', error: errorMsg });
