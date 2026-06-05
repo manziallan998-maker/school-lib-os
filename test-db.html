@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LibraryOS — Database Test</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.container {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 {
+  color: #333;
+  margin-top: 0;
+}
+.test-section {
+  margin: 25px 0;
+  padding: 15px;
+  border-left: 4px solid #ddd;
+  background: #f9f9f9;
+}
+.test-section.success {
+  border-left-color: #22c55e;
+  background: #f0fdf4;
+}
+.test-section.error {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+.test-section.loading {
+  border-left-color: #3b82f6;
+  background: #eff6ff;
+}
+.test-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #333;
+}
+.test-result {
+  font-family: 'Courier New', monospace;
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+  font-size: 14px;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+.success-badge {
+  background: #22c55e;
+  color: white;
+}
+.error-badge {
+  background: #ef4444;
+  color: white;
+}
+.warning-badge {
+  background: #f59e0b;
+  color: white;
+}
+.loading-badge {
+  background: #3b82f6;
+  color: white;
+}
+button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 20px;
+}
+button:hover {
+  background: #2563eb;
+}
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+.summary {
+  margin-top: 30px;
+  padding: 15px;
+  background: #f0f9ff;
+  border: 1px solid #0284c7;
+  border-radius: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🗄️ LibraryOS Database Connection Test</h1>
+  <p>Testing Supabase tables and connectivity...</p>
+  
+  <button onclick="runAllTests()" id="run-btn">Run Tests</button>
+  
+  <div id="tests-container"></div>
+  
+  <div id="summary" class="summary" style="display:none;"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEp[...]";
+
+let sb = null;
+let testResults = {
+  passed: 0,
+  failed: 0,
+  results: []
+};
+
+async function runAllTests() {
+  testResults = { passed: 0, failed: 0, results: [] };
+  document.getElementById('tests-container').innerHTML = '';
+  document.getElementById('summary').style.display = 'none';
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('run-btn').textContent = 'Running...';
+
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    await addTest('Initialize Supabase', async () => {
+      console.log("✅ Supabase client initialized");
+      return true;
+    });
+
+    await addTest('Check Supabase Connection', async () => {
+      const { data, error } = await sb.from('books').select('count()', { count: 'exact', head: true });
+      if (error) throw error;
+      return true;
+    });
+
+    await addTest('Check Books Table', async () => {
+      const { data, count, error } = await sb
+        .from('books')
+        .select('*', { count: 'exact' })
+        .limit(5);
+      
+      if (error) throw error;
+      
+      let result = `Found ${count} books in database.\n`;
+      if (data && data.length > 0) {
+        result += `\n📚 Sample Books:\n`;
+        data.forEach((book, i) => {
+          result += `${i + 1}. "${book.title}" by ${book.author}\n`;
+          result += `   Status: ${book.status} | ISBN: ${book.isbn || 'N/A'}\n`;
+        });
+      }
+      
+      addTestResult('Books Table', true, result);
+      return true;
+    });
+
+    await addTest('Check Loans Table', async () => {
+      const { data, count, error } = await sb
+        .from('loans')
+        .select('*', { count: 'exact' })
+        .limit(5);
+      
+      if (error) throw error;
+      
+      let result = `Found ${count} loans in database.\n`;
+      if (data && data.length > 0) {
+        result += `\n🔄 Sample Loans:\n`;
+        data.forEach((loan, i) => {
+          result += `${i + 1}. Loan ID: ${loan.id}\n`;
+          result += `   Status: ${loan.status}\n`;
+          result += `   Issue: ${new Date(loan.issue_date).toLocaleDateString()}\n`;
+        });
+      }
+      
+      addTestResult('Loans Table', true, result);
+      return true;
+    });
+
+    await addTest('Check Users Table', async () => {
+      const { data, count, error } = await sb
+        .from('users')
+        .select('*', { count: 'exact' })
+        .limit(5);
+      
+      if (error) throw error;
+      
+      let result = `Found ${count} users in database.\n`;
+      if (data && data.length > 0) {
+        result += `\n👥 Sample Users:\n`;
+        data.forEach((user, i) => {
+          result += `${i + 1}. ${user.full_name || user.email}\n`;
+          result += `   Email: ${user.email} | Role: ${user.role}\n`;
+        });
+      }
+      
+      addTestResult('Users Table', true, result);
+      return true;
+    });
+
+    await addTest('Test Join Query (Loans with Books)', async () => {
+      const { data, error } = await sb
+        .from('loans')
+        .select(`
+          *,
+          books(title, author),
+          users(email)
+        `)
+        .limit(3);
+      
+      if (error) throw error;
+      
+      let result = `Join query successful!\n`;
+      if (data && data.length > 0) {
+        result += `\n📖 Loans with Book & User Info:\n`;
+        data.forEach((loan, i) => {
+          result += `${i + 1}. ${loan.books?.title || 'Unknown Book'}\n`;
+          result += `   Borrowed by: ${loan.users?.email || 'Unknown User'}\n`;
+          result += `   Status: ${loan.status}\n`;
+        });
+      } else {
+        result += `No loans found to display.`;
+      }
+      
+      addTestResult('Join Query', true, result);
+      return true;
+    });
+
+    await addTest('Count Total Records', async () => {
+      const { count: bookCount } = await sb.from('books').select('*', { count: 'exact', head: true });
+      const { count: loanCount } = await sb.from('loans').select('*', { count: 'exact', head: true });
+      const { count: userCount } = await sb.from('users').select('*', { count: 'exact', head: true });
+      
+      let result = `📊 Total Records:\n`;
+      result += `📚 Books: ${bookCount || 0}\n`;
+      result += `🔄 Loans: ${loanCount || 0}\n`;
+      result += `👥 Users: ${userCount || 0}`;
+      
+      addTestResult('Record Count', true, result);
+      return true;
+    });
+
+  } catch (err) {
+    console.error("Error during tests:", err);
+    addTestResult('Fatal Error', false, err.message);
+    testResults.failed++;
+  }
+
+  showSummary();
+  document.getElementById('run-btn').disabled = false;
+  document.getElementById('run-btn').textContent = 'Run Tests Again';
+}
+
+async function addTest(name, testFn) {
+  const testEl = createTestElement(name, 'loading');
+  document.getElementById('tests-container').appendChild(testEl);
+
+  try {
+    await testFn();
+    updateTestElement(testEl, 'success', `✅ Passed`);
+    testResults.passed++;
+    testResults.results.push({ name, status: 'passed' });
+  } catch (err) {
+    const errorMsg = err.message || err;
+    updateTestElement(testEl, 'error', `❌ Failed: ${errorMsg}`);
+    testResults.failed++;
+    testResults.results.push({ name, status: 'failed', error: errorMsg });
+  }
+}
+
+function addTestResult(name, success, details) {
+  const container = document.getElementById('tests-container');
+  const section = document.createElement('div');
+  section.className = `test-section ${success ? 'success' : 'error'}`;
+  
+  section.innerHTML = `
+    <div class="test-title">
+      ${success ? '<span class="status-badge success-badge">✓</span>' : '<span class="status-badge error-badge">✗</span>'}
+      ${name}
+    </div>
+    <div class="test-result">${details.replace(/\n/g, '<br>')}</div>
+  `;
+  
+  container.appendChild(section);
+}
+
+function createTestElement(name, status) {
+  const section = document.createElement('div');
+  section.className = `test-section ${status}`;
+  
+  let badge = '';
+  if (status === 'loading') {
+    badge = '<span class="status-badge loading-badge">⏳</span>';
+  } else if (status === 'success') {
+    badge = '<span class="status-badge success-badge">✓</span>';
+  } else if (status === 'error') {
+    badge = '<span class="status-badge error-badge">✗</span>';
+  }
+  
+  section.innerHTML = `<div class="test-title">${badge} ${name}</div>`;
+  return section;
+}
+
+function updateTestElement(el, status, message) {
+  el.className = `test-section ${status}`;
+  const title = el.querySelector('.test-title');
+  
+  let badge = '';
+  if (status === 'success') {
+    badge = '<span class="status-badge success-badge">✓</span>';
+  } else if (status === 'error') {
+    badge = '<span class="status-badge error-badge">✗</span>';
+  }
+  
+  const testName = title.textContent.replace(/^[^A-Za-z]+ /, '');
+  title.innerHTML = `${badge} ${testName}<br><span style="font-weight:normal;color:#666;font-size:13px;">${message}</span>`;
+}
+
+function showSummary() {
+  const summary = document.getElementById('summary');
+  const total = testResults.passed + testResults.failed;
+  const percentage = total > 0 ? Math.round((testResults.passed / total) * 100) : 0;
+  
+  let statusColor = 'green';
+  if (percentage < 50) statusColor = 'red';
+  else if (percentage < 100) statusColor = 'orange';
+  
+  let html = `
+    <h3 style="margin-top:0;">📋 Test Summary</h3>
+    <p>
+      <strong>Total Tests:</strong> ${total}<br>
+      <strong>Passed:</strong> <span style="color:green;font-weight:bold;">${testResults.passed} ✓</span><br>
+      <strong>Failed:</strong> <span style="color:red;font-weight:bold;">${testResults.failed} ✗</span><br>
+      <strong>Success Rate:</strong> <span style="color:${statusColor};font-weight:bold;">${percentage}%</span>
+    </p>
+  `;
+  
+  if (testResults.failed > 0) {
+    html += `<p style="color:#dc2626;"><strong>⚠️ Issues detected:</strong></p><ul>`;
+    testResults.results.filter(r => r.status === 'failed').forEach(r => {
+      html += `<li>${r.name}: ${r.error}</li>`;
+    });
+    html += `</ul>`;
+  } else {
+    html += `<p style="color:#16a34a;"><strong>✅ All tests passed! Database connection is working.</strong></p>`;
+  }
+  
+  summary.innerHTML = html;
+  summary.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
