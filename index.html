@@ -129,6 +129,9 @@ tr:hover { background: rgba(0,0,0,0.02); }
 .badge-danger { background: var(--danger); color: #fff; }
 
 .user-email { color: var(--accent); font-weight: 600; }
+
+.loading { opacity: 0.6; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text2); }
 </style>
 </head>
 <body>
@@ -149,7 +152,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
       
       <div class="info-box">
         <strong>📝 For Testing:</strong>
-        After signing in, you'll see a sample dashboard with test data (books, loans, users).
+        After signing in, you'll see a sample dashboard with real data from the database.
       </div>
 
       <div class="form-group">
@@ -171,7 +174,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
       <div class="auth-title">Create account</div>
       <div class="auth-sub">Join LibraryOS</div>
       <div class="info-box">
-        <strong>⚠️ Note:</strong> Email verification is required. Check your inbox after signing up.
+        <strong>✅ Note:</strong> Your profile will be created automatically.
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -205,19 +208,19 @@ tr:hover { background: rgba(0,0,0,0.02); }
       <div class="section-title">📊 Library Overview</div>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value" id="total-books">0</div>
+          <div class="stat-value" id="total-books">—</div>
           <div class="stat-label">Total Books</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="active-loans">0</div>
+          <div class="stat-value" id="active-loans">—</div>
           <div class="stat-label">Active Loans</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="total-users">0</div>
+          <div class="stat-value" id="total-users">—</div>
           <div class="stat-label">Total Users</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="overdue-books">0</div>
+          <div class="stat-value" id="overdue-books">—</div>
           <div class="stat-label">Overdue Books</div>
         </div>
       </div>
@@ -225,12 +228,11 @@ tr:hover { background: rgba(0,0,0,0.02); }
 
     <!-- RECENT BOOKS -->
     <div class="section">
-      <div class="section-title">📖 Sample Books (Test Data)</div>
+      <div class="section-title">📖 Books in Library</div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Book ID</th>
               <th>Title</th>
               <th>Author</th>
               <th>ISBN</th>
@@ -240,28 +242,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
           </thead>
           <tbody id="books-table">
             <tr>
-              <td>BK-001</td>
-              <td>The Great Gatsby</td>
-              <td>F. Scott Fitzgerald</td>
-              <td>978-0743273565</td>
-              <td><span class="badge badge-success">Available</span></td>
-              <td>2026-06-04</td>
-            </tr>
-            <tr>
-              <td>BK-002</td>
-              <td>To Kill a Mockingbird</td>
-              <td>Harper Lee</td>
-              <td>978-0061120084</td>
-              <td><span class="badge badge-success">Available</span></td>
-              <td>2026-06-04</td>
-            </tr>
-            <tr>
-              <td>BK-003</td>
-              <td>1984</td>
-              <td>George Orwell</td>
-              <td>978-0451524935</td>
-              <td><span class="badge badge-warning">On Loan</span></td>
-              <td>2026-06-04</td>
+              <td colspan="5" class="empty-state">Loading books...</td>
             </tr>
           </tbody>
         </table>
@@ -270,14 +251,13 @@ tr:hover { background: rgba(0,0,0,0.02); }
 
     <!-- RECENT LOANS -->
     <div class="section">
-      <div class="section-title">🔄 Recent Loans (Test Data)</div>
+      <div class="section-title">🔄 Active Loans</div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Loan ID</th>
-              <th>Student</th>
-              <th>Book</th>
+              <th>Student Email</th>
+              <th>Book Title</th>
               <th>Issue Date</th>
               <th>Due Date</th>
               <th>Status</th>
@@ -285,28 +265,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
           </thead>
           <tbody id="loans-table">
             <tr>
-              <td>LOAN-001</td>
-              <td>John Doe</td>
-              <td>1984</td>
-              <td>2026-05-28</td>
-              <td>2026-06-11</td>
-              <td><span class="badge badge-success">Active</span></td>
-            </tr>
-            <tr>
-              <td>LOAN-002</td>
-              <td>Jane Smith</td>
-              <td>The Hobbit</td>
-              <td>2026-05-20</td>
-              <td>2026-06-03</td>
-              <td><span class="badge badge-danger">Overdue</span></td>
-            </tr>
-            <tr>
-              <td>LOAN-003</td>
-              <td>Bob Johnson</td>
-              <td>Pride and Prejudice</td>
-              <td>2026-06-01</td>
-              <td>2026-06-15</td>
-              <td><span class="badge badge-success">Active</span></td>
+              <td colspan="5" class="empty-state">Loading loans...</td>
             </tr>
           </tbody>
         </table>
@@ -325,7 +284,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
               <th>Details</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="db-status-table">
             <tr>
               <td>Supabase Connection</td>
               <td><span class="badge badge-success">Connected</span></td>
@@ -338,18 +297,18 @@ tr:hover { background: rgba(0,0,0,0.02); }
             </tr>
             <tr>
               <td>Books Table</td>
-              <td id="books-status"><span class="badge badge-success">Ready</span></td>
-              <td>3 test records visible</td>
+              <td id="books-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
+              <td id="books-count">—</td>
             </tr>
             <tr>
               <td>Loans Table</td>
-              <td id="loans-status"><span class="badge badge-success">Ready</span></td>
-              <td>3 test records visible</td>
+              <td id="loans-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
+              <td id="loans-count">—</td>
             </tr>
             <tr>
               <td>Users Table</td>
-              <td id="users-status"><span class="badge badge-success">Ready</span></td>
-              <td id="users-count">1 user (you)</td>
+              <td id="users-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
+              <td id="users-count">—</td>
             </tr>
           </tbody>
         </table>
@@ -362,7 +321,7 @@ tr:hover { background: rgba(0,0,0,0.02); }
 
 <script>
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEp[...]
 
 let sb = null;
 let currentUser = null;
@@ -455,7 +414,19 @@ async function handleRegister() {
     
     if (error) throw new Error(error.message);
     
-    showToast("✓ Account created! Check your email to confirm.", "success");
+    // Create user profile in users table
+    const { error: profileError } = await sb.from('users').insert({
+      id: data.user.id,
+      email: email,
+      full_name: email.split('@')[0],
+      role: 'user'
+    });
+
+    if (profileError) {
+      console.warn("Profile creation note:", profileError.message);
+    }
+    
+    showToast("✓ Account created! You can now sign in.", "success");
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
     document.getElementById('reg-email').value = '';
@@ -489,19 +460,202 @@ function showAuthScreen() {
   document.getElementById('login-password').value = '';
 }
 
-function showApp() {
+async function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   if (currentUser) {
     document.getElementById('user-email').textContent = currentUser.email;
     document.getElementById('auth-email').textContent = currentUser.email;
-    document.getElementById('users-count').textContent = "1 user (" + currentUser.email + ")";
     
-    document.getElementById('total-books').textContent = "3";
-    document.getElementById('active-loans').textContent = "2";
-    document.getElementById('total-users').textContent = "1";
-    document.getElementById('overdue-books').textContent = "1";
+    // Load all data from database
+    await loadDashboardData();
   }
+}
+
+async function loadDashboardData() {
+  try {
+    await Promise.all([
+      loadBooks(),
+      loadLoans(),
+      loadStatistics(),
+      checkDatabaseStatus()
+    ]);
+  } catch (err) {
+    console.error("Error loading dashboard data:", err);
+  }
+}
+
+async function loadBooks() {
+  try {
+    const { data, error } = await sb.from('books').select('*').order('created_at', { ascending: false });
+    
+    if (error) throw error;
+
+    const tbody = document.getElementById('books-table');
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No books found</td></tr>';
+      return;
+    }
+
+    data.forEach(book => {
+      const row = document.createElement('tr');
+      const statusBadge = getStatusBadge(book.status);
+      const dateStr = new Date(book.created_at).toLocaleDateString();
+      
+      row.innerHTML = `
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.isbn || '—'}</td>
+        <td>${statusBadge}</td>
+        <td>${dateStr}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Error loading books:", err);
+    document.getElementById('books-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading books</td></tr>';
+  }
+}
+
+async function loadLoans() {
+  try {
+    const { data, error } = await sb
+      .from('loans')
+      .select(`
+        *,
+        users(email),
+        books(title)
+      `)
+      .eq('status', 'active')
+      .order('issue_date', { ascending: false });
+    
+    if (error) throw error;
+
+    const tbody = document.getElementById('loans-table');
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No active loans</td></tr>';
+      return;
+    }
+
+    data.forEach(loan => {
+      const row = document.createElement('tr');
+      const issueDateStr = new Date(loan.issue_date).toLocaleDateString();
+      const dueDateStr = new Date(loan.due_date).toLocaleDateString();
+      const statusBadge = getStatusBadge(loan.status);
+      
+      row.innerHTML = `
+        <td>${loan.users?.email || '—'}</td>
+        <td>${loan.books?.title || '—'}</td>
+        <td>${issueDateStr}</td>
+        <td>${dueDateStr}</td>
+        <td>${statusBadge}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Error loading loans:", err);
+    document.getElementById('loans-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading loans</td></tr>';
+  }
+}
+
+async function loadStatistics() {
+  try {
+    // Count books
+    const { count: bookCount } = await sb
+      .from('books')
+      .select('*', { count: 'exact', head: true });
+
+    // Count active loans
+    const { count: activeLoanCount } = await sb
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'active');
+
+    // Count overdue loans
+    const { count: overdueCount } = await sb
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'overdue');
+
+    // Count users
+    const { count: userCount } = await sb
+      .from('users')
+      .select('*', { count: 'exact', head: true });
+
+    document.getElementById('total-books').textContent = bookCount || 0;
+    document.getElementById('active-loans').textContent = activeLoanCount || 0;
+    document.getElementById('total-users').textContent = userCount || 0;
+    document.getElementById('overdue-books').textContent = overdueCount || 0;
+  } catch (err) {
+    console.error("Error loading statistics:", err);
+  }
+}
+
+async function checkDatabaseStatus() {
+  try {
+    // Check Books table
+    const booksCheck = await sb
+      .from('books')
+      .select('*', { count: 'exact', head: true })
+      .catch(e => ({ count: null, error: e }));
+
+    // Check Loans table
+    const loansCheck = await sb
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+      .catch(e => ({ count: null, error: e }));
+
+    // Check Users table
+    const usersCheck = await sb
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .catch(e => ({ count: null, error: e }));
+
+    // Update books status
+    if (!booksCheck.error && booksCheck.count !== null) {
+      document.getElementById('books-status').innerHTML = '<span class="badge badge-success">Ready</span>';
+      document.getElementById('books-count').textContent = `${booksCheck.count} records`;
+    } else {
+      document.getElementById('books-status').innerHTML = '<span class="badge badge-danger">Error</span>';
+      document.getElementById('books-count').textContent = 'Check table exists';
+    }
+
+    // Update loans status
+    if (!loansCheck.error && loansCheck.count !== null) {
+      document.getElementById('loans-status').innerHTML = '<span class="badge badge-success">Ready</span>';
+      document.getElementById('loans-count').textContent = `${loansCheck.count} records`;
+    } else {
+      document.getElementById('loans-status').innerHTML = '<span class="badge badge-danger">Error</span>';
+      document.getElementById('loans-count').textContent = 'Check table exists';
+    }
+
+    // Update users status
+    if (!usersCheck.error && usersCheck.count !== null) {
+      document.getElementById('users-status').innerHTML = '<span class="badge badge-success">Ready</span>';
+      document.getElementById('users-count').textContent = `${usersCheck.count} users`;
+    } else {
+      document.getElementById('users-status').innerHTML = '<span class="badge badge-danger">Error</span>';
+      document.getElementById('users-count').textContent = 'Check table exists';
+    }
+  } catch (err) {
+    console.error("Error checking database status:", err);
+  }
+}
+
+function getStatusBadge(status) {
+  const statusMap = {
+    'available': '<span class="badge badge-success">Available</span>',
+    'on_loan': '<span class="badge badge-warning">On Loan</span>',
+    'archived': '<span class="badge" style="background:var(--text2);color:#fff;">Archived</span>',
+    'active': '<span class="badge badge-success">Active</span>',
+    'returned': '<span class="badge" style="background:var(--text2);color:#fff;">Returned</span>',
+    'overdue': '<span class="badge badge-danger">Overdue</span>'
+  };
+  return statusMap[status] || `<span class="badge">${status}</span>`;
 }
 
 function showToast(message, type = "info") {
