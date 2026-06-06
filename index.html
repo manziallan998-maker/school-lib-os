@@ -5,186 +5,329 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LibraryOS — School Library Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 :root {
-  --bg: #f7f6f3;
+  --navy: #0c1e3e;
+  --navy2: #162d54;
+  --gold: #c9a227;
+  --gold2: #e6bb44;
+  --bg: #f4f3f0;
   --surface: #ffffff;
-  --border: #e4e2dc;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
   --text: #1a1917;
   --text2: #6b6860;
-  --accent: #2563eb;
+  --text3: #9e9b94;
   --success: #16a34a;
   --danger: #dc2626;
   --warning: #d97706;
+  --info: #2563eb;
   --radius: 10px;
-  --transition: 0.18s ease;
+  --radius-lg: 14px;
+  --sidebar-w: 210px;
+  --topbar-h: 56px;
+  --transition: 0.15s ease;
 }
 [data-theme="dark"] {
-  --bg: #0f0f0e;
+  --bg: #0e0e0d;
   --surface: #1a1917;
-  --border: #2e2d29;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
   --text: #f0ede8;
   --text2: #9e9b94;
-  --accent: #3b82f6;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  --text3: #6b6860;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-button { cursor: pointer; border: none; font-family: inherit; }
-input, textarea { font-family: inherit; }
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+button { cursor: pointer; border: none; font-family: inherit; background: none; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* ── AUTH ── */
 #auth-screen {
   display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; background: var(--bg);
+  height: 100vh; background: var(--navy);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(201,162,39,0.15) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(201,162,39,0.08) 0%, transparent 50%);
 }
 .auth-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 40px; width: 100%; max-width: 420px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: 20px; padding: 44px; width: 100%; max-width: 420px;
 }
-.auth-logo { text-align: center; margin-bottom: 32px; }
-.auth-logo-icon { font-size: 40px; margin-bottom: 12px; }
-.auth-logo-text { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900; }
-.auth-logo-sub { font-size: 12px; color: var(--text2); }
-.auth-title { font-size: 22px; font-weight: 700; margin: 24px 0 8px; }
-.auth-sub { color: var(--text2); font-size: 14px; margin-bottom: 24px; }
-
-.info-box {
-  background: var(--border); border-radius: 8px; padding: 16px;
-  margin: 16px 0; font-size: 13px; color: var(--text2); line-height: 1.6;
+.auth-logo { text-align: center; margin-bottom: 36px; }
+.auth-logo-icon {
+  width: 56px; height: 56px; background: var(--navy); border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 14px;
 }
-.info-box strong { color: var(--text); display: block; margin-bottom: 8px; }
-.info-box code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-
+.auth-logo-name { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900; color: var(--text); }
+.auth-logo-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.auth-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.auth-sub { color: var(--text2); font-size: 13px; margin-bottom: 24px; }
 .form-group { margin-bottom: 16px; }
-.form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-input {
-  width: 100%; padding: 12px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  color: var(--text); font-size: 14px;
+  width: 100%; padding: 12px 14px; background: var(--bg);
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text); font-size: 14px; transition: border-color var(--transition);
 }
-.form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-
-.btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px; border-radius: var(--radius); font-size: 14px; font-weight: 600;
-  transition: all var(--transition); width: 100%;
+.form-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,39,0.15); }
+.btn-primary {
+  width: 100%; padding: 13px; border-radius: var(--radius);
+  background: var(--navy); color: #fff; font-size: 14px; font-weight: 600;
+  transition: background var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+.btn-primary:hover:not(:disabled) { background: var(--navy2); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.auth-links { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text2); }
+.auth-links a { color: var(--gold); cursor: pointer; font-weight: 600; }
+.auth-divider { text-align: center; color: var(--text3); font-size: 12px; margin: 6px 0; }
 
-.auth-links { text-align: center; margin-top: 16px; font-size: 13px; }
-.auth-links a { color: var(--accent); cursor: pointer; }
-.auth-links a:hover { text-decoration: underline; }
+/* ── APP SHELL ── */
+#app { display: none; height: 100vh; }
+#app.visible { display: flex; }
 
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--navy); display: flex; flex-direction: column;
+  flex-shrink: 0; overflow-y: auto; overflow-x: hidden;
+}
+.sb-header {
+  padding: 20px 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+}
+.sb-logo-box {
+  width: 36px; height: 36px; background: var(--gold); border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.sb-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 900; color: #fff; line-height: 1.1; }
+.sb-sub { font-size: 10px; color: rgba(255,255,255,0.4); }
+.sb-nav { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+.sb-section-label {
+  font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 10px 8px 4px; margin-top: 4px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition); position: relative;
+}
+.sb-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+.sb-item.active { background: var(--gold); color: #fff; }
+.sb-item.active .sb-badge { background: rgba(255,255,255,0.25); }
+.sb-item i { font-size: 17px; flex-shrink: 0; }
+.sb-badge {
+  margin-left: auto; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7);
+  font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600;
+}
+.sb-bottom {
+  padding: 10px; border-top: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+}
+.sb-user {
+  display: flex; align-items: center; gap: 10px; padding: 10px;
+  border-radius: 8px; margin-bottom: 6px;
+}
+.sb-avatar {
+  width: 32px; height: 32px; background: var(--gold); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--navy); flex-shrink: 0;
+}
+.sb-user-info { flex: 1; min-width: 0; }
+.sb-user-name { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 10px; color: rgba(255,255,255,0.4); }
+
+/* ── MAIN AREA ── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.topbar {
+  height: var(--topbar-h); background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; flex-shrink: 0; gap: 16px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.page-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-icon-btn {
+  width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; color: var(--text2); font-size: 18px;
+  transition: all var(--transition); border: 1px solid var(--border);
+}
+.topbar-icon-btn:hover { background: var(--bg); color: var(--text); }
+.refresh-btn { font-size: 13px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); color: var(--text2); display: flex; align-items: center; gap: 6px; transition: all var(--transition); }
+.refresh-btn:hover { background: var(--bg); color: var(--text); }
+.refresh-btn.spinning i { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── PAGE CONTENT ── */
+.page-content { flex: 1; overflow-y: auto; padding: 24px 28px; display: none; }
+.page-content.active { display: block; }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+}
+.stat-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.stat-trend { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+.trend-up { color: var(--success); }
+.trend-down { color: var(--danger); }
+.trend-neutral { color: var(--text2); }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--text2); }
+
+/* ── SECTION HEADER ── */
+.section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.section-action { font-size: 12px; color: var(--gold); font-weight: 600; cursor: pointer; }
+
+/* ── CARDS ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.card-body { padding: 18px 20px; }
+
+/* ── TABLES ── */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl thead { background: var(--bg); }
+.tbl th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.tbl td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.tbl tbody tr:last-child td { border-bottom: none; }
+.tbl tbody tr:hover { background: rgba(0,0,0,0.015); }
+.tbl-empty { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-neutral { background: var(--bg); color: var(--text2); }
+
+/* ── ANALYTICS ── */
+.period-tabs { display: flex; gap: 2px; background: var(--bg); border-radius: 9px; padding: 3px; }
+.period-tab { padding: 5px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all var(--transition); }
+.period-tab.active { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.charts-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 14px; margin-bottom: 14px; }
+.charts-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.chart-canvas-wrap { position: relative; }
+.kpi-insight { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--bg); margin-bottom: 8px; }
+.kpi-insight:last-child { margin-bottom: 0; }
+.kpi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.kpi-insight-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.kpi-insight-text strong { color: var(--text); font-weight: 600; }
+
+/* ── MINI BAR ── */
+.mini-bars { display: flex; flex-direction: column; gap: 10px; }
+.mini-bar-row { display: flex; align-items: center; gap: 10px; }
+.mini-bar-label { font-size: 12px; color: var(--text2); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-bar-track { flex: 1; height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.mini-bar-val { font-size: 11px; color: var(--text2); width: 28px; text-align: right; flex-shrink: 0; font-weight: 600; }
+
+/* ── OVERDUE LIST ── */
+.overdue-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.overdue-item:last-child { border: none; }
+.overdue-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.overdue-book { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.overdue-days { font-size: 12px; font-weight: 700; color: var(--danger); }
+
+/* ── SEARCH ── */
+.search-bar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius);
+  width: 260px;
+}
+.search-bar input { flex: 1; background: none; border: none; outline: none; font-size: 13px; color: var(--text); }
+.search-bar input::placeholder { color: var(--text3); }
+.search-bar i { color: var(--text3); font-size: 16px; }
+
+/* ── STATUS TABLE ── */
+.db-ok { color: var(--success); font-size: 13px; }
+.db-err { color: var(--danger); font-size: 13px; }
+
+/* ── TOAST ── */
 .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast {
-  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
-  background: var(--text); color: var(--bg); border-radius: var(--radius);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 14px; font-weight: 500;
-  animation: slideUp 0.25s ease; max-width: 400px;
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  background: var(--navy); color: #fff; border-radius: 10px;
+  font-size: 13px; font-weight: 500; min-width: 260px; max-width: 380px;
+  animation: slideUp 0.22s ease;
 }
 .toast.success { background: var(--success); }
 .toast.error { background: var(--danger); }
 .toast.warning { background: var(--warning); }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-#app { display: none; min-height: 100vh; padding: 40px; }
-#app.visible { display: block; }
+/* ── LOADING SKELETON ── */
+.skel { background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-.dashboard { max-width: 1200px; margin: 0 auto; }
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-.dashboard-title { font-size: 28px; font-weight: 900; }
-.logout-btn { width: auto; padding: 12px 24px; }
+/* ── RESPONSIVE GRID HELPERS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mb-14 { margin-bottom: 14px; }
+.mb-22 { margin-bottom: 22px; }
 
-.section { margin-bottom: 40px; }
-.section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
-
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px; }
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 20px; text-align: center;
-}
-.stat-value { font-size: 32px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
-.stat-label { font-size: 12px; color: var(--text2); text-transform: uppercase; font-weight: 600; }
-
-.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead { background: var(--border); }
-th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; }
-td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-tr:hover { background: rgba(0,0,0,0.02); }
-
-.badge {
-  display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
-}
-.badge-success { background: var(--success); color: #fff; }
-.badge-warning { background: var(--warning); color: #fff; }
-.badge-danger { background: var(--danger); color: #fff; }
-
-.user-email { color: var(--accent); font-weight: 600; }
-
-.loading { opacity: 0.6; }
-.empty-state { text-align: center; padding: 40px 20px; color: var(--text2); }
+/* ── DARK MODE TOGGLE ── */
+.theme-btn { font-size: 18px; }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- ══ AUTH SCREEN ══ -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
       <div class="auth-logo-icon">📚</div>
-      <div class="auth-logo-text">LibraryOS</div>
-      <div class="auth-logo-sub">School Library System</div>
+      <div class="auth-logo-name">LibraryOS</div>
+      <div class="auth-logo-sub">School Library Management System</div>
     </div>
 
-    <!-- LOGIN VIEW -->
     <div id="login-view">
-      <div class="auth-title">Welcome</div>
-      <div class="auth-sub">Sign in to your account</div>
-      
-      <div class="info-box">
-        <strong>📝 For Testing:</strong>
-        After signing in, you'll see a sample dashboard with real data from the database.
-      </div>
-
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account to continue</div>
       <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="login-email" class="form-input" placeholder="your@email.com">
+        <label class="form-label">Email address</label>
+        <input type="email" id="login-email" class="form-input" placeholder="your@email.com" autocomplete="email">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="login-password" class="form-input" placeholder="••••••••">
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary" id="login-btn">Sign In</button>
+      <button class="btn-primary" id="login-btn">
+        <i class="ti ti-login"></i> Sign In
+      </button>
       <div class="auth-links">
-        Don't have an account? <a id="show-register">Create one</a>
+        New here? <a id="show-register">Create an account</a>
       </div>
     </div>
 
-    <!-- REGISTER VIEW -->
-    <div id="register-view" style="display: none;">
+    <div id="register-view" style="display:none;">
       <div class="auth-title">Create account</div>
-      <div class="auth-sub">Join LibraryOS</div>
-      <div class="info-box">
-        <strong>✅ Note:</strong> Your profile will be created automatically.
-      </div>
+      <div class="auth-sub">Join LibraryOS to get started</div>
       <div class="form-group">
-        <label class="form-label">Email</label>
+        <label class="form-label">Email address</label>
         <input type="email" id="reg-email" class="form-input" placeholder="your@email.com">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
         <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters">
       </div>
-      <button class="btn btn-primary" id="register-btn">Create Account</button>
+      <button class="btn-primary" id="register-btn">
+        <i class="ti ti-user-plus"></i> Create Account
+      </button>
       <div class="auth-links">
         Already have an account? <a id="show-login">Sign in</a>
       </div>
@@ -192,130 +335,371 @@ tr:hover { background: rgba(0,0,0,0.02); }
   </div>
 </div>
 
-<!-- APP SCREEN -->
+<!-- ══ APP SHELL ══ -->
 <div id="app">
-  <div class="dashboard">
-    <div class="dashboard-header">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo-box">📚</div>
       <div>
-        <div class="dashboard-title">LibraryOS Dashboard</div>
-        <p style="color: var(--text2); margin-top: 8px;">Welcome, <span class="user-email" id="user-email">—</span></p>
-      </div>
-      <button class="btn btn-secondary logout-btn" id="logout-btn">Sign Out</button>
-    </div>
-
-    <!-- STATS SECTION -->
-    <div class="section">
-      <div class="section-title">📊 Library Overview</div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="total-books">—</div>
-          <div class="stat-label">Total Books</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="active-issues">—</div>
-          <div class="stat-label">Active Issues</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="total-students">—</div>
-          <div class="stat-label">Total Students</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="unreturned-books">—</div>
-          <div class="stat-label">Unreturned Books</div>
-        </div>
+        <div class="sb-title">LibraryOS</div>
+        <div class="sb-sub">School Library</div>
       </div>
     </div>
 
-    <!-- BOOKS -->
-    <div class="section">
-      <div class="section-title">📖 Books in Library</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Category</th>
-              <th>Grade</th>
-              <th>Publisher</th>
-              <th>Copies</th>
-            </tr>
-          </thead>
-          <tbody id="books-table">
-            <tr>
-              <td colspan="5" class="empty-state">Loading books...</td>
-            </tr>
-          </tbody>
-        </table>
+    <nav class="sb-nav">
+      <div class="sb-section-label">Overview</div>
+      <div class="sb-item active" data-page="dashboard">
+        <i class="ti ti-layout-dashboard"></i> Dashboard
       </div>
-    </div>
 
-    <!-- BOOK ISSUES -->
-    <div class="section">
-      <div class="section-title">🔄 Book Issues</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Subject</th>
-              <th>Issue Date</th>
-              <th>Return Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="issues-table">
-            <tr>
-              <td colspan="5" class="empty-state">Loading issues...</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sb-section-label">Library</div>
+      <div class="sb-item" data-page="books">
+        <i class="ti ti-books"></i> Books
+        <span class="sb-badge" id="nav-books-count">—</span>
       </div>
-    </div>
+      <div class="sb-item" data-page="students">
+        <i class="ti ti-users"></i> Students
+        <span class="sb-badge" id="nav-students-count">—</span>
+      </div>
+      <div class="sb-item" data-page="issues">
+        <i class="ti ti-repeat"></i> Issues
+        <span class="sb-badge" id="nav-issues-count">—</span>
+      </div>
+      <div class="sb-item" data-page="overdue">
+        <i class="ti ti-alert-triangle"></i> Overdue
+        <span class="sb-badge" id="nav-overdue-count" style="background:rgba(220,38,38,0.2);color:#fca5a5;">—</span>
+      </div>
 
-    <!-- DATABASE STATUS -->
-    <div class="section">
-      <div class="section-title">🗄️ Database Connection Status</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Component</th>
-              <th>Status</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody id="db-status-table">
-            <tr>
-              <td>Supabase Connection</td>
-              <td><span class="badge badge-success">Connected</span></td>
-              <td>URL: uvispwigefzhjvkqcxkm.supabase.co</td>
-            </tr>
-            <tr>
-              <td>Authentication</td>
-              <td id="auth-status"><span class="badge badge-success">Active</span></td>
-              <td id="auth-email">—</td>
-            </tr>
-            <tr>
-              <td>Books Table</td>
-              <td id="books-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
-              <td id="books-count">—</td>
-            </tr>
-            <tr>
-              <td>Students Table</td>
-              <td id="students-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
-              <td id="students-count">—</td>
-            </tr>
-            <tr>
-              <td>Book Issues Table</td>
-              <td id="issues-status"><span class="badge" style="opacity:0.5;">Checking...</span></td>
-              <td id="issues-count">—</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sb-section-label">Reports</div>
+      <div class="sb-item" data-page="analytics">
+        <i class="ti ti-chart-bar"></i> Analytics
+      </div>
+      <div class="sb-item" data-page="borrowlog">
+        <i class="ti ti-file-text"></i> Borrow Log
+      </div>
+
+      <div class="sb-section-label">System</div>
+      <div class="sb-item" data-page="dbstatus">
+        <i class="ti ti-database"></i> DB Status
+      </div>
+    </nav>
+
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">HM</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-email">—</div>
+          <div class="sb-user-role">Headmaster</div>
+        </div>
+      </div>
+      <div class="sb-item" id="logout-btn" style="color:rgba(255,255,255,0.5);">
+        <i class="ti ti-logout"></i> Sign Out
       </div>
     </div>
   </div>
-</div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <button class="refresh-btn" id="refresh-btn" title="Refresh data">
+          <i class="ti ti-refresh"></i> Refresh
+        </button>
+        <button class="topbar-icon-btn theme-btn" id="theme-btn" title="Toggle dark mode">
+          <i class="ti ti-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page-content active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="ti ti-books"></i></div>
+            <span class="stat-trend trend-neutral" id="stat-books-trend">—</span>
+          </div>
+          <div class="stat-value" id="stat-books">—</div>
+          <div class="stat-label">Total Books</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="ti ti-repeat"></i></div>
+            <span class="stat-trend trend-neutral" id="stat-issues-trend">Active</span>
+          </div>
+          <div class="stat-value" id="stat-issues">—</div>
+          <div class="stat-label">Active Issues</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#f0fdf4;color:#15803d;"><i class="ti ti-users"></i></div>
+            <span class="stat-trend trend-neutral" id="stat-students-trend">—</span>
+          </div>
+          <div class="stat-value" id="stat-students">—</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="ti ti-alert-triangle"></i></div>
+            <span class="stat-trend trend-down" id="stat-overdue-trend">Needs action</span>
+          </div>
+          <div class="stat-value" id="stat-overdue">—</div>
+          <div class="stat-label">Overdue Books</div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-14">
+        <div>
+          <div class="section-hd">
+            <div class="section-title">Recent Issues</div>
+            <span class="section-action" data-goto="issues">View all →</span>
+          </div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead><tr><th>Student</th><th>Book</th><th>Status</th></tr></thead>
+              <tbody id="dash-recent-issues"><tr><td colspan="3" class="tbl-empty">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-hd">
+            <div class="section-title">Overdue Alert</div>
+            <span class="section-action" data-goto="overdue">View all →</span>
+          </div>
+          <div class="card card-body" id="dash-overdue-list" style="min-height:120px;">
+            <div class="tbl-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-hd">
+          <div class="section-title">Books by Category</div>
+        </div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>Category</th><th>Grade</th><th>Publisher</th><th>Total Copies</th></tr></thead>
+            <tbody id="dash-books-preview"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: BOOKS -->
+    <div class="page-content" id="page-books">
+      <div class="section-hd mb-14">
+        <div class="section-title">All Books</div>
+        <div class="search-bar">
+          <i class="ti ti-search"></i>
+          <input type="text" id="books-search" placeholder="Search by subject, category…">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Subject</th><th>Category</th><th>Grade</th><th>Publisher</th><th>Total Copies</th></tr></thead>
+          <tbody id="books-table"><tr><td colspan="5" class="tbl-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: STUDENTS -->
+    <div class="page-content" id="page-students">
+      <div class="section-hd mb-14">
+        <div class="section-title">All Students</div>
+        <div class="search-bar">
+          <i class="ti ti-search"></i>
+          <input type="text" id="students-search" placeholder="Search by name…">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Name</th><th>Grade / Class</th><th>Books Issued</th><th>Returned</th><th>Overdue</th></tr></thead>
+          <tbody id="students-table"><tr><td colspan="5" class="tbl-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: ISSUES -->
+    <div class="page-content" id="page-issues">
+      <div class="section-hd mb-14">
+        <div class="section-title">Book Issues</div>
+        <div class="search-bar">
+          <i class="ti ti-search"></i>
+          <input type="text" id="issues-search" placeholder="Search by student or book…">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Student</th><th>Book</th><th>Issued</th><th>Due / Returned</th><th>Status</th></tr></thead>
+          <tbody id="issues-table"><tr><td colspan="5" class="tbl-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: OVERDUE -->
+    <div class="page-content" id="page-overdue">
+      <div class="section-hd mb-14">
+        <div class="section-title">Overdue Books</div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Student</th><th>Book</th><th>Issued</th><th>Due Date</th><th>Days Overdue</th></tr></thead>
+          <tbody id="overdue-table"><tr><td colspan="5" class="tbl-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: ANALYTICS -->
+    <div class="page-content" id="page-analytics">
+      <div class="section-hd mb-14">
+        <div></div>
+        <div class="period-tabs">
+          <div class="period-tab active" data-period="month">This Month</div>
+          <div class="period-tab" data-period="term">This Term</div>
+          <div class="period-tab" data-period="year">This Year</div>
+        </div>
+      </div>
+
+      <div class="stats-grid mb-14">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="ti ti-repeat"></i></div>
+            <span class="stat-trend" id="an-borrow-trend">—</span>
+          </div>
+          <div class="stat-value" id="an-borrowed">—</div>
+          <div class="stat-label">Books Borrowed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#f0fdf4;color:#15803d;"><i class="ti ti-check"></i></div>
+            <span class="stat-trend trend-up" id="an-return-rate">—</span>
+          </div>
+          <div class="stat-value" id="an-returned">—</div>
+          <div class="stat-label">Return Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="ti ti-alert-triangle"></i></div>
+            <span class="stat-trend trend-down" id="an-overdue-label">Overdue</span>
+          </div>
+          <div class="stat-value" id="an-overdue">—</div>
+          <div class="stat-label">Overdue Books</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="ti ti-books"></i></div>
+            <span class="stat-trend trend-neutral">Total</span>
+          </div>
+          <div class="stat-value" id="an-total-books">—</div>
+          <div class="stat-label">Books in Library</div>
+        </div>
+      </div>
+
+      <div class="charts-grid mb-14">
+        <div class="card card-body">
+          <div class="section-hd" style="margin-bottom:14px;">
+            <div class="section-title">Borrowing activity</div>
+            <span style="font-size:11px;color:var(--text3);">books issued per month</span>
+          </div>
+          <div class="chart-canvas-wrap" style="height:180px;">
+            <canvas id="an-borrow-chart" role="img" aria-label="Monthly borrowing activity bar chart"></canvas>
+          </div>
+        </div>
+        <div class="card card-body">
+          <div class="section-hd" style="margin-bottom:14px;">
+            <div class="section-title">Books by category</div>
+            <span style="font-size:11px;color:var(--text3);">catalog distribution</span>
+          </div>
+          <div class="chart-canvas-wrap" style="height:180px;">
+            <canvas id="an-cat-chart" role="img" aria-label="Doughnut chart of book categories"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-grid-3">
+        <div class="card card-body">
+          <div class="section-title" style="margin-bottom:14px;">Top borrowed books</div>
+          <div class="mini-bars" id="an-top-books">
+            <div class="tbl-empty">Loading…</div>
+          </div>
+        </div>
+        <div class="card card-body">
+          <div class="section-title" style="margin-bottom:12px;">Overdue students</div>
+          <div id="an-overdue-list">
+            <div class="tbl-empty">Loading…</div>
+          </div>
+        </div>
+        <div class="card card-body">
+          <div class="section-title" style="margin-bottom:12px;">Key insights</div>
+          <div id="an-insights">
+            <div class="tbl-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: BORROW LOG -->
+    <div class="page-content" id="page-borrowlog">
+      <div class="section-hd mb-14">
+        <div class="section-title">Full Borrow Log</div>
+        <div class="search-bar">
+          <i class="ti ti-search"></i>
+          <input type="text" id="log-search" placeholder="Search…">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Student</th><th>Book</th><th>Category</th><th>Issued</th><th>Return Date</th><th>Status</th></tr></thead>
+          <tbody id="log-table"><tr><td colspan="6" class="tbl-empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: DB STATUS -->
+    <div class="page-content" id="page-dbstatus">
+      <div class="section-hd mb-14">
+        <div class="section-title">Database Connection Status</div>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Component</th><th>Status</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Supabase URL</td>
+              <td><span class="badge badge-success"><i class="ti ti-check"></i> Connected</span></td>
+              <td style="color:var(--text2);">uvispwigefzhjvkqcxkm.supabase.co</td>
+            </tr>
+            <tr>
+              <td>Authentication</td>
+              <td id="db-auth-status"><span class="badge badge-warning">Checking…</span></td>
+              <td id="db-auth-detail" style="color:var(--text2);">—</td>
+            </tr>
+            <tr>
+              <td>Books table</td>
+              <td id="db-books-status"><span class="badge badge-warning">Checking…</span></td>
+              <td id="db-books-detail" style="color:var(--text2);">—</td>
+            </tr>
+            <tr>
+              <td>Students table</td>
+              <td id="db-students-status"><span class="badge badge-warning">Checking…</span></td>
+              <td id="db-students-detail" style="color:var(--text2);">—</td>
+            </tr>
+            <tr>
+              <td>Book Issues table</td>
+              <td id="db-issues-status"><span class="badge badge-warning">Checking…</span></td>
+              <td id="db-issues-detail" style="color:var(--text2);">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
 
 <div class="toast-container" id="toast-container"></div>
 
@@ -323,34 +707,521 @@ tr:hover { background: rgba(0,0,0,0.02); }
 const SUPABASE_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
 
-let sb = null;
-let currentUser = null;
+let sb, currentUser;
+let allBooks = [], allStudents = [], allIssues = [];
+let borrowChart, catChart;
+let currentPeriod = 'month';
 
-function initApp() {
-  try {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log("✅ Supabase initialized");
-    
-    sb.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        currentUser = session.user;
-        showApp();
-      } else {
-        showAuthScreen();
-      }
-    }).catch(err => {
-      showToast("Connection error: " + err.message, "error");
-      console.error(err);
-    });
-
-    setupEventListeners();
-  } catch (err) {
-    showToast("Failed to initialize: " + err.message, "error");
-    console.error(err);
-  }
+// ── INIT ──
+async function initApp() {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) { currentUser = session.user; showApp(); }
+  else { showAuth(); }
+  setupListeners();
 }
 
-function setupEventListeners() {
+// ── AUTH ──
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+async function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  const email = currentUser.email;
+  document.getElementById('sb-user-email').textContent = email;
+  document.getElementById('sb-avatar').textContent = email.slice(0,2).toUpperCase();
+  await loadAllData();
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { toast('Please fill in all fields', 'error'); return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader"></i> Signing in…';
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    currentUser = data.user;
+    toast('Signed in successfully', 'success');
+    setTimeout(showApp, 400);
+  } catch(e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ti ti-login"></i> Sign In'; }
+}
+
+async function handleRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!email || !password || password.length < 6) { toast('Email and password required (min 6 chars)', 'error'); return; }
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader"></i> Creating…';
+  try {
+    const { error } = await sb.auth.signUp({ email, password });
+    if (error) throw error;
+    toast('Account created! You can now sign in.', 'success');
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('register-view').style.display = 'none';
+  } catch(e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account'; }
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  allBooks = []; allStudents = []; allIssues = [];
+  toast('Signed out', 'success');
+  setTimeout(showAuth, 400);
+}
+
+// ── DATA LOADING ──
+async function loadAllData() {
+  setRefreshSpinning(true);
+  try {
+    await Promise.all([fetchBooks(), fetchStudents(), fetchIssues()]);
+    renderDashboard();
+    renderBooks();
+    renderStudents();
+    renderIssues();
+    renderOverdue();
+    renderAnalytics();
+    renderBorrowLog();
+    renderDbStatus();
+    updateNavBadges();
+  } catch(e) { toast('Error loading data: ' + e.message, 'error'); }
+  setRefreshSpinning(false);
+}
+
+async function fetchBooks() {
+  const { data, error } = await sb.from('books').select('*').order('subject');
+  if (error) throw error;
+  allBooks = data || [];
+}
+async function fetchStudents() {
+  const { data, error } = await sb.from('students').select('*').order('student_name');
+  if (error) throw error;
+  allStudents = data || [];
+}
+async function fetchIssues() {
+  const { data, error } = await sb.from('book_issues').select(`
+    *, books(subject, book_category, grade), students(student_name, grade)
+  `).order('issue_date', { ascending: false });
+  if (error) throw error;
+  allIssues = data || [];
+}
+
+// ── HELPERS ──
+function fmt(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); }
+function daysAgo(d) { return Math.floor((Date.now() - new Date(d)) / 86400000); }
+function daysOverdue(issue) {
+  if (issue.returned) return 0;
+  const due = issue.return_date ? new Date(issue.return_date) : new Date(new Date(issue.issue_date).getTime() + 14*86400000);
+  const diff = Math.floor((Date.now() - due) / 86400000);
+  return diff > 0 ? diff : 0;
+}
+function isOverdue(issue) { return !issue.returned && daysOverdue(issue) > 0; }
+
+// ── NAV BADGES ──
+function updateNavBadges() {
+  document.getElementById('nav-books-count').textContent = allBooks.length;
+  document.getElementById('nav-students-count').textContent = allStudents.length;
+  const active = allIssues.filter(i => !i.returned).length;
+  document.getElementById('nav-issues-count').textContent = active;
+  const ov = allIssues.filter(isOverdue).length;
+  const ovBadge = document.getElementById('nav-overdue-count');
+  ovBadge.textContent = ov;
+  ovBadge.style.background = ov > 0 ? 'rgba(220,38,38,0.25)' : 'rgba(255,255,255,0.12)';
+  ovBadge.style.color = ov > 0 ? '#fca5a5' : 'rgba(255,255,255,0.7)';
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  document.getElementById('stat-books').textContent = allBooks.length;
+  const activeIssues = allIssues.filter(i => !i.returned).length;
+  document.getElementById('stat-issues').textContent = activeIssues;
+  document.getElementById('stat-students').textContent = allStudents.length;
+  const overdueCount = allIssues.filter(isOverdue).length;
+  document.getElementById('stat-overdue').textContent = overdueCount;
+  document.getElementById('stat-overdue-trend').textContent = overdueCount > 0 ? `${overdueCount} need action` : '✓ None';
+  document.getElementById('stat-overdue-trend').className = 'stat-trend ' + (overdueCount > 0 ? 'trend-down' : 'trend-up');
+
+  // Recent issues table
+  const recent = allIssues.slice(0, 8);
+  const tb = document.getElementById('dash-recent-issues');
+  if (!recent.length) { tb.innerHTML = `<tr><td colspan="3" class="tbl-empty">No issues found</td></tr>`; return; }
+  tb.innerHTML = recent.map(i => {
+    const st = i.returned ? `<span class="badge badge-success">Returned</span>`
+      : isOverdue(i) ? `<span class="badge badge-danger">Overdue</span>`
+      : `<span class="badge badge-warning">Pending</span>`;
+    return `<tr><td>${i.students?.student_name||'—'}</td><td>${i.books?.subject||'—'}</td><td>${st}</td></tr>`;
+  }).join('');
+
+  // Overdue alert panel
+  const overdueIssues = allIssues.filter(isOverdue).slice(0, 5);
+  const od = document.getElementById('dash-overdue-list');
+  if (!overdueIssues.length) {
+    od.innerHTML = `<div style="text-align:center;padding:20px 0;color:var(--success);font-size:13px;"><i class="ti ti-circle-check" style="font-size:22px;display:block;margin-bottom:6px;"></i>No overdue books!</div>`;
+  } else {
+    od.innerHTML = overdueIssues.map(i => `
+      <div class="overdue-item">
+        <div>
+          <div class="overdue-name">${i.students?.student_name||'—'}</div>
+          <div class="overdue-book">${i.books?.subject||'—'}</div>
+        </div>
+        <div class="overdue-days">${daysOverdue(i)}d late</div>
+      </div>`).join('');
+  }
+
+  // Books preview
+  const booksPreview = allBooks.slice(0, 8);
+  const bp = document.getElementById('dash-books-preview');
+  bp.innerHTML = booksPreview.map(b => `
+    <tr>
+      <td><strong>${b.subject||'—'}</strong></td>
+      <td>${b.book_category||'—'}</td>
+      <td>${b.grade||'—'}</td>
+      <td>${b.book_publisher||'—'}</td>
+      <td><span class="badge badge-info">${b.tot||0} copies</span></td>
+    </tr>`).join('') || `<tr><td colspan="4" class="tbl-empty">No books</td></tr>`;
+}
+
+// ── BOOKS PAGE ──
+function renderBooks(filter = '') {
+  const books = filter
+    ? allBooks.filter(b => `${b.subject} ${b.book_category} ${b.grade} ${b.book_publisher}`.toLowerCase().includes(filter.toLowerCase()))
+    : allBooks;
+  const tb = document.getElementById('books-table');
+  if (!books.length) { tb.innerHTML = `<tr><td colspan="5" class="tbl-empty">No books found</td></tr>`; return; }
+  tb.innerHTML = books.map(b => `
+    <tr>
+      <td><strong>${b.subject||'—'}</strong></td>
+      <td>${b.book_category||'—'}</td>
+      <td><span class="badge badge-neutral">${b.grade||'—'}</span></td>
+      <td>${b.book_publisher||'—'}</td>
+      <td><span class="badge badge-info">${b.tot||0}</span></td>
+    </tr>`).join('');
+}
+
+// ── STUDENTS PAGE ──
+function renderStudents(filter = '') {
+  const students = filter
+    ? allStudents.filter(s => (s.student_name||'').toLowerCase().includes(filter.toLowerCase()))
+    : allStudents;
+  const tb = document.getElementById('students-table');
+  if (!students.length) { tb.innerHTML = `<tr><td colspan="5" class="tbl-empty">No students found</td></tr>`; return; }
+  tb.innerHTML = students.map(s => {
+    const sIssues = allIssues.filter(i => i.student_id === s.id || i.students?.student_name === s.student_name);
+    const total = sIssues.length;
+    const returned = sIssues.filter(i => i.returned).length;
+    const overdue = sIssues.filter(isOverdue).length;
+    return `<tr>
+      <td><strong>${s.student_name||'—'}</strong></td>
+      <td>${s.grade||'—'}</td>
+      <td>${total}</td>
+      <td>${returned}</td>
+      <td>${overdue > 0 ? `<span class="badge badge-danger">${overdue}</span>` : `<span class="badge badge-success">0</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ISSUES PAGE ──
+function renderIssues(filter = '') {
+  const issues = filter
+    ? allIssues.filter(i => `${i.students?.student_name} ${i.books?.subject}`.toLowerCase().includes(filter.toLowerCase()))
+    : allIssues;
+  const tb = document.getElementById('issues-table');
+  if (!issues.length) { tb.innerHTML = `<tr><td colspan="5" class="tbl-empty">No issues found</td></tr>`; return; }
+  tb.innerHTML = issues.map(i => {
+    const st = i.returned
+      ? `<span class="badge badge-success"><i class="ti ti-check"></i> Returned</span>`
+      : isOverdue(i)
+      ? `<span class="badge badge-danger"><i class="ti ti-alert-triangle"></i> Overdue ${daysOverdue(i)}d</span>`
+      : `<span class="badge badge-warning"><i class="ti ti-clock"></i> Pending</span>`;
+    return `<tr>
+      <td>${i.students?.student_name||'—'}</td>
+      <td>${i.books?.subject||'—'}</td>
+      <td>${fmt(i.issue_date)}</td>
+      <td>${fmt(i.return_date)}</td>
+      <td>${st}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── OVERDUE PAGE ──
+function renderOverdue() {
+  const overdueIssues = allIssues.filter(isOverdue).sort((a,b) => daysOverdue(b) - daysOverdue(a));
+  const tb = document.getElementById('overdue-table');
+  if (!overdueIssues.length) {
+    tb.innerHTML = `<tr><td colspan="5" class="tbl-empty" style="color:var(--success);">✓ No overdue books — great work!</td></tr>`;
+    return;
+  }
+  tb.innerHTML = overdueIssues.map(i => {
+    const due = i.return_date ? fmt(i.return_date) : fmt(new Date(new Date(i.issue_date).getTime() + 14*86400000));
+    const days = daysOverdue(i);
+    const severity = days > 14 ? 'badge-danger' : days > 7 ? 'badge-warning' : 'badge-neutral';
+    return `<tr>
+      <td><strong>${i.students?.student_name||'—'}</strong></td>
+      <td>${i.books?.subject||'—'}</td>
+      <td>${fmt(i.issue_date)}</td>
+      <td>${due}</td>
+      <td><span class="badge ${severity}">${days} days</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── BORROW LOG ──
+function renderBorrowLog(filter = '') {
+  const issues = filter
+    ? allIssues.filter(i => `${i.students?.student_name} ${i.books?.subject} ${i.books?.book_category}`.toLowerCase().includes(filter.toLowerCase()))
+    : allIssues;
+  const tb = document.getElementById('log-table');
+  if (!issues.length) { tb.innerHTML = `<tr><td colspan="6" class="tbl-empty">No records</td></tr>`; return; }
+  tb.innerHTML = issues.map(i => {
+    const st = i.returned
+      ? `<span class="badge badge-success">Returned</span>`
+      : isOverdue(i)
+      ? `<span class="badge badge-danger">Overdue</span>`
+      : `<span class="badge badge-warning">Pending</span>`;
+    return `<tr>
+      <td>${i.students?.student_name||'—'}</td>
+      <td>${i.books?.subject||'—'}</td>
+      <td>${i.books?.book_category||'—'}</td>
+      <td>${fmt(i.issue_date)}</td>
+      <td>${fmt(i.return_date)}</td>
+      <td>${st}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ANALYTICS ──
+function renderAnalytics() {
+  const now = new Date();
+  let cutoff;
+  if (currentPeriod === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+  else if (currentPeriod === 'term') cutoff = new Date(now.getFullYear(), Math.floor(now.getMonth()/3)*3, 1);
+  else cutoff = new Date(now.getFullYear(), 0, 1);
+
+  const periodIssues = allIssues.filter(i => new Date(i.issue_date) >= cutoff);
+  const totalBorrowed = periodIssues.length;
+  const returned = periodIssues.filter(i => i.returned).length;
+  const returnRate = totalBorrowed > 0 ? Math.round((returned / totalBorrowed) * 100) : 0;
+  const overdueCount = allIssues.filter(isOverdue).length;
+
+  document.getElementById('an-borrowed').textContent = totalBorrowed;
+  document.getElementById('an-returned').textContent = returnRate + '%';
+  document.getElementById('an-return-rate').textContent = returnRate >= 80 ? '↑ Good' : '↓ Low';
+  document.getElementById('an-return-rate').className = 'stat-trend ' + (returnRate >= 80 ? 'trend-up' : 'trend-down');
+  document.getElementById('an-overdue').textContent = overdueCount;
+  document.getElementById('an-total-books').textContent = allBooks.length;
+
+  renderBorrowChart();
+  renderCatChart();
+  renderTopBooks();
+  renderAnOverdue();
+  renderInsights(periodIssues, returnRate, overdueCount);
+}
+
+function renderBorrowChart() {
+  const months = [];
+  const counts = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const label = d.toLocaleString('default', { month: 'short' });
+    months.push(label);
+    const c = allIssues.filter(iss => {
+      const id = new Date(iss.issue_date);
+      return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear();
+    }).length;
+    counts.push(c);
+  }
+  const ctx = document.getElementById('an-borrow-chart').getContext('2d');
+  if (borrowChart) borrowChart.destroy();
+  borrowChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Books issued',
+        data: counts,
+        backgroundColor: '#0c1e3e',
+        hoverBackgroundColor: '#c9a227',
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} books` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888', stepSize: Math.max(1, Math.ceil(Math.max(...counts)/5)) }, border: { display: false }, min: 0 }
+      }
+    }
+  });
+}
+
+function renderCatChart() {
+  const catMap = {};
+  allBooks.forEach(b => {
+    const c = b.book_category || 'Other';
+    catMap[c] = (catMap[c] || 0) + (b.tot || 1);
+  });
+  const sorted = Object.entries(catMap).sort((a,b) => b[1]-a[1]).slice(0, 6);
+  const colors = ['#0c1e3e','#c9a227','#0f6e56','#7c3aed','#dc2626','#9ca3af'];
+  const ctx = document.getElementById('an-cat-chart').getContext('2d');
+  if (catChart) catChart.destroy();
+  catChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(e => e[0]),
+      datasets: [{
+        data: sorted.map(e => e[1]),
+        backgroundColor: colors,
+        borderWidth: 3,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { font: { size: 10 }, boxWidth: 10, padding: 8, color: '#6b7280', usePointStyle: true }
+        }
+      }
+    }
+  });
+}
+
+function renderTopBooks() {
+  const bookCounts = {};
+  allIssues.forEach(i => {
+    const name = i.books?.subject;
+    if (name) bookCounts[name] = (bookCounts[name] || 0) + 1;
+  });
+  const sorted = Object.entries(bookCounts).sort((a,b) => b[1]-a[1]).slice(0, 6);
+  const max = sorted[0]?.[1] || 1;
+  const el = document.getElementById('an-top-books');
+  if (!sorted.length) { el.innerHTML = `<div class="tbl-empty">No data</div>`; return; }
+  el.innerHTML = sorted.map(([name, count]) => `
+    <div class="mini-bar-row">
+      <div class="mini-bar-label" title="${name}">${name}</div>
+      <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${Math.round(count/max*100)}%;background:#0c1e3e;"></div></div>
+      <div class="mini-bar-val">${count}</div>
+    </div>`).join('');
+}
+
+function renderAnOverdue() {
+  const overdueIssues = allIssues.filter(isOverdue).sort((a,b) => daysOverdue(b)-daysOverdue(a)).slice(0, 5);
+  const el = document.getElementById('an-overdue-list');
+  if (!overdueIssues.length) {
+    el.innerHTML = `<div style="text-align:center;padding:16px 0;color:var(--success);font-size:12px;"><i class="ti ti-circle-check" style="font-size:20px;display:block;margin-bottom:4px;"></i>No overdue books!</div>`;
+    return;
+  }
+  el.innerHTML = overdueIssues.map(i => `
+    <div class="overdue-item">
+      <div>
+        <div class="overdue-name" style="font-size:12px;">${i.students?.student_name||'—'}</div>
+        <div class="overdue-book">${i.books?.subject||'—'}</div>
+      </div>
+      <div class="overdue-days" style="font-size:11px;">${daysOverdue(i)}d</div>
+    </div>`).join('');
+}
+
+function renderInsights(periodIssues, returnRate, overdueCount) {
+  const insights = [];
+
+  // Most borrowed category
+  const catCounts = {};
+  periodIssues.forEach(i => {
+    const c = i.books?.book_category || 'Unknown';
+    catCounts[c] = (catCounts[c] || 0) + 1;
+  });
+  const topCat = Object.entries(catCounts).sort((a,b) => b[1]-a[1])[0];
+  if (topCat) insights.push({ color: '#16a34a', text: `<strong>${topCat[0]}</strong> books are the most borrowed this period with <strong>${topCat[1]}</strong> issues.` });
+
+  // Return rate
+  if (returnRate >= 85) insights.push({ color: '#16a34a', text: `Return rate is <strong>${returnRate}%</strong> — excellent library discipline.` });
+  else if (returnRate >= 65) insights.push({ color: '#d97706', text: `Return rate is <strong>${returnRate}%</strong>. Consider sending reminders to pending students.` });
+  else insights.push({ color: '#dc2626', text: `Return rate is only <strong>${returnRate}%</strong>. Immediate follow-up recommended.` });
+
+  // Overdue
+  if (overdueCount === 0) insights.push({ color: '#16a34a', text: `<strong>No overdue books</strong> — the library is in great shape!` });
+  else {
+    const worst = allIssues.filter(isOverdue).sort((a,b) => daysOverdue(b)-daysOverdue(a))[0];
+    insights.push({ color: '#dc2626', text: `<strong>${overdueCount} book${overdueCount>1?'s':''}</strong> overdue. ${worst ? `Longest: ${worst.students?.student_name||'Unknown'} at ${daysOverdue(worst)} days.` : ''}` });
+  }
+
+  // Total activity
+  if (periodIssues.length > 0) insights.push({ color: '#2563eb', text: `<strong>${periodIssues.length}</strong> books were issued this ${currentPeriod} across <strong>${allStudents.length}</strong> students.` });
+
+  const el = document.getElementById('an-insights');
+  el.innerHTML = insights.map(ins => `
+    <div class="kpi-insight">
+      <div class="kpi-dot" style="background:${ins.color};"></div>
+      <div class="kpi-insight-text">${ins.text}</div>
+    </div>`).join('');
+}
+
+// ── DB STATUS ──
+async function renderDbStatus() {
+  document.getElementById('db-auth-status').innerHTML = `<span class="badge badge-success"><i class="ti ti-check"></i> Active</span>`;
+  document.getElementById('db-auth-detail').textContent = currentUser?.email || '—';
+
+  async function checkTable(name, statusId, detailId) {
+    try {
+      const { count, error } = await sb.from(name).select('*', { count: 'exact', head: true });
+      if (error) throw error;
+      document.getElementById(statusId).innerHTML = `<span class="badge badge-success"><i class="ti ti-check"></i> Ready</span>`;
+      document.getElementById(detailId).textContent = `${count} records`;
+    } catch(e) {
+      document.getElementById(statusId).innerHTML = `<span class="badge badge-danger"><i class="ti ti-x"></i> Error</span>`;
+      document.getElementById(detailId).textContent = e.message;
+    }
+  }
+  await Promise.all([
+    checkTable('books', 'db-books-status', 'db-books-detail'),
+    checkTable('students', 'db-students-status', 'db-students-detail'),
+    checkTable('book_issues', 'db-issues-status', 'db-issues-detail'),
+  ]);
+}
+
+// ── NAVIGATION ──
+function navigateTo(page) {
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  document.querySelectorAll('.page-content').forEach(el => el.classList.toggle('active', el.id === 'page-' + page));
+  const titles = { dashboard:'Dashboard', books:'Books', students:'Students', issues:'Issues', overdue:'Overdue Books', analytics:'Analytics', borrowlog:'Borrow Log', dbstatus:'DB Status' };
+  document.getElementById('page-title').textContent = titles[page] || page;
+}
+
+// ── REFRESH ──
+function setRefreshSpinning(v) {
+  document.getElementById('refresh-btn').classList.toggle('spinning', v);
+}
+
+// ── THEME ──
+function toggleTheme() {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('theme-btn').innerHTML = `<i class="ti ti-${isDark ? 'moon' : 'sun'}"></i>`;
+  if (borrowChart || catChart) { renderBorrowChart(); renderCatChart(); }
+}
+
+// ── TOAST ──
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="ti ti-${type==='success'?'check':type==='error'?'x':'info-circle'}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+// ── EVENT LISTENERS ──
+function setupListeners() {
   document.getElementById('login-btn').addEventListener('click', handleLogin);
   document.getElementById('register-btn').addEventListener('click', handleRegister);
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -362,287 +1233,46 @@ function setupEventListeners() {
     document.getElementById('login-view').style.display = 'block';
     document.getElementById('register-view').style.display = 'none';
   });
-}
 
-async function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
+  document.querySelectorAll('.sb-item[data-page]').forEach(el => {
+    el.addEventListener('click', () => navigateTo(el.dataset.page));
+  });
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => navigateTo(el.dataset.goto));
+  });
 
-  if (!email || !password) {
-    showToast("Please fill in all fields", "error");
-    return;
-  }
+  document.getElementById('refresh-btn').addEventListener('click', async () => {
+    if (!currentUser) return;
+    await loadAllData();
+    toast('Data refreshed', 'success');
+  });
 
-  const btn = document.getElementById('login-btn');
-  btn.disabled = true;
-  btn.textContent = "Signing in...";
+  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
 
-  try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-    
-    currentUser = data.user;
-    showToast("✓ Logged in successfully!", "success");
-    setTimeout(showApp, 500);
-  } catch (err) {
-    showToast("✗ " + err.message, "error");
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Sign In";
-  }
-}
+  // Search inputs
+  document.getElementById('books-search').addEventListener('input', e => renderBooks(e.target.value));
+  document.getElementById('students-search').addEventListener('input', e => renderStudents(e.target.value));
+  document.getElementById('issues-search').addEventListener('input', e => renderIssues(e.target.value));
+  document.getElementById('log-search').addEventListener('input', e => renderBorrowLog(e.target.value));
 
-async function handleRegister() {
-  const email = document.getElementById('reg-email').value.trim();
-  const password = document.getElementById('reg-password').value;
-
-  if (!email || !password || password.length < 6) {
-    showToast("Email and password required (min 6 characters)", "error");
-    return;
-  }
-
-  const btn = document.getElementById('register-btn');
-  btn.disabled = true;
-  btn.textContent = "Creating account...";
-
-  try {
-    const { data, error } = await sb.auth.signUp({ 
-      email, 
-      password
+  // Analytics period tabs
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentPeriod = tab.dataset.period;
+      renderAnalytics();
     });
-    
-    if (error) throw new Error(error.message);
-    
-    showToast("✓ Account created! You can now sign in.", "success");
-    document.getElementById('login-view').style.display = 'block';
-    document.getElementById('register-view').style.display = 'none';
-    document.getElementById('reg-email').value = '';
-    document.getElementById('reg-password').value = '';
-  } catch (err) {
-    showToast("✗ " + err.message, "error");
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Create Account";
-  }
+  });
+
+  // Enter key on login
+  document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  document.getElementById('login-email').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 }
 
-async function handleLogout() {
-  try {
-    await sb.auth.signOut();
-    currentUser = null;
-    showToast("✓ Signed out", "success");
-    setTimeout(showAuthScreen, 500);
-  } catch (err) {
-    showToast("✗ " + err.message, "error");
-  }
-}
-
-function showAuthScreen() {
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-view').style.display = 'block';
-  document.getElementById('register-view').style.display = 'none';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
-}
-
-async function showApp() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  if (currentUser) {
-    document.getElementById('user-email').textContent = currentUser.email;
-    document.getElementById('auth-email').textContent = currentUser.email;
-    
-    // Load all data from database
-    await loadDashboardData();
-  }
-}
-
-async function loadDashboardData() {
-  try {
-    await Promise.all([
-      loadBooks(),
-      loadIssues(),
-      loadStatistics(),
-      checkDatabaseStatus()
-    ]);
-  } catch (err) {
-    console.error("Error loading dashboard data:", err);
-  }
-}
-
-async function loadBooks() {
-  try {
-    const { data, error } = await sb.from('books').select('*').limit(10);
-    
-    if (error) throw new Error(error.message || JSON.stringify(error));
-
-    const tbody = document.getElementById('books-table');
-    tbody.innerHTML = '';
-
-    if (!data || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No books found</td></tr>';
-      return;
-    }
-
-    data.forEach(book => {
-      const row = document.createElement('tr');
-      
-      row.innerHTML = `
-        <td>${book.subject || '—'}</td>
-        <td>${book.book_category || '—'}</td>
-        <td>${book.grade || '—'}</td>
-        <td>${book.book_publisher || '—'}</td>
-        <td>${book.tot || 0}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Error loading books:", err);
-    document.getElementById('books-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading books</td></tr>';
-  }
-}
-
-async function loadIssues() {
-  try {
-    const { data, error } = await sb
-      .from('book_issues')
-      .select(`
-        *,
-        books(subject, book_category),
-        students(student_name)
-      `)
-      .limit(10);
-    
-    if (error) throw new Error(error.message || JSON.stringify(error));
-
-    const tbody = document.getElementById('issues-table');
-    tbody.innerHTML = '';
-
-    if (!data || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No issues found</td></tr>';
-      return;
-    }
-
-    data.forEach(issue => {
-      const row = document.createElement('tr');
-      const issueDateStr = new Date(issue.issue_date).toLocaleDateString();
-      const returnDateStr = issue.return_date ? new Date(issue.return_date).toLocaleDateString() : '—';
-      const statusBadge = issue.returned ? '<span class="badge badge-success">Returned</span>' : '<span class="badge badge-warning">Pending</span>';
-      
-      row.innerHTML = `
-        <td>${issue.students?.student_name || '—'}</td>
-        <td>${issue.books?.subject || '—'}</td>
-        <td>${issueDateStr}</td>
-        <td>${returnDateStr}</td>
-        <td>${statusBadge}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Error loading issues:", err);
-    document.getElementById('issues-table').innerHTML = '<tr><td colspan="5" class="empty-state">Error loading issues</td></tr>';
-  }
-}
-
-async function loadStatistics() {
-  try {
-    // Count books
-    const { count: bookCount } = await sb
-      .from('books')
-      .select('*', { count: 'exact', head: true });
-
-    // Count active issues (not returned)
-    const { count: activeIssueCount } = await sb
-      .from('book_issues')
-      .select('*', { count: 'exact', head: true })
-      .eq('returned', false);
-
-    // Count unreturned books
-    const { count: unreturnedCount } = await sb
-      .from('book_issues')
-      .select('*', { count: 'exact', head: true })
-      .eq('returned', false);
-
-    // Count students
-    const { count: studentCount } = await sb
-      .from('students')
-      .select('*', { count: 'exact', head: true });
-
-    document.getElementById('total-books').textContent = bookCount || 0;
-    document.getElementById('active-issues').textContent = activeIssueCount || 0;
-    document.getElementById('total-students').textContent = studentCount || 0;
-    document.getElementById('unreturned-books').textContent = unreturnedCount || 0;
-  } catch (err) {
-    console.error("Error loading statistics:", err);
-  }
-}
-
-async function checkDatabaseStatus() {
-  try {
-    // Check Books table
-    const booksCheck = await sb
-      .from('books')
-      .select('*', { count: 'exact', head: true });
-
-    // Check Students table
-    const studentsCheck = await sb
-      .from('students')
-      .select('*', { count: 'exact', head: true });
-
-    // Check Book Issues table
-    const issuesCheck = await sb
-      .from('book_issues')
-      .select('*', { count: 'exact', head: true });
-
-    // Update books status
-    if (!booksCheck.error && booksCheck.count !== null) {
-      document.getElementById('books-status').innerHTML = '<span class="badge badge-success">Ready</span>';
-      document.getElementById('books-count').textContent = `${booksCheck.count} records`;
-    } else {
-      document.getElementById('books-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('books-count').textContent = booksCheck.error?.message || 'Check table exists';
-    }
-
-    // Update students status
-    if (!studentsCheck.error && studentsCheck.count !== null) {
-      document.getElementById('students-status').innerHTML = '<span class="badge badge-success">Ready</span>';
-      document.getElementById('students-count').textContent = `${studentsCheck.count} records`;
-    } else {
-      document.getElementById('students-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('students-count').textContent = studentsCheck.error?.message || 'Check table exists';
-    }
-
-    // Update issues status
-    if (!issuesCheck.error && issuesCheck.count !== null) {
-      document.getElementById('issues-status').innerHTML = '<span class="badge badge-success">Ready</span>';
-      document.getElementById('issues-count').textContent = `${issuesCheck.count} records`;
-    } else {
-      document.getElementById('issues-status').innerHTML = '<span class="badge badge-danger">Error</span>';
-      document.getElementById('issues-count').textContent = issuesCheck.error?.message || 'Check table exists';
-    }
-  } catch (err) {
-    console.error("Error checking database status:", err);
-  }
-}
-
-function showToast(message, type = "info") {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-
-  setTimeout(() => toast.remove(), 4000);
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
+// ── START ──
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+else initApp();
 </script>
 </body>
 </html>
