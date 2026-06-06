@@ -1362,5 +1362,38 @@ function bindListeners() {
 ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', init);
 </script>
+  <!-- FOOTER -->
+<style>
+.lib-footer{
+  position:fixed;bottom:0;left:var(--sidebar-w);right:0;
+  height:36px;
+  background:linear-gradient(90deg,var(--navy) 0%,#1a3a6b 40%,var(--navy2) 100%);
+  border-top:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  gap:14px;z-index:500;
+}
+.lib-footer-text{
+  font-family:'Fraunces',serif;
+  font-size:13px;font-weight:700;letter-spacing:2.5px;
+  color:var(--gold2);
+  text-transform:uppercase;
+}
+.lib-footer-sep{
+  color:var(--gold);font-size:18px;font-weight:300;opacity:.7;
+}
+.lib-footer-brand{
+  font-family:'Fraunces',serif;
+  font-size:14px;font-weight:900;letter-spacing:3px;
+  color:#fff;
+  text-transform:uppercase;
+}
+.page{padding-bottom:48px !important;}
+</style>
+<div class="lib-footer">
+  <span class="lib-footer-text">Powered by</span>
+  <span class="lib-footer-sep">||</span>
+  <span class="lib-footer-brand">Billan Company</span>
+</div>
+<!-- END FOOTER -->
 </body>
 </html>
