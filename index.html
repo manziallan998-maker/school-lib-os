@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School Library Management os</title>
+<title>LibraryOS — G.S APAPEC MURAMBI</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Cinzel:wght@700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 :root {
@@ -16,6 +16,7 @@
   --text:#1a1917; --text2:#6b6860; --text3:#9e9b94;
   --success:#16a34a; --danger:#dc2626; --warning:#d97706; --info:#2563eb;
   --radius:10px; --radius-lg:14px; --sidebar-w:215px; --topbar-h:56px; --tr:0.15s ease;
+  --footer-h:42px;
 }
 [data-theme="dark"] {
   --bg:#0e0e0d; --surface:#1c1b18; --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
@@ -29,38 +30,128 @@ input,select{font-family:inherit;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
 
-/* AUTH */
-#auth-screen{display:flex;align-items:center;justify-content:center;height:100vh;
+/* ══════════════════════════════════════
+   TYPEWRITER CURSOR
+══════════════════════════════════════ */
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.tw-cursor{display:inline-block;width:2px;background:currentColor;margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
+.tw-cursor.done{display:none;}
+
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
+#auth-screen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;
   background:var(--navy);
-  background-image:radial-gradient(ellipse at 15% 50%,rgba(201,162,39,.18) 0%,transparent 55%),
-                   radial-gradient(ellipse at 85% 15%,rgba(201,162,39,.09) 0%,transparent 50%);}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px;width:100%;max-width:420px;}
-.auth-logo{text-align:center;margin-bottom:34px;}
-.auth-logo-icon{width:58px;height:58px;background:var(--navy);border-radius:15px;display:inline-flex;align-items:center;justify-content:center;font-size:27px;margin-bottom:14px;}
-.auth-logo-name{font-family:'Fraunces',serif;font-size:26px;font-weight:900;}
-.auth-logo-sub{font-size:12px;color:var(--text2);margin-top:3px;}
-.auth-title{font-size:20px;font-weight:700;margin-bottom:4px;}
-.auth-sub{color:var(--text2);font-size:13px;margin-bottom:24px;}
-.form-group{margin-bottom:16px;}
+  background-image:
+    radial-gradient(ellipse at 15% 50%,rgba(201,162,39,.22) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 15%,rgba(201,162,39,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 90%,rgba(22,45,84,.8) 0%,transparent 70%);
+  position:relative;
+  overflow:hidden;
+}
+#auth-screen::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 50px,rgba(201,162,39,.02) 50px,rgba(201,162,39,.02) 51px),
+             repeating-linear-gradient(90deg,transparent,transparent 50px,rgba(201,162,39,.02) 50px,rgba(201,162,39,.02) 51px);
+  pointer-events:none;
+}
+
+/* Hero text ABOVE the card */
+.auth-hero{
+  text-align:center;
+  margin-bottom:28px;
+  z-index:1;
+}
+.auth-hero-line1{
+  font-family:'Cinzel',serif;
+  font-size:13px;font-weight:700;
+  letter-spacing:5px;text-transform:uppercase;
+  color:var(--gold2);
+  display:block;margin-bottom:6px;
+  min-height:20px;
+}
+.auth-hero-line2{
+  font-family:'Playfair Display',serif;
+  font-size:32px;font-weight:900;
+  color:#fff;
+  letter-spacing:1px;
+  display:block;margin-bottom:4px;
+  min-height:42px;
+  line-height:1.1;
+}
+.auth-hero-line3{
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:400;
+  color:rgba(255,255,255,.42);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  display:block;
+  min-height:20px;
+}
+
+.auth-card{
+  background:var(--surface);border:1px solid rgba(201,162,39,.18);
+  border-radius:20px;padding:40px;width:100%;max-width:410px;
+  box-shadow:0 32px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset;
+  z-index:1;
+  animation:fadeUp .5s ease both .2s;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+.auth-logo{text-align:center;margin-bottom:28px;}
+.auth-logo-icon{
+  width:58px;height:58px;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  border:2px solid var(--gold);
+  border-radius:15px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:27px;margin-bottom:12px;
+  box-shadow:0 8px 24px rgba(201,162,39,.25);
+}
+.auth-logo-name{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--text);}
+.auth-logo-sub{font-size:11px;color:var(--text2);margin-top:3px;letter-spacing:.5px;}
+.auth-title{font-size:19px;font-weight:700;margin-bottom:4px;}
+.auth-sub{color:var(--text2);font-size:13px;margin-bottom:22px;}
+.form-group{margin-bottom:15px;}
 .form-label{display:block;font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;}
-.form-input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;transition:border-color var(--tr);}
+.form-input{
+  width:100%;padding:12px 14px;
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--radius);color:var(--text);font-size:14px;
+  transition:border-color var(--tr),box-shadow var(--tr);
+}
 .form-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.13);}
-.btn-primary{width:100%;padding:13px;border-radius:var(--radius);background:var(--navy);color:#fff;font-size:14px;font-weight:600;transition:background var(--tr);display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-primary:hover:not(:disabled){background:var(--navy2);}
+.btn-primary{
+  width:100%;padding:13px;border-radius:var(--radius);
+  background:var(--navy);color:#fff;font-size:14px;font-weight:600;
+  transition:background var(--tr),transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-primary:hover:not(:disabled){background:var(--navy2);transform:translateY(-1px);}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
-.auth-links{text-align:center;margin-top:16px;font-size:13px;color:var(--text2);}
+.auth-links{text-align:center;margin-top:15px;font-size:13px;color:var(--text2);}
 .auth-links a{color:var(--gold);cursor:pointer;font-weight:600;}
 
-/* APP SHELL */
+/* ══════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════ */
 #app{display:none;height:100vh;}
 #app.visible{display:flex;}
 
-/* SIDEBAR */
+/* ══════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════ */
 .sidebar{width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;}
-.sb-header{padding:18px 15px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.sb-header{
+  padding:18px 15px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:11px;flex-shrink:0;
+}
 .sb-logo-box{width:37px;height:37px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
-.sb-brand-name{font-family:'Fraunces',serif;font-size:16px;font-weight:900;color:#fff;line-height:1.1;}
-.sb-brand-sub{font-size:10px;color:rgba(255,255,255,.38);}
+.sb-brand-name{
+  font-family:'Fraunces',serif;font-size:15px;font-weight:900;color:#fff;
+  line-height:1.1;min-height:18px;
+}
+.sb-brand-sub{font-size:9px;color:rgba(255,255,255,.38);letter-spacing:1.5px;min-height:13px;}
 .sb-nav{flex:1;padding:12px 9px;display:flex;flex-direction:column;gap:1px;}
 .sb-sec-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1.1px;padding:10px 8px 4px;margin-top:4px;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);position:relative;user-select:none;}
@@ -69,12 +160,15 @@ input,select{font-family:inherit;}
 .sb-item i{font-size:17px;flex-shrink:0;}
 .sb-badge{margin-left:auto;background:rgba(255,255,255,.13);color:rgba(255,255,255,.7);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;}
 .sb-item.active .sb-badge{background:rgba(255,255,255,.25);}
-.sb-bottom{padding:10px 9px 12px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.sb-bottom{padding:10px 9px 12px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;padding-bottom:calc(12px + var(--footer-h));}
 .sb-user{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;margin-bottom:4px;}
 .sb-avatar{width:33px;height:33px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;}
 .sb-user-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
 .sb-user-role{font-size:10px;color:rgba(255,255,255,.38);}
-/* MAIN */
+
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 .topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;flex-shrink:0;gap:14px;}
 .page-title{font-size:15px;font-weight:700;}
@@ -87,11 +181,13 @@ input,select{font-family:inherit;}
 .icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px;transition:all var(--tr);}
 .icon-btn:hover{background:var(--bg);color:var(--text);}
 
-/* PAGE CONTENT */
-.page{flex:1;overflow-y:auto;padding:22px 26px;display:none;}
+/* ══════════════════════════════════════
+   PAGE CONTENT
+══════════════════════════════════════ */
+.page{flex:1;overflow-y:auto;padding:22px 26px;padding-bottom:calc(22px + var(--footer-h));display:none;}
 .page.active{display:block;}
 
-/* STAT CARDS */
+/* ── STAT CARDS ── */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:17px 19px;}
 .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px;}
@@ -103,13 +199,13 @@ input,select{font-family:inherit;}
 .stat-val{font-size:30px;font-weight:700;line-height:1;margin-bottom:4px;}
 .stat-lbl{font-size:12px;color:var(--text2);}
 
-/* SECTION HEAD */
+/* ── SECTION HEAD ── */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
 .sec-title{font-size:14px;font-weight:700;}
 .sec-link{font-size:12px;color:var(--gold);font-weight:600;cursor:pointer;}
 .sec-link:hover{text-decoration:underline;}
 
-/* TABLE */
+/* ── TABLE ── */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
 .tbl{width:100%;border-collapse:collapse;}
 .tbl thead{background:var(--bg);}
@@ -120,7 +216,7 @@ input,select{font-family:inherit;}
 [data-theme="dark"] .tbl tbody tr:hover{background:rgba(255,255,255,.03);}
 .tbl-empty{text-align:center;padding:38px;color:var(--text3);font-size:13px;}
 
-/* BADGES */
+/* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .b-success{background:#dcfce7;color:#166534;}
 .b-warning{background:#fef3c7;color:#92400e;}
@@ -134,17 +230,17 @@ input,select{font-family:inherit;}
 [data-theme="dark"] .b-info{background:rgba(37,99,235,.2);color:#60a5fa;}
 [data-theme="dark"] .b-purple{background:rgba(124,58,237,.2);color:#a78bfa;}
 
-/* CARD */
+/* ── CARD ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);}
 .card-body{padding:17px 19px;}
 
-/* SEARCH */
+/* ── SEARCH ── */
 .search-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);width:260px;}
 .search-bar input{flex:1;background:none;border:none;outline:none;font-size:13px;color:var(--text);}
 .search-bar input::placeholder{color:var(--text3);}
 .search-bar i{color:var(--text3);font-size:16px;}
 
-/* ANALYTICS */
+/* ── ANALYTICS ── */
 .period-tabs{display:flex;gap:2px;background:var(--bg);border-radius:9px;padding:3px;border:1px solid var(--border);}
 .ptab{padding:5px 15px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all var(--tr);}
 .ptab.active{background:var(--surface);color:var(--text);border:1px solid var(--border2);}
@@ -152,7 +248,7 @@ input,select{font-family:inherit;}
 .charts-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;}
 .chart-wrap{position:relative;}
 
-/* MINI BARS */
+/* ── MINI BARS ── */
 .mini-bars{display:flex;flex-direction:column;gap:9px;}
 .mbar-row{display:flex;align-items:center;gap:9px;}
 .mbar-lbl{font-size:11px;color:var(--text2);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -160,48 +256,107 @@ input,select{font-family:inherit;}
 .mbar-fill{height:100%;border-radius:4px;transition:width .55s ease;}
 .mbar-val{font-size:11px;color:var(--text2);width:26px;text-align:right;flex-shrink:0;font-weight:700;}
 
-/* OVERDUE LIST */
+/* ── OVERDUE LIST ── */
 .ov-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
 .ov-item:last-child{border:none;}
 .ov-name{font-size:13px;font-weight:600;}
 .ov-book{font-size:11px;color:var(--text2);margin-top:1px;}
 .ov-days{font-size:12px;font-weight:700;color:var(--danger);}
 
-/* INSIGHT */
+/* ── INSIGHT ── */
 .insight-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:8px;background:var(--bg);margin-bottom:7px;}
 .insight-item:last-child{margin-bottom:0;}
 .ins-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 .ins-text{font-size:12px;color:var(--text2);line-height:1.55;}
 .ins-text strong{color:var(--text);font-weight:600;}
 
-/* GRID HELPERS */
+/* ── GRID HELPERS ── */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .mb-13{margin-bottom:13px;}
 .mb-20{margin-bottom:20px;}
 
-/* DEBUG PANEL */
+/* ── DEBUG PANEL ── */
 .debug-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px 18px;margin-bottom:15px;font-size:12px;color:var(--text2);}
 .debug-panel strong{color:var(--text);}
 .debug-panel code{background:var(--bg);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:11px;}
 
-/* TOAST */
-.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:calc(22px + var(--footer-h));right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
 .toast{display:flex;align-items:center;gap:9px;padding:11px 15px;background:var(--navy);color:#fff;border-radius:10px;font-size:13px;font-weight:500;min-width:250px;max-width:370px;animation:slideUp .22s ease;}
 .toast.success{background:var(--success);}
 .toast.error{background:var(--danger);}
 .toast.warning{background:var(--warning);}
 @keyframes slideUp{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 
-/* DB STATUS */
+/* ── DB STATUS ── */
 .db-detail{font-size:12px;color:var(--text2);}
 .empty-success{text-align:center;padding:22px 0;color:var(--success);font-size:13px;}
 .empty-success i{font-size:24px;display:block;margin-bottom:7px;}
+
+/* ══════════════════════════════════════
+   FOOTER — full width, touches sidebar
+══════════════════════════════════════ */
+.lib-footer{
+  position:fixed;
+  bottom:0;left:0;right:0;          /* ← full width, touches sidebar */
+  height:var(--footer-h);
+  background:linear-gradient(90deg, #060e1c 0%, var(--navy) 25%, #1a3a6b 60%, var(--navy2) 100%);
+  border-top:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  gap:16px;
+  z-index:500;
+  overflow:hidden;
+}
+.lib-footer::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(201,162,39,.05) 120px,rgba(201,162,39,.05) 121px);
+  pointer-events:none;
+}
+/* Animated shimmer */
+.lib-footer::after{
+  content:'';
+  position:absolute;left:-100%;top:0;bottom:0;width:60%;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,.08),transparent);
+  animation:shimmer 3.5s linear infinite;
+}
+@keyframes shimmer{to{left:160%;}}
+
+.lib-footer-text{
+  font-family:'Cinzel',serif;
+  font-size:11px;font-weight:700;letter-spacing:3px;
+  color:rgba(201,162,39,.7);
+  text-transform:uppercase;
+  position:relative;z-index:1;
+  min-width:80px;
+}
+.lib-footer-sep{
+  color:var(--gold);font-size:20px;font-weight:300;opacity:.5;
+  position:relative;z-index:1;
+}
+.lib-footer-brand{
+  font-family:'Playfair Display',serif;
+  font-size:15px;font-weight:900;letter-spacing:4px;
+  color:#fff;text-transform:uppercase;
+  position:relative;z-index:1;
+  text-shadow:0 0 20px rgba(201,162,39,.35);
+  min-width:160px;
+}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
+<!-- ════════════════════════════════════════
+     AUTH
+════════════════════════════════════════ -->
 <div id="auth-screen">
+  <!-- Animated hero text above the card -->
+  <div class="auth-hero">
+    <span class="auth-hero-line1" id="hero-l1"></span>
+    <span class="auth-hero-line2" id="hero-l2"></span>
+    <span class="auth-hero-line3" id="hero-l3"></span>
+  </div>
+
   <div class="auth-card">
     <div class="auth-logo">
       <div class="auth-logo-icon">📚</div>
@@ -239,15 +394,17 @@ input,select{font-family:inherit;}
   </div>
 </div>
 
-<!-- APP -->
+<!-- ════════════════════════════════════════
+     APP
+════════════════════════════════════════ -->
 <div id="app">
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sb-header">
       <div class="sb-logo-box">📚</div>
       <div>
-        <div class="sb-brand-name">G.S APAPEC MURAMBI</div>
-        <div class="sb-brand-sub">MONITORING HUB</div>
+        <div class="sb-brand-name" id="sb-brand-name"></div>
+        <div class="sb-brand-sub" id="sb-brand-sub"></div>
       </div>
     </div>
     <nav class="sb-nav">
@@ -371,11 +528,11 @@ input,select{font-family:inherit;}
     <div class="page" id="page-students">
       <div class="sec-hd mb-13">
         <div class="sec-title">Students <span id="students-count-lbl" style="color:var(--text2);font-weight:400;"></span></div>
-        <div class="search-bar"><i class="ti ti-search"></i><input type="text" id="students-search" placeholder="Search by name…"></div>
+        <div class="search-bar"><i class="ti ti-search"></i><input type="text" id="students-search" placeholder="Search by name or class…"></div>
       </div>
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th>Student Name</th><th>Grade</th><th>Total Issued</th><th>Returned</th><th>Overdue</th></tr></thead>
+          <thead><tr><th>Student Name</th><th>Class</th><th>Total Issued</th><th>Returned</th><th>Overdue</th></tr></thead>
           <tbody id="students-tbl"></tbody>
         </table>
       </div>
@@ -544,6 +701,11 @@ input,select{font-family:inherit;}
               <td class="db-detail">book_id · book_category · curriculum · subject · book_publisher · grade · tot</td>
             </tr>
             <tr>
+              <td>students columns</td>
+              <td><span class="badge b-info">Schema</span></td>
+              <td class="db-detail">student_id · student_name · class</td>
+            </tr>
+            <tr>
               <td>book_issues detected columns</td>
               <td><span class="badge b-info">Auto-detected</span></td>
               <td class="db-detail" id="db-cols-dt">—</td>
@@ -551,7 +713,6 @@ input,select{font-family:inherit;}
           </tbody>
         </table>
       </div>
-      <!-- Raw issues columns debug -->
       <div class="debug-panel" id="db-debug-panel" style="display:none;">
         <strong>book_issues — detected column mapping:</strong>
         <div style="margin-top:8px;" id="db-debug-content"></div>
@@ -561,14 +722,18 @@ input,select{font-family:inherit;}
   </div><!-- /main -->
 </div><!-- /app -->
 
+<!-- FOOTER — full width -->
+<div class="lib-footer" id="lib-footer">
+  <span class="lib-footer-text" id="footer-text"></span>
+  <span class="lib-footer-sep">||</span>
+  <span class="lib-footer-brand" id="footer-brand"></span>
+</div>
+
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════
    SUPABASE CONFIG
-   Strategy: fetch each table with select('*') — NO joins.
-   All matching is done in JavaScript.
-   This avoids the "Could not find relationship" error.
 ═══════════════════════════════════════════════════════ */
 const SB_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
@@ -578,24 +743,60 @@ let BOOKS = [], STUDENTS = [], ISSUES = [];
 let borrowChart, catChart;
 let currentPeriod = 'month';
 
-/* ── Detected column names (auto-set from actual data) ── */
+/* Detected column names */
 let C = {
-  /* students */
-  s_id:   'id',
-  s_name: 'student_name',
-  /* book_issues */
-  i_book:   'book_id',
-  i_student:'student_id',
-  i_issued: 'issue_date',
-  i_due:    'return_date',    /* the expected return date OR actual return date */
-  i_returned: null,           /* boolean "returned" column — null if absent */
+  s_id:       'student_id',
+  s_name:     'student_name',
+  s_class:    'class',         /* ← THE FIX: students.class not students.grade */
+  i_book:     'book_id',
+  i_student:  'student_id',
+  i_issued:   'issue_date',
+  i_due:      'return_date',
+  i_returned: null,
 };
+
+/* ═══════════════════════════════════════════════════════
+   TYPEWRITER UTILITY
+═══════════════════════════════════════════════════════ */
+function typewrite(el, text, speed, delay, onDone) {
+  if (!el) return;
+  el.textContent = '';
+  const cursor = document.createElement('span');
+  cursor.className = 'tw-cursor';
+  el.appendChild(cursor);
+  let i = 0;
+  setTimeout(() => {
+    const iv = setInterval(() => {
+      if (i < text.length) {
+        el.insertBefore(document.createTextNode(text[i]), cursor);
+        i++;
+      } else {
+        clearInterval(iv);
+        cursor.classList.add('done');
+        if (onDone) onDone();
+      }
+    }, speed);
+  }, delay || 0);
+}
 
 /* ═══════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════ */
 async function init() {
   sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+  /* Animate login hero text */
+  typewrite($('hero-l1'), 'G.S APAPEC MURAMBI', 55, 100, () => {
+    typewrite($('hero-l2'), 'LibraryOS', 80, 200, () => {
+      typewrite($('hero-l3'), 'School Library Management System', 40, 100);
+    });
+  });
+
+  /* Animate footer */
+  typewrite($('footer-text'), 'Powered by', 60, 600, () => {
+    typewrite($('footer-brand'), 'Billan Company', 70, 400);
+  });
+
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) { user = session.user; showApp(); }
@@ -617,6 +818,12 @@ async function showApp() {
   const em = user.email || '—';
   $('sb-email').textContent  = em;
   $('sb-avatar').textContent = em.slice(0,2).toUpperCase();
+
+  /* Animate sidebar brand */
+  typewrite($('sb-brand-name'), 'G.S APAPEC MURAMBI', 55, 200, () => {
+    typewrite($('sb-brand-sub'), 'MONITORING HUB', 65, 100);
+  });
+
   await loadAll();
 }
 
@@ -651,7 +858,7 @@ async function doLogout() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   DATA LOADING — each table independently, NO joins
+   DATA LOADING
 ═══════════════════════════════════════════════════════ */
 async function loadAll() {
   setRefresh(true);
@@ -677,6 +884,7 @@ async function fetchBooks() {
 }
 
 async function fetchStudents() {
+  /* Select all cols so we get student_id, student_name, class */
   const { data, error } = await sb.from('students').select('*');
   if (error) throw new Error('students: ' + error.message);
   STUDENTS = data || [];
@@ -684,7 +892,6 @@ async function fetchStudents() {
 }
 
 async function fetchIssues() {
-  /* CRITICAL: plain select('*') — absolutely no join syntax */
   const { data, error } = await sb
     .from('book_issues')
     .select('*')
@@ -692,7 +899,6 @@ async function fetchIssues() {
     .limit(2000);
 
   if (error) {
-    /* fallback: try without ordering by created_at in case that col doesn't exist */
     const { data: data2, error: error2 } = await sb
       .from('book_issues')
       .select('*')
@@ -706,57 +912,35 @@ async function fetchIssues() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   AUTO-DETECT COLUMN NAMES from first row of actual data
+   AUTO-DETECT COLUMN NAMES
 ═══════════════════════════════════════════════════════ */
 function detectColumns() {
   /* ── students ── */
   if (STUDENTS.length) {
     const s = STUDENTS[0];
     const keys = Object.keys(s);
-    C.s_id   = keys.find(k => k === 'id') || keys[0];
-    /* prefer 'student_name', else any key containing 'name' */
-    C.s_name = keys.find(k => k === 'student_name')
-            || keys.find(k => /name/i.test(k))
-            || keys.find(k => k !== C.s_id)
-            || keys[1] || keys[0];
+    /* student_id */
+    C.s_id   = keys.find(k => /^student_id$/i.test(k)) || keys.find(k => /^id$/i.test(k)) || keys[0];
+    /* student_name */
+    C.s_name = keys.find(k => /^student_name$/i.test(k)) || keys.find(k => /name/i.test(k)) || keys[1] || keys[0];
+    /* class — the column is literally "class" */
+    C.s_class = keys.find(k => /^class$/i.test(k))
+             || keys.find(k => /^grade$/i.test(k))
+             || keys.find(k => /class|grade|level|form/i.test(k))
+             || null;
+    console.log('[LibraryOS] student cols detected — id:', C.s_id, 'name:', C.s_name, 'class:', C.s_class);
   }
 
   /* ── book_issues ── */
   if (ISSUES.length) {
     const is = ISSUES[0];
     const keys = Object.keys(is);
-
-    /* book reference column */
-    C.i_book = keys.find(k => k === 'book_id')
-             || keys.find(k => /^book_id$/i.test(k))
-             || keys.find(k => /book/i.test(k) && /id/i.test(k))
-             || 'book_id';
-
-    /* student reference column */
-    C.i_student = keys.find(k => k === 'student_id')
-               || keys.find(k => /^student_id$/i.test(k))
-               || keys.find(k => /student/i.test(k) && /id/i.test(k))
-               || 'student_id';
-
-    /* issue date */
-    C.i_issued = keys.find(k => k === 'issue_date')
-              || keys.find(k => /issue_date/i.test(k))
-              || keys.find(k => /issued_at/i.test(k))
-              || keys.find(k => /issue/i.test(k) && /date|at/i.test(k))
-              || 'issue_date';
-
-    /* return / due date */
-    C.i_due = keys.find(k => k === 'return_date')
-           || keys.find(k => /return_date/i.test(k))
-           || keys.find(k => /due_date/i.test(k))
-           || keys.find(k => /return/i.test(k) && /date|at/i.test(k))
-           || null;
-
-    /* boolean returned flag */
+    C.i_book     = keys.find(k => /^book_id$/i.test(k))    || keys.find(k => /book.*id/i.test(k))    || 'book_id';
+    C.i_student  = keys.find(k => /^student_id$/i.test(k)) || keys.find(k => /student.*id/i.test(k)) || 'student_id';
+    C.i_issued   = keys.find(k => /^issue_date$/i.test(k)) || keys.find(k => /issue/i.test(k) && /date|at/i.test(k)) || 'issue_date';
+    C.i_due      = keys.find(k => /^return_date$/i.test(k))|| keys.find(k => /due_date/i.test(k))    || keys.find(k => /return/i.test(k) && /date|at/i.test(k)) || null;
     C.i_returned = keys.find(k => /^returned$/i.test(k)) || null;
-
     console.log('[LibraryOS] detected columns:', C);
-    console.log('[LibraryOS] all book_issues keys:', keys);
   }
 }
 
@@ -766,44 +950,44 @@ function detectColumns() {
 function bookById(id) {
   return BOOKS.find(b => String(b.book_id) === String(id)) || null;
 }
-
 function studentById(id) {
   return STUDENTS.find(s => String(s[C.s_id]) === String(id)) || null;
 }
-
 function studentName(issue) {
-  /* Try the linked student first */
   const sid = issue[C.i_student];
   if (sid !== undefined && sid !== null) {
     const s = studentById(sid);
     if (s) return s[C.s_name] || '—';
   }
-  /* Fallback: issue row might embed the name directly */
   const nameKey = Object.keys(issue).find(k => /name/i.test(k));
   return nameKey ? (issue[nameKey] || '—') : '—';
 }
-
+/* NEW: get class from student row */
+function studentClass(issue) {
+  const sid = issue[C.i_student];
+  if (sid !== undefined && sid !== null) {
+    const s = studentById(sid);
+    if (s && C.s_class) return s[C.s_class] || '—';
+  }
+  return '—';
+}
 function bookSubject(issue) {
   const bid = issue[C.i_book];
   if (bid !== undefined && bid !== null) {
     const b = bookById(bid);
     if (b) return b.subject || '—';
   }
-  /* Fallback: direct subject column on issue row */
   const sk = Object.keys(issue).find(k => /^subject$/i.test(k));
   return sk ? (issue[sk] || '—') : '—';
 }
-
 function bookCat(issue) {
   const b = bookById(issue[C.i_book]);
   return b ? (b.book_category || '—') : '—';
 }
-
 function bookGrade(issue) {
   const b = bookById(issue[C.i_book]);
   return b ? (b.grade || '—') : '—';
 }
-
 function bookCurr(issue) {
   const b = bookById(issue[C.i_book]);
   return b ? (b.curriculum || '—') : '—';
@@ -811,11 +995,6 @@ function bookCurr(issue) {
 
 /* ═══════════════════════════════════════════════════════
    OVERDUE LOGIC
-   An issue is "returned" if:
-     1. Boolean C.i_returned === true, OR
-     2. No boolean col AND C.i_due is set AND its date <= today (means book was returned on that date)
-   An issue is "overdue" if:
-     - Not returned AND the computed due date is in the past
 ═══════════════════════════════════════════════════════ */
 function isReturned(issue) {
   if (C.i_returned) {
@@ -824,7 +1003,6 @@ function isReturned(issue) {
     if (v === false || v === 0) return false;
     if (typeof v === 'string')  return v.toLowerCase() === 'true' || v === '1';
   }
-  /* No boolean col: treat a set return_date in the past as "returned" */
   if (C.i_due) {
     const rd = issue[C.i_due];
     if (rd) {
@@ -834,13 +1012,11 @@ function isReturned(issue) {
   }
   return false;
 }
-
 function getDueDate(issue) {
   if (C.i_due && issue[C.i_due]) {
     const d = new Date(issue[C.i_due]);
     if (!isNaN(d)) return d;
   }
-  /* default: 14 days from issue */
   const issued = issue[C.i_issued];
   if (issued) {
     const d = new Date(issued);
@@ -848,7 +1024,6 @@ function getDueDate(issue) {
   }
   return null;
 }
-
 function daysLate(issue) {
   if (isReturned(issue)) return 0;
   const due = getDueDate(issue);
@@ -856,7 +1031,6 @@ function daysLate(issue) {
   const diff = Math.floor((Date.now() - due) / 864e5);
   return diff > 0 ? diff : 0;
 }
-
 function isOverdue(issue) {
   return !isReturned(issue) && daysLate(issue) > 0;
 }
@@ -886,21 +1060,17 @@ function renderAll() {
   renderDbStatus();
 }
 
-/* ── Nav badges ── */
 function updateBadges() {
   $('nb-books').textContent    = BOOKS.length;
   $('nb-students').textContent = STUDENTS.length;
-
   const active = ISSUES.filter(i => !isReturned(i)).length;
   $('nb-issues').textContent   = active;
-
   const ov = ISSUES.filter(isOverdue).length;
   $('nb-overdue').textContent  = ov;
   $('nb-overdue').style.background = ov > 0 ? 'rgba(220,38,38,.25)' : 'rgba(255,255,255,.13)';
   $('nb-overdue').style.color      = ov > 0 ? '#fca5a5'             : 'rgba(255,255,255,.7)';
 }
 
-/* ── Dashboard ── */
 function renderDashboard() {
   const totalCopies = BOOKS.reduce((a,b) => a + (parseInt(b.tot)||0), 0);
   $('s-books').textContent      = BOOKS.length;
@@ -914,7 +1084,6 @@ function renderDashboard() {
   ovSub.textContent = ov > 0 ? ov + ' need action' : '✓ None';
   ovSub.className   = 'stat-trend ' + (ov > 0 ? 'trend-dn' : 'trend-up');
 
-  /* Recent issues (newest first) */
   const recent = [...ISSUES].sort((a,b) => {
     const da = new Date(a[C.i_issued]||0), db = new Date(b[C.i_issued]||0);
     return db - da;
@@ -929,7 +1098,6 @@ function renderDashboard() {
     return `<tr><td>${studentName(i)}</td><td>${bookSubject(i)}</td><td>${st}</td></tr>`;
   }).join('') : `<tr><td colspan="3" class="tbl-empty">No issues recorded yet</td></tr>`;
 
-  /* Overdue panel */
   const ovList = ISSUES.filter(isOverdue).sort((a,b)=>daysLate(b)-daysLate(a)).slice(0,5);
   $('d-overdue-panel').innerHTML = ovList.length
     ? ovList.map(i => `
@@ -940,7 +1108,6 @@ function renderDashboard() {
         </div>`).join('')
     : `<div class="empty-success"><i class="ti ti-circle-check"></i>No overdue books!</div>`;
 
-  /* Books preview */
   $('d-books-preview').innerHTML = BOOKS.slice(0,8).map(b => `
     <tr>
       <td><strong>${b.subject||'—'}</strong></td>
@@ -952,7 +1119,6 @@ function renderDashboard() {
     </tr>`).join('') || `<tr><td colspan="6" class="tbl-empty">No books</td></tr>`;
 }
 
-/* ── Books ── */
 function renderBooks(filter='') {
   const q = filter.toLowerCase();
   const list = q
@@ -972,21 +1138,26 @@ function renderBooks(filter='') {
     : `<tr><td colspan="6" class="tbl-empty">No books found</td></tr>`;
 }
 
-/* ── Students ── */
+/* ── Students — now shows "class" from students.class ── */
 function renderStudents(filter='') {
   const q = filter.toLowerCase();
   const list = q
-    ? STUDENTS.filter(s => (s[C.s_name]||'').toLowerCase().includes(q))
+    ? STUDENTS.filter(s => {
+        const cls = C.s_class ? (s[C.s_class]||'') : '';
+        return (s[C.s_name]||'').toLowerCase().includes(q)
+            || cls.toLowerCase().includes(q);
+      })
     : STUDENTS;
   $('students-count-lbl').textContent = `(${list.length})`;
   $('students-tbl').innerHTML = list.length ? list.map(s => {
     const sid = s[C.s_id];
+    const cls = C.s_class ? (s[C.s_class] || '—') : '—';
     const mine = ISSUES.filter(i => String(i[C.i_student]) === String(sid));
     const ret  = mine.filter(isReturned).length;
     const ov   = mine.filter(isOverdue).length;
     return `<tr>
       <td><strong>${s[C.s_name]||'—'}</strong></td>
-      <td>${s.grade||'—'}</td>
+      <td><span class="badge b-purple">${cls}</span></td>
       <td>${mine.length}</td>
       <td>${ret}</td>
       <td>${ov>0 ? `<span class="badge b-danger">${ov}</span>` : `<span class="badge b-success">0</span>`}</td>
@@ -994,7 +1165,6 @@ function renderStudents(filter='') {
   }).join('') : `<tr><td colspan="5" class="tbl-empty">No students found</td></tr>`;
 }
 
-/* ── Issues ── */
 function renderIssues(filter='') {
   const q = filter.toLowerCase();
   const list = q
@@ -1019,7 +1189,6 @@ function renderIssues(filter='') {
   }).join('') : `<tr><td colspan="7" class="tbl-empty">No issues found</td></tr>`;
 }
 
-/* ── Overdue ── */
 function renderOverdue() {
   const list = ISSUES.filter(isOverdue).sort((a,b)=>daysLate(b)-daysLate(a));
   $('overdue-tbl').innerHTML = list.length ? list.map(i => {
@@ -1039,7 +1208,6 @@ function renderOverdue() {
     : `<tr><td colspan="7" class="tbl-empty" style="color:var(--success);">✓ No overdue books — excellent!</td></tr>`;
 }
 
-/* ── Borrow Log ── */
 function renderBorrowLog(filter='') {
   const q = filter.toLowerCase();
   const list = q
@@ -1094,7 +1262,6 @@ function renderAnalytics() {
   const rateSub = $('an-rate-sub');
   rateSub.textContent = rate >= 80 ? '↑ Good' : rate >= 60 ? '⚠ Fair' : (borrowed > 0 ? '↓ Low' : '—');
   rateSub.className   = 'stat-trend ' + (rate >= 80 ? 'trend-up' : rate >= 60 ? 'trend-neu' : 'trend-dn');
-
   $('an-borrow-sub').textContent = currentPeriod === 'all' ? 'all time' : 'this ' + currentPeriod;
 
   buildBorrowChart();
@@ -1200,7 +1367,6 @@ function buildAnOverdue() {
 
 function buildInsights(pIssues, rate, ov, borrowed) {
   const ins = [];
-
   const catMap = {};
   pIssues.forEach(i => { const c = bookSubject(i); if(c&&c!=='—') catMap[c]=(catMap[c]||0)+1; });
   const topSubj = Object.entries(catMap).sort((a,b)=>b[1]-a[1])[0];
@@ -1258,7 +1424,6 @@ async function renderDbStatus() {
     check('book_issues', 'db-iss-st',   'db-iss-dt'),
   ]);
 
-  /* Show detected columns */
   if (ISSUES.length) {
     const keys = Object.keys(ISSUES[0]).join(' · ');
     $('db-cols-dt').textContent = keys;
@@ -1268,7 +1433,8 @@ async function renderDbStatus() {
       <span style="margin-right:12px;"><code>student reference:</code> <strong>${C.i_student}</strong></span>
       <span style="margin-right:12px;"><code>issue date:</code> <strong>${C.i_issued}</strong></span>
       <span style="margin-right:12px;"><code>due/return date:</code> <strong>${C.i_due||'not found'}</strong></span>
-      <span><code>returned flag:</code> <strong>${C.i_returned||'none'}</strong></span>`;
+      <span style="margin-right:12px;"><code>returned flag:</code> <strong>${C.i_returned||'none'}</strong></span>
+      <span><code>student class col:</code> <strong>${C.s_class||'not found'}</strong></span>`;
   } else {
     $('db-cols-dt').textContent = 'No issues data loaded';
   }
@@ -1290,10 +1456,8 @@ function goTo(page) {
   $('page-title').textContent = PAGE_TITLES[page] || page;
 }
 
-/* ── Refresh ── */
 function setRefresh(v) { $('refresh-btn').classList.toggle('spinning', v); }
 
-/* ── Theme ── */
 function toggleTheme() {
   const dark = document.documentElement.dataset.theme === 'dark';
   document.documentElement.dataset.theme = dark ? 'light' : 'dark';
@@ -1301,7 +1465,6 @@ function toggleTheme() {
   if (BOOKS.length || ISSUES.length) { buildBorrowChart(); buildCatChart(); }
 }
 
-/* ── Toast ── */
 function toast(msg, type='info') {
   const icons = { success:'check', error:'x', warning:'alert-triangle', info:'info-circle' };
   const t = document.createElement('div');
@@ -1311,7 +1474,6 @@ function toast(msg, type='info') {
   setTimeout(() => t.remove(), 4500);
 }
 
-/* ── Util ── */
 function $(id) { return document.getElementById(id); }
 
 /* ═══════════════════════════════════════════════════════
@@ -1336,7 +1498,7 @@ function bindListeners() {
   $('refresh-btn').addEventListener('click', async () => {
     if (!user) return;
     await loadAll();
-    toast('Data refreshed', 'success');
+    toast('Data refreshed','success');
   });
   $('theme-btn').addEventListener('click', toggleTheme);
 
@@ -1352,7 +1514,6 @@ function bindListeners() {
     renderAnalytics();
   }));
 
-  /* Enter on login */
   ['login-email','login-password'].forEach(id =>
     $(id)?.addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); }));
 }
@@ -1362,38 +1523,5 @@ function bindListeners() {
 ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', init);
 </script>
-  <!-- FOOTER -->
-<style>
-.lib-footer{
-  position:fixed;bottom:0;left:var(--sidebar-w);right:0;
-  height:36px;
-  background:linear-gradient(90deg,var(--navy) 0%,#1a3a6b 40%,var(--navy2) 100%);
-  border-top:2px solid var(--gold);
-  display:flex;align-items:center;justify-content:center;
-  gap:14px;z-index:500;
-}
-.lib-footer-text{
-  font-family:'Playfair Display', serif;
-  font-size:13px;font-weight:700;letter-spacing:2.5px;
-  color:var(--gold2);
-  text-transform:uppercase;
-}
-.lib-footer-sep{
-  color:var(--gold);font-size:18px;font-weight:300;opacity:.7;
-}
-.lib-footer-brand{
-  font-family:'Playfair Display', serif;
-  font-size:14px;font-weight:900;letter-spacing:3px;
-  color:#fff;
-  text-transform:uppercase;
-}
-.page{padding-bottom:48px !important;}
-</style>
-<div class="lib-footer">
-  <span class="lib-footer-text">Powered by</span>
-  <span class="lib-footer-sep">||</span>
-  <span class="lib-footer-brand">Billan Company</span>
-</div>
-<!-- END FOOTER -->
 </body>
 </html>
