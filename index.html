@@ -38,6 +38,20 @@ input,select{font-family:inherit;}
 .tw-cursor{display:inline-block;width:2px;background:currentColor;margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 .tw-cursor.done{display:none;}
 
+/* ══ CONDITION BADGES ══ */
+.b-condition-good{background:#dcfce7;color:#166534;}
+.b-condition-minor{background:#fef3c7;color:#92400e;}
+.b-condition-poor{background:#ffedd5;color:#9a3412;}
+.b-condition-missing{background:#fee2e2;color:#991b1b;}
+.b-condition-other{background:#ede9fe;color:#5b21b6;}
+[data-theme="dark"] .b-condition-good{background:rgba(22,163,74,.2);color:#4ade80;}
+[data-theme="dark"] .b-condition-minor{background:rgba(217,119,6,.2);color:#fbbf24;}
+[data-theme="dark"] .b-condition-poor{background:rgba(234,88,12,.2);color:#fb923c;}
+[data-theme="dark"] .b-condition-missing{background:rgba(220,38,38,.2);color:#f87171;}
+[data-theme="dark"] .b-condition-other{background:rgba(124,58,237,.2);color:#a78bfa;}
+.condition-stat{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
+.condition-stat:last-child{border:none;}
+
 /* ══ AUTH ══ */
 #auth-screen{
   display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;
@@ -354,6 +368,7 @@ input,select{font-family:inherit;}
       <div class="sb-item" data-page="borrowlog"><i class="ti ti-file-text"></i> Borrow Log</div>
       <div class="sb-sec-lbl">System</div>
       <div class="sb-item" data-page="dbstatus"><i class="ti ti-database"></i> DB Status</div>
+      <div class="sb-item" data-page="conditions"><i class="ti ti-heart-rate-monitor"></i> Book Conditions <span class="sb-badge" id="nb-conditions">—</span></div>
     </nav>
     <div class="sb-bottom">
       <div class="sb-user">
@@ -591,6 +606,21 @@ input,select{font-family:inherit;}
 
     </div><!-- /page-dbstatus -->
 
+    <!-- CONDITIONS -->
+    <div class="page" id="page-conditions">
+      <div class="sec-hd mb-13">
+        <div class="sec-title">Book Conditions <span id="conditions-count-lbl" style="color:var(--text2);font-weight:400;"></span></div>
+        <div class="search-bar"><i class="ti ti-search"></i><input type="text" id="conditions-search" placeholder="Search student, book, condition…"></div>
+      </div>
+      <div class="stats-grid mb-13" id="conditions-summary"></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Student</th><th>Subject</th><th>Category</th><th>Grade</th><th>Issue Date</th><th>Condition</th><th>Notes</th></tr></thead>
+          <tbody id="conditions-tbl"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -784,7 +814,7 @@ function fmtDate(d){
 /* ═══ RENDER ALL ═══ */
 function renderAll(){
   updateBadges(); renderDashboard(); renderBooks(); renderStudents();
-  renderIssues(); renderOverdue(); renderAnalytics(); renderBorrowLog(); renderDbStatus();
+  renderIssues(); renderOverdue(); renderAnalytics(); renderBorrowLog(); renderDbStatus(); renderConditions();
 }
 function updateBadges(){
   $('nb-books').textContent=BOOKS.length; $('nb-students').textContent=STUDENTS.length;
@@ -792,6 +822,10 @@ function updateBadges(){
   const ov=ISSUES.filter(isOverdue).length; $('nb-overdue').textContent=ov;
   $('nb-overdue').style.background=ov>0?'rgba(220,38,38,.25)':'rgba(255,255,255,.13)';
   $('nb-overdue').style.color=ov>0?'#fca5a5':'rgba(255,255,255,.7)';
+  const dmg=ISSUES.filter(i=>i.book_condition&&i.book_condition!=='good').length;
+  $('nb-conditions').textContent=dmg;
+  $('nb-conditions').style.background=dmg>0?'rgba(220,38,38,.25)':'rgba(255,255,255,.13)';
+  $('nb-conditions').style.color=dmg>0?'#fca5a5':'rgba(255,255,255,.7)';
 }
 function renderDashboard(){
   const totalCopies=BOOKS.reduce((a,b)=>a+(parseInt(b.tot)||0),0);
@@ -911,6 +945,42 @@ function buildInsights(pIssues,rate,ov,borrowed){
   $('an-insights').innerHTML=ins.length?ins.map(i=>`<div class="insight-item"><div class="ins-dot" style="background:${i.c};"></div><div class="ins-text">${i.t}</div></div>`).join(''):`<div class="tbl-empty">Add some book issues to see insights</div>`;
 }
 
+
+/* ═══ BOOK CONDITIONS ═══ */
+function conditionBadgeClass(c){
+  const map={good:'b-condition-good',minor_damage:'b-condition-minor',poor_cover:'b-condition-poor',missing_pages:'b-condition-missing',other:'b-condition-other'};
+  return map[c]||'b-neutral';
+}
+function conditionLabel(c){
+  const map={good:'Good',minor_damage:'Minor Damage',poor_cover:'Poor Cover',missing_pages:'Missing Pages',other:'Other'};
+  return map[c]||(c||'Unknown');
+}
+function renderConditions(filter=''){
+  const damaged=ISSUES.filter(i=>i.book_condition&&i.book_condition!=='good');
+  const q=filter.toLowerCase();
+  const list=q
+    ?damaged.filter(i=>`${studentName(i)} ${bookSubject(i)} ${i.book_condition} ${i.condition_notes||''}`.toLowerCase().includes(q))
+    :damaged;
+  $('conditions-count-lbl').textContent=`(${list.length} issue${list.length!==1?'s':''} with problems)`;
+  const condTypes=['minor_damage','poor_cover','missing_pages','other'];
+  const condIcons={minor_damage:'ti-tool',poor_cover:'ti-book-off',missing_pages:'ti-file-minus',other:'ti-help-circle'};
+  const condColors={minor_damage:'#fef3c7,#92400e',poor_cover:'#ffedd5,#9a3412',missing_pages:'#fee2e2,#dc2626',other:'#ede9fe,#5b21b6'};
+  $('conditions-summary').innerHTML=condTypes.map(ct=>{
+    const cnt=ISSUES.filter(i=>i.book_condition===ct).length;
+    const [bg,fg]=condColors[ct].split(',');
+    return`<div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:${bg};color:${fg};"><i class="ti ${condIcons[ct]}"></i></div><span class="stat-trend" style="color:${cnt>0?'var(--danger)':'var(--success)'};">${cnt>0?cnt+' book'+(cnt>1?'s':''):'✓ None'}</span></div><div class="stat-val">${cnt}</div><div class="stat-lbl">${conditionLabel(ct)}</div></div>`;
+  }).join('');
+  $('conditions-tbl').innerHTML=list.length
+    ?list.map(i=>{
+        const cls=conditionBadgeClass(i.book_condition);
+        const notes=i.condition_notes&&i.condition_notes.trim()
+          ?`<span style="font-size:12px;color:var(--text2);">${i.condition_notes}</span>`
+          :`<span style="color:var(--text3);font-size:12px;">—</span>`;
+        return`<tr><td><strong>${studentName(i)}</strong></td><td>${bookSubject(i)}</td><td>${bookCat(i)}</td><td>${bookGrade(i)}</td><td>${fmtDate(i[C.i_issued])}</td><td><span class="badge ${cls}">${conditionLabel(i.book_condition)}</span></td><td>${notes}</td></tr>`;
+      }).join('')
+    :`<tr><td colspan="7" class="tbl-empty" style="color:var(--success);">✓ All books returned in good condition!</td></tr>`;
+}
+
 /* ═══ DB STATUS — updated to show contact card, no old debug text ═══ */
 async function renderDbStatus(){
   $('db-auth-st').innerHTML=`<span class="badge b-success"><i class="ti ti-check"></i> Active</span>`;
@@ -941,7 +1011,7 @@ async function renderDbStatus(){
 }
 
 /* ═══ NAVIGATION ═══ */
-const PAGE_TITLES={dashboard:'Dashboard',books:'Books Catalog',students:'Students',issues:'Book Issues',overdue:'Overdue Books',analytics:'Analytics',borrowlog:'Borrow Log',dbstatus:'DB Status'};
+const PAGE_TITLES={dashboard:'Dashboard',books:'Books Catalog',students:'Students',issues:'Book Issues',overdue:'Overdue Books',analytics:'Analytics',borrowlog:'Borrow Log',dbstatus:'DB Status',conditions:'Book Conditions'};
 function goTo(page){
   document.querySelectorAll('.sb-item[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
   document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
@@ -977,6 +1047,7 @@ function bindListeners(){
   $('students-search').addEventListener('input',e=>renderStudents(e.target.value));
   $('issues-search').addEventListener('input',e=>renderIssues(e.target.value));
   $('log-search').addEventListener('input',e=>renderBorrowLog(e.target.value));
+  $('conditions-search').addEventListener('input',e=>renderConditions(e.target.value));
   document.querySelectorAll('.ptab').forEach(t=>t.addEventListener('click',()=>{
     document.querySelectorAll('.ptab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active'); currentPeriod=t.dataset.period; renderAnalytics();
