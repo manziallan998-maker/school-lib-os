@@ -2,12 +2,11 @@
 <html lang="en" data-theme="light">
 <head>
   <meta name="monetag" content="20b486ce3d79bc3cec191aa56d09c11a">
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LibraryOS — G.S APAPEC MURAMBI</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="money.js"></script>
+<script src="money.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Cinzel:wght@700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
@@ -38,7 +37,7 @@ input,select{font-family:inherit;}
 .tw-cursor{display:inline-block;width:2px;background:currentColor;margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 .tw-cursor.done{display:none;}
 
-/* ══ CONDITION BADGES ══ */
+/* CONDITION BADGES */
 .b-condition-good{background:#dcfce7;color:#166534;}
 .b-condition-minor{background:#fef3c7;color:#92400e;}
 .b-condition-poor{background:#ffedd5;color:#9a3412;}
@@ -51,8 +50,9 @@ input,select{font-family:inherit;}
 [data-theme="dark"] .b-condition-other{background:rgba(124,58,237,.2);color:#a78bfa;}
 .condition-stat{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
 .condition-stat:last-child{border:none;}
+.fee-badge{font-weight:700;color:var(--danger);font-size:13px;}
 
-/* ══ AUTH ══ */
+/* AUTH */
 #auth-screen{
   display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;
   background:var(--navy);
@@ -90,7 +90,7 @@ input,select{font-family:inherit;}
 .auth-links{text-align:center;margin-top:15px;font-size:13px;color:var(--text2);}
 .auth-links a{color:var(--gold);cursor:pointer;font-weight:600;}
 
-/* ══ APP ══ */
+/* APP */
 #app{display:none;height:100vh;}
 #app.visible{display:flex;}
 .sidebar{width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;}
@@ -111,6 +111,19 @@ input,select{font-family:inherit;}
 .sb-avatar{width:33px;height:33px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;}
 .sb-user-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
 .sb-user-role{font-size:10px;color:rgba(255,255,255,.38);}
+
+/* ADMIN PANEL BUTTON in sidebar */
+.sb-admin-btn{
+  display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold) 0%,#a87b10 100%);
+  color:var(--navy);font-size:12px;font-weight:700;cursor:pointer;
+  transition:all var(--tr);margin:0 0 4px;
+  border:1px solid rgba(201,162,39,.4);
+  box-shadow:0 3px 12px rgba(201,162,39,.25);
+}
+.sb-admin-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(201,162,39,.4);}
+.sb-admin-btn i{font-size:16px;}
+
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 .topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;flex-shrink:0;gap:14px;}
 .page-title{font-size:15px;font-weight:700;}
@@ -120,11 +133,24 @@ input,select{font-family:inherit;}
 .tbtn i{font-size:16px;}
 .tbtn.spinning i{animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOPBAR ADMIN PANEL BUTTON */
+.tbtn-admin{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;
+  background:var(--navy);color:var(--gold);
+  font-size:12px;font-weight:700;
+  border:1px solid var(--gold);
+  transition:all var(--tr);
+  box-shadow:0 2px 8px rgba(201,162,39,.15);
+}
+.tbtn-admin:hover{background:var(--gold);color:var(--navy);box-shadow:0 3px 14px rgba(201,162,39,.35);}
+.tbtn-admin i{font-size:15px;}
+
 .icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px;transition:all var(--tr);}
 .icon-btn:hover{background:var(--bg);color:var(--text);}
 .page{flex:1;overflow-y:auto;padding:22px 26px;padding-bottom:calc(22px + var(--footer-h));display:none;}
 .page.active{display:block;}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:20px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:17px 19px;}
 .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px;}
 .stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
@@ -194,88 +220,118 @@ input,select{font-family:inherit;}
 .empty-success{text-align:center;padding:22px 0;color:var(--success);font-size:13px;}
 .empty-success i{font-size:24px;display:block;margin-bottom:7px;}
 
-/* ══════════════════════════════════════
-   CONTACT CARD — replaces old debug panel
-   Matches the orange/black design in image
-══════════════════════════════════════ */
+/* CONTACT CARD */
 .contact-card{
-  background:#000000;
-  border:3px solid var(--orange);
-  border-radius:14px;
-  padding:0;
-  margin-top:16px;
-  overflow:hidden;
-  box-shadow:0 8px 40px rgba(255,107,0,0.18);
+  background:#000000;border:3px solid var(--orange);border-radius:14px;padding:0;
+  margin-top:16px;overflow:hidden;box-shadow:0 8px 40px rgba(255,107,0,0.18);
 }
 .contact-card-title{
-  text-align:center;
-  padding:14px 20px 12px;
-  font-family:'Cinzel',serif;
-  font-size:14px;font-weight:900;
-  letter-spacing:3px;text-transform:uppercase;
-  color:#ffff00;
-  border-bottom:2px solid var(--orange);
-  background:#0a0a0a;
+  text-align:center;padding:14px 20px 12px;font-family:'Cinzel',serif;
+  font-size:14px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#ffff00;
+  border-bottom:2px solid var(--orange);background:#0a0a0a;
 }
-.contact-card-body{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;
-}
-.contact-col{
-  padding:18px 22px;
-  position:relative;
-}
-.contact-col:first-child{
-  border-right:2px solid var(--orange);
-}
-.contact-name{
-  font-family:'Cinzel',serif;
-  font-size:12px;font-weight:900;
-  letter-spacing:2px;text-transform:uppercase;
-  color:var(--orange);
-  margin-bottom:14px;
-  line-height:1.4;
-}
-.contact-row{
-  display:flex;align-items:flex-start;gap:8px;
-  margin-bottom:12px;
-}
-.contact-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--orange);flex-shrink:0;margin-top:5px;
-}
+.contact-card-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.contact-col{padding:18px 22px;position:relative;}
+.contact-col:first-child{border-right:2px solid var(--orange);}
+.contact-name{font-family:'Cinzel',serif;font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;line-height:1.4;}
+.contact-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;}
+.contact-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:5px;}
 .contact-field{flex:1;}
-.contact-label{
-  font-family:'Cinzel',serif;
-  font-size:10px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--orange2);
-  margin-bottom:3px;
-}
-.contact-value{
-  font-size:11.5px;font-weight:500;
-  color:#00aaff;
-  word-break:break-all;
-  font-family:'DM Sans',sans-serif;
-}
-.contact-value.link{
-  color:#00aaff;cursor:pointer;
-  transition:color 0.2s;
-}
+.contact-label{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange2);margin-bottom:3px;}
+.contact-value{font-size:11.5px;font-weight:500;color:#00aaff;word-break:break-all;font-family:'DM Sans',sans-serif;}
+.contact-value.link{color:#00aaff;cursor:pointer;transition:color 0.2s;}
 .contact-value.link:hover{color:#fff;text-decoration:underline;}
-.contact-footer{
-  text-align:center;
-  padding:10px 20px;
-  border-top:2px solid var(--orange);
-  background:#0a0a0a;
-  font-family:'Cinzel',serif;
-  font-size:9px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  color:var(--danger);
-}
+.contact-footer{text-align:center;padding:10px 20px;border-top:2px solid var(--orange);background:#0a0a0a;font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--danger);}
 
-/* ══ TOAST ══ */
+/* ══════════════════════════════════════
+   USER MANAGEMENT PAGE
+══════════════════════════════════════ */
+.um-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.um-create-btn{
+  display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius);
+  background:var(--navy);color:#fff;font-size:13px;font-weight:600;
+  transition:all var(--tr);border:none;
+}
+.um-create-btn:hover{background:var(--navy2);transform:translateY(-1px);}
+.um-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;align-items:start;}
+.um-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;position:sticky;top:0;}
+.um-form-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.um-form-title i{color:var(--gold);}
+.um-field{margin-bottom:14px;}
+.um-label{display:block;font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;}
+.um-input{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;transition:border-color var(--tr),box-shadow var(--tr);}
+.um-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.13);}
+.um-select{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;appearance:none;cursor:pointer;}
+.um-select:focus{outline:none;border-color:var(--gold);}
+.um-submit-btn{
+  width:100%;padding:11px;border-radius:var(--radius);background:var(--navy);color:#fff;
+  font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;
+  gap:7px;transition:all var(--tr);
+}
+.um-submit-btn:hover:not(:disabled){background:var(--navy2);}
+.um-submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.um-cancel-btn{
+  width:100%;padding:9px;border-radius:var(--radius);background:transparent;color:var(--text2);
+  font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;
+  gap:7px;transition:all var(--tr);border:1px solid var(--border2);margin-top:7px;
+}
+.um-cancel-btn:hover{background:var(--bg);}
+.um-role-pills{display:flex;gap:8px;margin-top:3px;}
+.um-role-pill{
+  flex:1;padding:9px;border-radius:8px;border:2px solid var(--border2);
+  text-align:center;cursor:pointer;transition:all var(--tr);font-size:12px;font-weight:600;color:var(--text2);
+}
+.um-role-pill.selected{border-color:var(--navy);background:var(--navy);color:#fff;}
+.um-role-pill:hover:not(.selected){border-color:var(--navy);color:var(--navy);}
+[data-theme="dark"] .um-role-pill.selected{border-color:var(--gold);background:var(--navy2);color:var(--gold);}
+.um-role-pill .pill-icon{font-size:18px;margin-bottom:4px;display:block;}
+.um-role-pill .pill-lbl{font-size:11px;display:block;}
+.um-role-pill .pill-desc{font-size:10px;color:inherit;opacity:.7;display:block;margin-top:2px;}
+
+/* role badge colours */
+.b-role-admin{background:#fef9ec;color:#92400e;border:1px solid #fde68a;}
+.b-role-librarian{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+.b-role-viewer{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
+[data-theme="dark"] .b-role-admin{background:rgba(217,119,6,.15);color:#fbbf24;border-color:rgba(217,119,6,.3);}
+[data-theme="dark"] .b-role-librarian{background:rgba(37,99,235,.15);color:#60a5fa;border-color:rgba(37,99,235,.3);}
+[data-theme="dark"] .b-role-viewer{background:rgba(22,163,74,.15);color:#4ade80;border-color:rgba(22,163,74,.3);}
+
+.um-action-btn{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;cursor:pointer;transition:all var(--tr);border:1px solid transparent;
+}
+.um-action-btn.edit{background:#eff6ff;color:#1e40af;border-color:#bfdbfe;}
+.um-action-btn.edit:hover{background:#dbeafe;}
+.um-action-btn.del{background:#fee2e2;color:#dc2626;border-color:#fecaca;}
+.um-action-btn.del:hover{background:#fecaca;}
+[data-theme="dark"] .um-action-btn.edit{background:rgba(37,99,235,.15);color:#60a5fa;border-color:rgba(37,99,235,.3);}
+[data-theme="dark"] .um-action-btn.del{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3);}
+.um-notice{
+  background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.25);border-radius:10px;
+  padding:12px 15px;font-size:12px;color:var(--text2);margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:9px;line-height:1.55;
+}
+.um-notice i{color:var(--gold);font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* ADMIN PORTAL BANNER on SSO launch */
+.portal-banner{
+  background:linear-gradient(135deg,var(--navy) 0%,#1a3a6b 100%);
+  border:1px solid var(--gold);border-radius:var(--radius-lg);padding:24px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  margin-bottom:18px;
+  box-shadow:0 8px 32px rgba(201,162,39,.12);
+}
+.portal-info h2{font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;}
+.portal-info p{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;}
+.portal-launch-btn{
+  display:flex;align-items:center;gap:8px;padding:12px 22px;border-radius:var(--radius);
+  background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;
+  white-space:nowrap;transition:all var(--tr);flex-shrink:0;
+  box-shadow:0 4px 16px rgba(201,162,39,.35);
+}
+.portal-launch-btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 6px 22px rgba(201,162,39,.5);}
+
+/* TOAST */
 .toast-wrap{position:fixed;bottom:calc(22px + var(--footer-h));right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
 .toast{display:flex;align-items:center;gap:9px;padding:11px 15px;background:var(--navy);color:#fff;border-radius:10px;font-size:13px;font-weight:500;min-width:250px;max-width:370px;animation:slideUp .22s ease;}
 .toast.success{background:var(--success);}
@@ -283,7 +339,7 @@ input,select{font-family:inherit;}
 .toast.warning{background:var(--warning);}
 @keyframes slideUp{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 
-/* ══ FOOTER ══ */
+/* FOOTER */
 .lib-footer{
   position:fixed;bottom:0;left:0;right:0;height:var(--footer-h);
   background:linear-gradient(90deg, #060e1c 0%, var(--navy) 25%, #1a3a6b 60%, var(--navy2) 100%);
@@ -363,14 +419,23 @@ input,select{font-family:inherit;}
       <div class="sb-item" data-page="students"><i class="ti ti-users"></i> Students <span class="sb-badge" id="nb-students">—</span></div>
       <div class="sb-item" data-page="issues"><i class="ti ti-repeat"></i> Issues <span class="sb-badge" id="nb-issues">—</span></div>
       <div class="sb-item" data-page="overdue"><i class="ti ti-alert-triangle"></i> Overdue <span class="sb-badge" id="nb-overdue">—</span></div>
+      <div class="sb-item" data-page="lostbooks"><i class="ti ti-ban"></i> Lost Books <span class="sb-badge" id="nb-lostbooks">—</span></div>
       <div class="sb-sec-lbl">Reports</div>
       <div class="sb-item" data-page="analytics"><i class="ti ti-chart-bar"></i> Analytics</div>
       <div class="sb-item" data-page="borrowlog"><i class="ti ti-file-text"></i> Borrow Log</div>
       <div class="sb-sec-lbl">System</div>
       <div class="sb-item" data-page="dbstatus"><i class="ti ti-database"></i> DB Status</div>
       <div class="sb-item" data-page="conditions"><i class="ti ti-heart-rate-monitor"></i> Book Conditions <span class="sb-badge" id="nb-conditions">—</span></div>
+      <div class="sb-sec-lbl">Admin</div>
+      <div class="sb-item" data-page="users"><i class="ti ti-users-group"></i> User Management <span class="sb-badge" id="nb-users">—</span></div>
     </nav>
     <div class="sb-bottom">
+      <!-- Admin Panel Portal Button -->
+      <div class="sb-admin-btn" id="admin-portal-btn" title="Open Librarian System">
+        <i class="ti ti-external-link"></i>
+        <span>Admin Panel</span>
+        <i class="ti ti-arrow-right" style="margin-left:auto;font-size:13px;opacity:.7;"></i>
+      </div>
       <div class="sb-user">
         <div class="sb-avatar" id="sb-avatar">HM</div>
         <div>
@@ -386,6 +451,9 @@ input,select{font-family:inherit;}
     <div class="topbar">
       <div class="page-title" id="page-title">Dashboard</div>
       <div class="topbar-right">
+        <button class="tbtn-admin" id="topbar-admin-btn" title="Go to Librarian System">
+          <i class="ti ti-layout-grid"></i> Admin Panel
+        </button>
         <button class="tbtn" id="refresh-btn"><i class="ti ti-refresh"></i> Refresh</button>
         <button class="icon-btn" id="theme-btn" title="Toggle theme"><i class="ti ti-moon"></i></button>
       </div>
@@ -409,6 +477,10 @@ input,select{font-family:inherit;}
         <div class="stat-card">
           <div class="stat-top"><div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="ti ti-alert-triangle"></i></div><span class="stat-trend" id="s-ov-sub">—</span></div>
           <div class="stat-val" id="s-overdue">—</div><div class="stat-lbl">Overdue Books</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="ti ti-ban"></i></div><span class="stat-trend" id="s-lost-sub">—</span></div>
+          <div class="stat-val" id="s-lostbooks">—</div><div class="stat-lbl">Lost Books</div>
         </div>
       </div>
       <div class="grid-2 mb-13">
@@ -460,6 +532,15 @@ input,select{font-family:inherit;}
       <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Subject</th><th>Category</th><th>Grade</th><th>Issue Date</th><th>Due Date</th><th>Days Overdue</th></tr></thead><tbody id="overdue-tbl"></tbody></table></div>
     </div>
 
+    <!-- LOST BOOKS (monitoring view only) -->
+    <div class="page" id="page-lostbooks">
+      <div class="sec-hd mb-13">
+        <div class="sec-title">Lost Books <span id="lostbooks-count-lbl" style="color:var(--text2);font-weight:400;"></span></div>
+        <div class="search-bar"><i class="ti ti-search"></i><input type="text" id="lostbooks-search" placeholder="Search student, book, code…"></div>
+      </div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Class</th><th>Book Subject</th><th>Book Code</th><th>Pages</th><th>Fee (FRW)</th><th>Lost Date</th><th>Notes</th></tr></thead><tbody id="lostbooks-tbl"></tbody></table></div>
+    </div>
+
     <!-- ANALYTICS -->
     <div class="page" id="page-analytics">
       <div class="sec-hd mb-20">
@@ -499,13 +580,9 @@ input,select{font-family:inherit;}
       <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Subject</th><th>Category</th><th>Grade</th><th>Curriculum</th><th>Issue Date</th><th>Return Date</th><th>Status</th></tr></thead><tbody id="log-tbl"></tbody></table></div>
     </div>
 
-    <!-- ══════════════════════════════════════
-         DB STATUS PAGE — ONLY THIS SECTION CHANGED
-    ══════════════════════════════════════ -->
+    <!-- DB STATUS -->
     <div class="page" id="page-dbstatus">
       <div class="sec-hd mb-13"><div class="sec-title">Database Connection Status</div></div>
-
-      <!-- Status table — unchanged -->
       <div class="tbl-wrap" style="margin-bottom:16px;">
         <table class="tbl">
           <thead><tr><th>Component</th><th>Status</th><th>Details</th></tr></thead>
@@ -553,13 +630,9 @@ input,select{font-family:inherit;}
           </tbody>
         </table>
       </div>
-
-      <!-- ══ NEW CONTACT CARD replaces old debug-panel ══ -->
       <div class="contact-card" id="db-debug-panel">
         <div class="contact-card-title">📞 CONTACT US</div>
         <div class="contact-card-body">
-
-          <!-- LEFT: Nkurunziza Manzi Allan -->
           <div class="contact-col">
             <div class="contact-name">Nkurunziza Manzi<br>Allan</div>
             <div class="contact-row">
@@ -577,8 +650,6 @@ input,select{font-family:inherit;}
               </div>
             </div>
           </div>
-
-          <!-- RIGHT: Mugisha Billy Chriss -->
           <div class="contact-col">
             <div class="contact-name">Mugisha Billy Chriss</div>
             <div class="contact-row">
@@ -596,15 +667,10 @@ input,select{font-family:inherit;}
               </div>
             </div>
           </div>
-
         </div>
-        <div class="contact-footer">
-          For any issue about our services please contact us
-        </div>
+        <div class="contact-footer">For any issue about our services please contact us</div>
       </div>
-      <!-- ══ END CONTACT CARD ══ -->
-
-    </div><!-- /page-dbstatus -->
+    </div>
 
     <!-- CONDITIONS -->
     <div class="page" id="page-conditions">
@@ -621,6 +687,88 @@ input,select{font-family:inherit;}
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════
+         USER MANAGEMENT PAGE
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-users">
+      <div class="um-header">
+        <div class="sec-title">User Management <span id="users-count-lbl" style="color:var(--text2);font-weight:400;font-size:13px;"></span></div>
+        <button class="um-create-btn" id="um-new-btn"><i class="ti ti-user-plus"></i> Create New User</button>
+      </div>
+
+      <!-- Portal banner -->
+      <div class="portal-banner">
+        <div class="portal-info">
+          <h2><i class="ti ti-layout-grid" style="color:var(--gold);margin-right:8px;"></i>Librarian System — Admin Panel</h2>
+          <p>Launch the full Librarian Management System. Your current session will be carried over automatically — no second login required.</p>
+        </div>
+        <button class="portal-launch-btn" id="portal-launch-btn-page">
+          <i class="ti ti-external-link"></i> Open Admin Panel
+        </button>
+      </div>
+
+      <div class="um-notice">
+        <i class="ti ti-info-circle"></i>
+        <span>Users created here can log in to both this monitoring hub <strong>and</strong> the Librarian System at <em>lib-system.manziallan998.workers.dev</em> using the same credentials. Assign roles to control what each user can access.</span>
+      </div>
+
+      <div class="um-grid">
+        <!-- CREATE / EDIT FORM -->
+        <div class="um-form-card" id="um-form-card" style="display:none;">
+          <div class="um-form-title"><i class="ti ti-user-plus"></i> <span id="um-form-title-text">Create User</span></div>
+
+          <div class="um-field">
+            <label class="um-label">Email Address</label>
+            <input type="email" class="um-input" id="um-email" placeholder="user@example.com">
+          </div>
+
+          <div class="um-field" id="um-password-field">
+            <label class="um-label">Password</label>
+            <input type="password" class="um-input" id="um-password" placeholder="Min 6 characters">
+          </div>
+
+          <div class="um-field">
+            <label class="um-label">Full Name (optional)</label>
+            <input type="text" class="um-input" id="um-fullname" placeholder="e.g. Jean Paul Habimana">
+          </div>
+
+          <div class="um-field">
+            <label class="um-label" style="margin-bottom:10px;">Role</label>
+            <div class="um-role-pills" id="um-role-pills">
+              <div class="um-role-pill selected" data-role="librarian">
+                <span class="pill-icon">📖</span>
+                <span class="pill-lbl">Librarian</span>
+                <span class="pill-desc">Full library access</span>
+              </div>
+              <div class="um-role-pill" data-role="viewer">
+                <span class="pill-icon">👁</span>
+                <span class="pill-lbl">Viewer</span>
+                <span class="pill-desc">Read-only access</span>
+              </div>
+              <div class="um-role-pill" data-role="admin">
+                <span class="pill-icon">🔑</span>
+                <span class="pill-lbl">Admin</span>
+                <span class="pill-desc">Full system access</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="um-submit-btn" id="um-submit-btn"><i class="ti ti-check"></i> Create User</button>
+          <button class="um-cancel-btn" id="um-cancel-btn"><i class="ti ti-x"></i> Cancel</button>
+        </div>
+
+        <!-- USERS TABLE -->
+        <div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>User</th><th>Role</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="users-tbl"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-users -->
+
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -634,14 +782,21 @@ input,select{font-family:inherit;}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-/* ═══ SUPABASE CONFIG — unchanged ═══ */
+/* ══ SUPABASE CONFIG ══ */
 const SB_URL = "https://uvispwigefzhjvkqcxkm.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2aXNwd2lnZWZ6aGp2a3FjeGttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTIzNDYsImV4cCI6MjA5NjA2ODM0Nn0.wPN9uyEpKswUWcYZF1HPQZXCLSh5B0OheI1jBRgBEhA";
 
-let sb, user;
+/* Target portal URL */
+const PORTAL_URL = "https://manziallan998-maker.github.io/libmanagement/";
+
+let sb, user, currentSession;
 let BOOKS = [], STUDENTS = [], ISSUES = [];
+let USERS_CACHE = []; // locally tracked users
 let borrowChart, catChart;
 let currentPeriod = 'month';
+let umMode = 'create'; // 'create' | 'edit'
+let umEditId = null;
+let umSelectedRole = 'librarian';
 
 let C = {
   s_id:'student_id', s_name:'student_name', s_class:'class',
@@ -649,7 +804,7 @@ let C = {
   i_due:'return_date', i_returned:null,
 };
 
-/* ═══ TYPEWRITER ═══ */
+/* ══ TYPEWRITER ══ */
 function typewrite(el, text, speed, delay, onDone) {
   if (!el) return;
   el.textContent = '';
@@ -665,7 +820,7 @@ function typewrite(el, text, speed, delay, onDone) {
   }, delay || 0);
 }
 
-/* ═══ INIT ═══ */
+/* ══ INIT ══ */
 async function init() {
   sb = window.supabase.createClient(SB_URL, SB_KEY);
   typewrite($('hero-l1'), 'G.S APAPEC MURAMBI', 55, 100, () => {
@@ -678,13 +833,19 @@ async function init() {
   });
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) { user = session.user; showApp(); }
+    if (session?.user) { user = session.user; currentSession = session; showApp(); }
     else showAuth();
   } catch(e) { showAuth(); }
+
+  // Listen for session changes to always keep token fresh
+  sb.auth.onAuthStateChange((_event, session) => {
+    if (session) { user = session.user; currentSession = session; }
+  });
+
   bindListeners();
 }
 
-/* ═══ AUTH ═══ */
+/* ══ AUTH ══ */
 function showAuth() { $('auth-screen').style.display='flex'; $('app').classList.remove('visible'); }
 async function showApp() {
   $('auth-screen').style.display='none'; $('app').classList.add('visible');
@@ -702,7 +863,8 @@ async function doLogin() {
   try {
     const{data,error}=await sb.auth.signInWithPassword({email:em,password:pw});
     if(error) throw error;
-    user=data.user; toast('Signed in successfully','success'); setTimeout(showApp,350);
+    user=data.user; currentSession=data.session;
+    toast('Signed in successfully','success'); setTimeout(showApp,350);
   } catch(e){toast(e.message,'error');}
   finally{btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> Sign In';}
 }
@@ -719,11 +881,48 @@ async function doRegister() {
   finally{btn.disabled=false;btn.innerHTML='<i class="ti ti-user-plus"></i> Create Account';}
 }
 async function doLogout(){
-  await sb.auth.signOut(); user=null; BOOKS=[]; STUDENTS=[]; ISSUES=[];
+  await sb.auth.signOut(); user=null; currentSession=null;
+  BOOKS=[]; STUDENTS=[]; ISSUES=[]; USERS_CACHE=[];
   toast('Signed out','success'); setTimeout(showAuth,350);
 }
 
-/* ═══ DATA ═══ */
+/* ══ ADMIN PORTAL SSO ══ */
+/*
+  How this works:
+  1. We grab the current Supabase access_token & refresh_token from the live session.
+  2. We open the portal URL with those tokens in the URL hash using Supabase's
+     #access_token=...&refresh_token=...&type=recovery format.
+     The target site (lib-system) uses the same Supabase project, so calling
+     sb.auth.setSession() on the other side will authenticate the same user.
+  3. The target site must call supabase.auth.exchangeCodeForSession() or
+     supabase.auth.setSession() from the hash params on load.
+*/
+async function launchAdminPortal() {
+  try {
+    // Refresh session to get the freshest tokens
+    const { data, error } = await sb.auth.getSession();
+    if (error || !data.session) throw new Error('No active session. Please sign in again.');
+
+    const { access_token, refresh_token } = data.session;
+
+    // Build the portal URL with session tokens embedded in the hash
+    // Supabase JS v2 on the target site will auto-detect these from window.location.hash
+    const targetUrl = new URL(PORTAL_URL);
+    targetUrl.hash = [
+      `access_token=${encodeURIComponent(access_token)}`,
+      `refresh_token=${encodeURIComponent(refresh_token)}`,
+      `token_type=bearer`,
+      `type=magiclink`
+    ].join('&');
+
+    toast('Opening Admin Panel — your session is being transferred…', 'success');
+    window.open(targetUrl.toString(), '_blank');
+  } catch(e) {
+    toast('Could not open portal: ' + e.message, 'error');
+  }
+}
+
+/* ══ DATA ══ */
 async function loadAll() {
   setRefresh(true);
   try { await Promise.all([fetchBooks(),fetchStudents(),fetchIssues()]); detectColumns(); renderAll(); }
@@ -731,7 +930,7 @@ async function loadAll() {
   setRefresh(false);
 }
 async function fetchBooks(){
-  const{data,error}=await sb.from('books').select('book_id,book_category,curriculum,subject,book_publisher,grade,tot').order('subject',{ascending:true});
+  const{data,error}=await sb.from('books').select('book_id,book_category,curriculum,subject,book_publisher,grade,pages,tot').order('subject',{ascending:true});
   if(error) throw new Error('books: '+error.message);
   BOOKS=data||[];
 }
@@ -749,7 +948,195 @@ async function fetchIssues(){
   } else ISSUES=data||[];
 }
 
-/* ═══ COLUMN DETECTION ═══ */
+/* ══ USER MANAGEMENT — uses app_users table ══ */
+/*
+  We store user metadata in a custom 'app_users' table in Supabase:
+    id (uuid, PK), email (text), full_name (text), role (text), created_at (timestamptz), is_active (bool)
+  
+  Creating users: we use Supabase Auth signUp so they get real auth credentials.
+  We also insert into app_users for role tracking.
+  
+  NOTE: In production, creating users server-side requires the service_role key or
+  a Supabase Edge Function. Here we use the client-side signUp approach (creates
+  user + sends confirmation email). The admin can also use the Supabase dashboard.
+  The app_users table must exist: CREATE TABLE app_users (id uuid PRIMARY KEY, email text, full_name text, role text DEFAULT 'viewer', created_at timestamptz DEFAULT now(), is_active bool DEFAULT true);
+*/
+async function fetchUsers() {
+  try {
+    const { data, error } = await sb.from('app_users').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    USERS_CACHE = data || [];
+  } catch(e) {
+    // Table may not exist yet — show empty state
+    USERS_CACHE = [];
+  }
+}
+
+async function createUser() {
+  const email = $('um-email').value.trim();
+  const password = $('um-password').value;
+  const fullName = $('um-fullname').value.trim();
+  const role = umSelectedRole;
+
+  if (!email) { toast('Email is required', 'error'); return; }
+  if (!password || password.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+
+  const btn = $('um-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Creating…';
+
+  try {
+    // 1. Create the auth user via signUp
+    //    This sends a confirmation email; the user can log in immediately if email confirm is disabled in Supabase settings.
+    const { data: authData, error: authError } = await sb.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, role } }
+    });
+    if (authError) throw authError;
+
+    const newUid = authData.user?.id;
+
+    // 2. Insert into app_users for role & metadata tracking
+    if (newUid) {
+      const { error: dbError } = await sb.from('app_users').insert({
+        id: newUid,
+        email,
+        full_name: fullName || null,
+        role,
+        is_active: true
+      });
+      if (dbError) {
+        // Non-fatal — auth user was created, just metadata failed
+        console.warn('app_users insert failed:', dbError.message);
+        toast(`User created in Auth but metadata save failed: ${dbError.message}`, 'warning');
+      } else {
+        toast(`User "${email}" created as ${role}`, 'success');
+      }
+    } else {
+      toast(`User "${email}" registered — check email for confirmation`, 'success');
+    }
+
+    umReset();
+    await fetchUsers();
+    renderUsers();
+  } catch(e) {
+    toast('Create user failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Create User';
+  }
+}
+
+async function editUserRole(userId, currentRole) {
+  umMode = 'edit';
+  umEditId = userId;
+  const u = USERS_CACHE.find(x => x.id === userId);
+  if (!u) return;
+
+  $('um-email').value = u.email || '';
+  $('um-email').disabled = true;
+  $('um-fullname').value = u.full_name || '';
+  $('um-password-field').style.display = 'none';
+  setRole(u.role || 'viewer');
+  $('um-form-title-text').textContent = 'Edit User';
+  $('um-submit-btn').innerHTML = '<i class="ti ti-check"></i> Save Changes';
+  $('um-form-card').style.display = 'block';
+  $('um-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveUserEdit() {
+  const fullName = $('um-fullname').value.trim();
+  const role = umSelectedRole;
+  const btn = $('um-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Saving…';
+
+  try {
+    const { error } = await sb.from('app_users').update({ full_name: fullName || null, role }).eq('id', umEditId);
+    if (error) throw error;
+    toast('User updated successfully', 'success');
+    umReset();
+    await fetchUsers();
+    renderUsers();
+  } catch(e) {
+    toast('Update failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Save Changes';
+  }
+}
+
+async function deactivateUser(userId) {
+  const u = USERS_CACHE.find(x => x.id === userId);
+  const label = u?.is_active ? 'deactivate' : 're-activate';
+  if (!confirm(`Are you sure you want to ${label} this user?\n${u?.email}`)) return;
+
+  try {
+    const { error } = await sb.from('app_users').update({ is_active: !u.is_active }).eq('id', userId);
+    if (error) throw error;
+    toast(`User ${label}d`, 'success');
+    await fetchUsers();
+    renderUsers();
+  } catch(e) {
+    toast('Action failed: ' + e.message, 'error');
+  }
+}
+
+function umReset() {
+  umMode = 'create'; umEditId = null; umSelectedRole = 'librarian';
+  $('um-email').value = ''; $('um-email').disabled = false;
+  $('um-password').value = ''; $('um-fullname').value = '';
+  $('um-password-field').style.display = 'block';
+  $('um-form-title-text').textContent = 'Create User';
+  $('um-submit-btn').innerHTML = '<i class="ti ti-check"></i> Create User';
+  setRole('librarian');
+  $('um-form-card').style.display = 'none';
+}
+
+function setRole(role) {
+  umSelectedRole = role;
+  document.querySelectorAll('.um-role-pill').forEach(p => {
+    p.classList.toggle('selected', p.dataset.role === role);
+  });
+}
+
+function renderUsers() {
+  $('users-count-lbl').textContent = `(${USERS_CACHE.length} accounts)`;
+  $('nb-users').textContent = USERS_CACHE.length;
+
+  const roleClass = { admin: 'b-role-admin', librarian: 'b-role-librarian', viewer: 'b-role-viewer' };
+  const roleIcon  = { admin: '🔑', librarian: '📖', viewer: '👁' };
+
+  $('users-tbl').innerHTML = USERS_CACHE.length
+    ? USERS_CACHE.map(u => {
+        const rc = roleClass[u.role] || 'b-neutral';
+        const ri = roleIcon[u.role] || '?';
+        const active = u.is_active !== false;
+        const createdAt = u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        const deactLabel = active ? 'Deactivate' : 'Re-activate';
+        const deactIcon  = active ? 'ti-user-off' : 'ti-user-check';
+        return `<tr>
+          <td>
+            <div style="font-weight:600;">${u.full_name || '—'}</div>
+            <div style="font-size:11px;color:var(--text2);">${u.email || '—'}</div>
+          </td>
+          <td><span class="badge ${rc}">${ri} ${(u.role||'viewer').charAt(0).toUpperCase()+(u.role||'viewer').slice(1)}</span></td>
+          <td style="font-size:12px;color:var(--text2);">${createdAt}</td>
+          <td>${active ? '<span class="badge b-success"><i class="ti ti-check"></i> Active</span>' : '<span class="badge b-danger"><i class="ti ti-x"></i> Inactive</span>'}</td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button class="um-action-btn edit" onclick="editUserRole('${u.id}','${u.role}')"><i class="ti ti-pencil"></i> Edit</button>
+              <button class="um-action-btn del" onclick="deactivateUser('${u.id}')"><i class="ti ti-${deactIcon}"></i> ${deactLabel}</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" class="tbl-empty">
+        No users yet. Click <strong>"Create New User"</strong> to add the first librarian or viewer account.<br>
+        <span style="font-size:11px;color:var(--text3);margin-top:6px;display:block;">Note: Make sure the <code>app_users</code> table exists in your Supabase project.</span>
+      </td></tr>`;
+}
+
+/* ══ COLUMN DETECTION ══ */
 function detectColumns(){
   if(STUDENTS.length){
     const s=STUDENTS[0], keys=Object.keys(s);
@@ -767,7 +1154,7 @@ function detectColumns(){
   }
 }
 
-/* ═══ HELPERS ═══ */
+/* ══ HELPERS ══ */
 function bookById(id){return BOOKS.find(b=>String(b.book_id)===String(id))||null;}
 function studentById(id){return STUDENTS.find(s=>String(s[C.s_id])===String(id))||null;}
 function studentName(issue){
@@ -811,10 +1198,22 @@ function fmtDate(d){
   return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 }
 
-/* ═══ RENDER ALL ═══ */
+/* ══ LOST BOOKS (read-only monitoring) ══ */
+const LOST_FEE_PER_PAGE = 50, LOST_FEE_COVER = 1000;
+function calcLostFee(pages){ return (parseInt(pages)||0)*LOST_FEE_PER_PAGE + LOST_FEE_COVER; }
+function fmtFRW(n){ return Number(n||0).toLocaleString('en-US')+' FRW'; }
+function isLost(issue){ return issue.lost===true||issue.lost===1||issue.lost==='true'; }
+function lostFeeOf(issue){
+  if(issue.lost_fee) return issue.lost_fee;
+  const b=bookById(issue[C.i_book]);
+  return calcLostFee(b?b.pages:0);
+}
+
+/* ══ RENDER ALL ══ */
 function renderAll(){
   updateBadges(); renderDashboard(); renderBooks(); renderStudents();
-  renderIssues(); renderOverdue(); renderAnalytics(); renderBorrowLog(); renderDbStatus(); renderConditions();
+  renderIssues(); renderOverdue(); renderLostBooks(); renderAnalytics(); renderBorrowLog(); renderDbStatus(); renderConditions();
+  fetchUsers().then(renderUsers);
 }
 function updateBadges(){
   $('nb-books').textContent=BOOKS.length; $('nb-students').textContent=STUDENTS.length;
@@ -826,6 +1225,10 @@ function updateBadges(){
   $('nb-conditions').textContent=dmg;
   $('nb-conditions').style.background=dmg>0?'rgba(220,38,38,.25)':'rgba(255,255,255,.13)';
   $('nb-conditions').style.color=dmg>0?'#fca5a5':'rgba(255,255,255,.7)';
+  const lost=ISSUES.filter(isLost).length;
+  $('nb-lostbooks').textContent=lost;
+  $('nb-lostbooks').style.background=lost>0?'rgba(220,38,38,.25)':'rgba(255,255,255,.13)';
+  $('nb-lostbooks').style.color=lost>0?'#fca5a5':'rgba(255,255,255,.7)';
 }
 function renderDashboard(){
   const totalCopies=BOOKS.reduce((a,b)=>a+(parseInt(b.tot)||0),0);
@@ -835,6 +1238,12 @@ function renderDashboard(){
   const ov=ISSUES.filter(isOverdue).length; $('s-overdue').textContent=ov;
   const ovSub=$('s-ov-sub'); ovSub.textContent=ov>0?ov+' need action':'✓ None';
   ovSub.className='stat-trend '+(ov>0?'trend-dn':'trend-up');
+  const lostIssues=ISSUES.filter(isLost);
+  const lostStudentsSet=new Set(lostIssues.map(i=>i[C.i_student]));
+  $('s-lostbooks').textContent=lostIssues.length;
+  const lostSub=$('s-lost-sub');
+  lostSub.textContent=lostIssues.length>0?lostStudentsSet.size+' student'+(lostStudentsSet.size>1?'s':'')+' affected':'✓ None';
+  lostSub.className='stat-trend '+(lostIssues.length>0?'trend-dn':'trend-up');
   const recent=[...ISSUES].sort((a,b)=>new Date(b[C.i_issued]||0)-new Date(a[C.i_issued]||0)).slice(0,8);
   $('d-recent').innerHTML=recent.length?recent.map(i=>{
     const st=isReturned(i)?`<span class="badge b-success"><i class="ti ti-check"></i> Returned</span>`:isOverdue(i)?`<span class="badge b-danger"><i class="ti ti-alert-triangle"></i> Overdue</span>`:`<span class="badge b-warning"><i class="ti ti-clock"></i> Pending</span>`;
@@ -877,6 +1286,20 @@ function renderOverdue(){
     return`<tr><td><strong>${studentName(i)}</strong></td><td>${bookSubject(i)}</td><td>${bookCat(i)}</td><td>${bookGrade(i)}</td><td>${fmtDate(i[C.i_issued])}</td><td>${due?fmtDate(due):'—'}</td><td><span class="badge ${cls}">${d} days</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="tbl-empty" style="color:var(--success);">✓ No overdue books — excellent!</td></tr>`;
 }
+
+/* ══ LOST BOOKS RENDER (monitoring — no actions) ══ */
+function renderLostBooks(filter=''){
+  const lost=ISSUES.filter(isLost);
+  const q=filter.toLowerCase();
+  const list=q?lost.filter(i=>`${studentName(i)} ${studentClass(i)} ${bookSubject(i)} ${i.book_code||''}`.toLowerCase().includes(q)):lost;
+  $('lostbooks-count-lbl').textContent=`(${list.length} record${list.length!==1?'s':''})`;
+  $('lostbooks-tbl').innerHTML=list.length?list.map(i=>{
+    const fee=lostFeeOf(i);
+    const b=bookById(i[C.i_book]);
+    const pages=b&&b.pages!=null?b.pages:'—';
+    return`<tr><td><strong>${studentName(i)}</strong></td><td><span class="badge b-purple">${studentClass(i)}</span></td><td>${bookSubject(i)}</td><td><span class="badge b-neutral">${i.book_code||'—'}</span></td><td>${pages}</td><td><span class="fee-badge">${fmtFRW(fee)}</span></td><td>${fmtDate(i.lost_date||i[C.i_issued])}</td><td><span style="font-size:12px;color:var(--text2);">${i.condition_notes||'—'}</span></td></tr>`;
+  }).join(''):`<tr><td colspan="8" class="tbl-empty" style="color:var(--success);">✓ No lost books recorded — great job!</td></tr>`;
+}
 function renderBorrowLog(filter=''){
   const q=filter.toLowerCase();
   const list=q?ISSUES.filter(i=>`${studentName(i)} ${bookSubject(i)} ${bookCat(i)}`.toLowerCase().includes(q)):ISSUES;
@@ -887,7 +1310,7 @@ function renderBorrowLog(filter=''){
   }).join(''):`<tr><td colspan="8" class="tbl-empty">No records</td></tr>`;
 }
 
-/* ═══ ANALYTICS ═══ */
+/* ══ ANALYTICS ══ */
 function renderAnalytics(){
   const now=new Date();let cutoff;
   if(currentPeriod==='month') cutoff=new Date(now.getFullYear(),now.getMonth(),1);
@@ -945,8 +1368,7 @@ function buildInsights(pIssues,rate,ov,borrowed){
   $('an-insights').innerHTML=ins.length?ins.map(i=>`<div class="insight-item"><div class="ins-dot" style="background:${i.c};"></div><div class="ins-text">${i.t}</div></div>`).join(''):`<div class="tbl-empty">Add some book issues to see insights</div>`;
 }
 
-
-/* ═══ BOOK CONDITIONS ═══ */
+/* ══ BOOK CONDITIONS ══ */
 function conditionBadgeClass(c){
   const map={good:'b-condition-good',minor_damage:'b-condition-minor',poor_cover:'b-condition-poor',missing_pages:'b-condition-missing',other:'b-condition-other'};
   return map[c]||'b-neutral';
@@ -958,9 +1380,7 @@ function conditionLabel(c){
 function renderConditions(filter=''){
   const damaged=ISSUES.filter(i=>i.book_condition&&i.book_condition!=='good');
   const q=filter.toLowerCase();
-  const list=q
-    ?damaged.filter(i=>`${studentName(i)} ${bookSubject(i)} ${i.book_condition} ${i.condition_notes||''}`.toLowerCase().includes(q))
-    :damaged;
+  const list=q?damaged.filter(i=>`${studentName(i)} ${bookSubject(i)} ${i.book_condition} ${i.condition_notes||''}`.toLowerCase().includes(q)):damaged;
   $('conditions-count-lbl').textContent=`(${list.length} issue${list.length!==1?'s':''} with problems)`;
   const condTypes=['minor_damage','poor_cover','missing_pages','other'];
   const condIcons={minor_damage:'ti-tool',poor_cover:'ti-book-off',missing_pages:'ti-file-minus',other:'ti-help-circle'};
@@ -970,18 +1390,14 @@ function renderConditions(filter=''){
     const [bg,fg]=condColors[ct].split(',');
     return`<div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:${bg};color:${fg};"><i class="ti ${condIcons[ct]}"></i></div><span class="stat-trend" style="color:${cnt>0?'var(--danger)':'var(--success)'};">${cnt>0?cnt+' book'+(cnt>1?'s':''):'✓ None'}</span></div><div class="stat-val">${cnt}</div><div class="stat-lbl">${conditionLabel(ct)}</div></div>`;
   }).join('');
-  $('conditions-tbl').innerHTML=list.length
-    ?list.map(i=>{
-        const cls=conditionBadgeClass(i.book_condition);
-        const notes=i.condition_notes&&i.condition_notes.trim()
-          ?`<span style="font-size:12px;color:var(--text2);">${i.condition_notes}</span>`
-          :`<span style="color:var(--text3);font-size:12px;">—</span>`;
-        return`<tr><td><strong>${studentName(i)}</strong></td><td>${bookSubject(i)}</td><td>${bookCat(i)}</td><td>${bookGrade(i)}</td><td>${fmtDate(i[C.i_issued])}</td><td><span class="badge ${cls}">${conditionLabel(i.book_condition)}</span></td><td>${notes}</td></tr>`;
-      }).join('')
-    :`<tr><td colspan="7" class="tbl-empty" style="color:var(--success);">✓ All books returned in good condition!</td></tr>`;
+  $('conditions-tbl').innerHTML=list.length?list.map(i=>{
+    const cls=conditionBadgeClass(i.book_condition);
+    const notes=i.condition_notes&&i.condition_notes.trim()?`<span style="font-size:12px;color:var(--text2);">${i.condition_notes}</span>`:`<span style="color:var(--text3);font-size:12px;">—</span>`;
+    return`<tr><td><strong>${studentName(i)}</strong></td><td>${bookSubject(i)}</td><td>${bookCat(i)}</td><td>${bookGrade(i)}</td><td>${fmtDate(i[C.i_issued])}</td><td><span class="badge ${cls}">${conditionLabel(i.book_condition)}</span></td><td>${notes}</td></tr>`;
+  }).join(''):`<tr><td colspan="7" class="tbl-empty" style="color:var(--success);">✓ All books returned in good condition!</td></tr>`;
 }
 
-/* ═══ DB STATUS — updated to show contact card, no old debug text ═══ */
+/* ══ DB STATUS ══ */
 async function renderDbStatus(){
   $('db-auth-st').innerHTML=`<span class="badge b-success"><i class="ti ti-check"></i> Active</span>`;
   $('db-auth-dt').textContent=user?.email||'—';
@@ -1001,17 +1417,17 @@ async function renderDbStatus(){
     check('students','db-stud-st','db-stud-dt'),
     check('book_issues','db-iss-st','db-iss-dt'),
   ]);
-  /* Populate the detected columns row (non-contact part of page) */
-  if(ISSUES.length){
-    $('db-cols-dt').textContent=Object.keys(ISSUES[0]).join(' · ');
-  } else {
-    $('db-cols-dt').textContent='No issues data loaded';
-  }
-  /* Contact card is static HTML — nothing to inject */
+  if(ISSUES.length){ $('db-cols-dt').textContent=Object.keys(ISSUES[0]).join(' · '); }
+  else { $('db-cols-dt').textContent='No issues data loaded'; }
 }
 
-/* ═══ NAVIGATION ═══ */
-const PAGE_TITLES={dashboard:'Dashboard',books:'Books Catalog',students:'Students',issues:'Book Issues',overdue:'Overdue Books',analytics:'Analytics',borrowlog:'Borrow Log',dbstatus:'DB Status',conditions:'Book Conditions'};
+/* ══ NAVIGATION ══ */
+const PAGE_TITLES={
+  dashboard:'Dashboard',books:'Books Catalog',students:'Students',
+  issues:'Book Issues',overdue:'Overdue Books',lostbooks:'Lost Books',
+  analytics:'Analytics',borrowlog:'Borrow Log',dbstatus:'DB Status',
+  conditions:'Book Conditions',users:'User Management'
+};
 function goTo(page){
   document.querySelectorAll('.sb-item[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
   document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
@@ -1032,7 +1448,7 @@ function toast(msg,type='info'){
 }
 function $(id){return document.getElementById(id);}
 
-/* ═══ BIND ═══ */
+/* ══ BIND ══ */
 function bindListeners(){
   $('login-btn').addEventListener('click',doLogin);
   $('register-btn').addEventListener('click',doRegister);
@@ -1046,6 +1462,7 @@ function bindListeners(){
   $('books-search').addEventListener('input',e=>renderBooks(e.target.value));
   $('students-search').addEventListener('input',e=>renderStudents(e.target.value));
   $('issues-search').addEventListener('input',e=>renderIssues(e.target.value));
+  $('lostbooks-search').addEventListener('input',e=>renderLostBooks(e.target.value));
   $('log-search').addEventListener('input',e=>renderBorrowLog(e.target.value));
   $('conditions-search').addEventListener('input',e=>renderConditions(e.target.value));
   document.querySelectorAll('.ptab').forEach(t=>t.addEventListener('click',()=>{
@@ -1053,9 +1470,29 @@ function bindListeners(){
     t.classList.add('active'); currentPeriod=t.dataset.period; renderAnalytics();
   }));
   ['login-email','login-password'].forEach(id=>$(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();}));
+
+  /* Admin portal buttons */
+  $('admin-portal-btn').addEventListener('click', launchAdminPortal);
+  $('topbar-admin-btn').addEventListener('click', launchAdminPortal);
+  $('portal-launch-btn-page').addEventListener('click', launchAdminPortal);
+
+  /* User management */
+  $('um-new-btn').addEventListener('click', () => {
+    umReset();
+    $('um-form-card').style.display = 'block';
+    $('um-form-card').scrollIntoView({ behavior: 'smooth' });
+  });
+  $('um-cancel-btn').addEventListener('click', umReset);
+  $('um-submit-btn').addEventListener('click', () => {
+    if (umMode === 'create') createUser();
+    else saveUserEdit();
+  });
+  document.querySelectorAll('.um-role-pill').forEach(p => {
+    p.addEventListener('click', () => setRole(p.dataset.role));
+  });
 }
 
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
